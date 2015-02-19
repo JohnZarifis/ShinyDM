@@ -1,7 +1,6 @@
 ### Version 14.02.2015
 
 library("shiny")
-library("shinythemes")
 library("lubridate")
 library("mgcv")
 library("htmltools")
