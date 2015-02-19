@@ -19,7 +19,7 @@ df <- create_dataset(Dataset)
 
 #-----------------------------------------------------------------------------------------------------
 sidebarUni <- sidebarPanel(
-  
+  #fixed responsive img #added class img
   img(src="Aquamanager-logo.png" ,class = "img-responsive"),
   
   h2("Dimensions"),
