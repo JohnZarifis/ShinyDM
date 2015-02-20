@@ -4,6 +4,7 @@ library("shiny")
 library("lubridate")
 library("mgcv")
 library("htmltools")
+#library("shinythemes")
 
 
 # load helpers.R file
@@ -137,22 +138,26 @@ sidebarUni <- sidebarPanel(
 
 #----------------------------------------------------
 # 
-shinyUI( 
-  navbarPage( theme = "bootstrap.css",
+shinyUI( sidebarLayout(theme = "bootstrap.css", 
+  conditionalPanel(
+    condition = "input.SideBar == false",
+    sidebarUni),
+  
+  mainPanel(
+  navbarPage( 
               "Aquamanager Data Miner", 
               #---------------------------------------------------------- First MenuPage
               tabPanel(" Univariate Statistics ", id="MenuPage_1", 
-                       fluidPage( theme = "bootstrap.css", 
+                       fluidPage( #theme = "bootstrap.css", 
                                  # titlePanel("Exploratory Data Analysis"),
-                                  sidebarLayout(
-                                    sidebarUni,
-                              
-                                    mainPanel(
+                                  
                                       tabsetPanel(
                                         tabPanel("Histograms",
                                                    fluidRow(column(3, sliderInput("numbins", "Number of bins:", 
                                                                                   min = 5, max = 100, 
-                                                                                  value = 20, step=1))), 
+                                                                                  value = 20, step=1)),
+                                                            column(6,checkboxInput("SideBar", "Hide SideBar"))
+                                                            ), 
                                                    fluidRow(plotOutput("histPlotAvWeight")),
                                                    fluidRow( plotOutput("histPlotPeriod.FCR")),
                                                    fluidRow( plotOutput("histPlotEcon.FCR")),
@@ -220,7 +225,7 @@ shinyUI(
 
 # ---------------------------------------------------------- Second MenuPage
             tabPanel(" Multivariate Statistics ", id="MenuPage_2", 
-                fluidPage( theme = shinytheme("cerulean"),
+                fluidPage( #theme = shinytheme("cerulean"),
                           #titlePanel("Exploratory Data Analysis"),
                           fluidRow( column(9, radioButtons("radioDimMulti", label = h3("Separate The Dataset By:"), 
                                                       choices = list("None", "Orientation", "System", "Batch", "Section", "Hatchery",
@@ -323,7 +328,7 @@ shinyUI(
 
 #---------------------------------------------------------- Third MenuPage
             tabPanel(" Multidimensional Dashboard ", id="MenuPage_3", 
-                      fluidPage( theme = shinytheme("cerulean"),
+                      fluidPage( #theme = shinytheme("cerulean"),
                                  plotOutput('plotDashboard',height="600px"),
                                  hr(),
                                  fluidRow(
@@ -429,7 +434,7 @@ shinyUI(
 
 #---------------------------------------------------------- Forth MenuPage
 tabPanel(" Regression Models ", id="MenuPage_4", 
-          fluidPage( theme = shinytheme("cerulean"),
+          fluidPage( #theme = shinytheme("cerulean"),
                     sidebarPanel(
                       img(src="Aquamanager-logo.png",class = "img-responsive"),
                       hr(),
@@ -538,7 +543,7 @@ tabPanel(" Regression Models ", id="MenuPage_4",
 
 #---------------------------------------------------------- fifth MenuPage
 tabPanel(" Analysis Of Variance ", id="MenuPage_5", 
-        fluidPage( theme = shinytheme("cerulean"),
+        fluidPage( # theme = shinytheme("cerulean"),
               sidebarPanel(
                      img(src="Aquamanager-logo.png",class = "img-responsive"),
                      hr(),
@@ -577,10 +582,7 @@ tabPanel(" Analysis Of Variance ", id="MenuPage_5",
               ) # end mainPanel
                 
         ) # end fluidPage
-)  # end tabPanel ANOVA   
-
-
-
+    )  # end tabPanel ANOVA   
   ) # end navbarPage
 ) # end shinyUI                                               
                                                    
