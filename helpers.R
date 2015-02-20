@@ -126,5 +126,15 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
 
 ######-------end of function-----------####
 
+x<-4
+
+HideSidebar <- function(ver){
+  if(ver == F) {
+    x<-4
+  }
+  x<-0
+  return(x)
+  
+}
 
 

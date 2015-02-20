@@ -6,7 +6,7 @@
 #
 
 library("shiny")
-library("shinythemes")
+
 library("graphics")
 library("ggplot2")
 library("lattice")
@@ -277,6 +277,7 @@ shinyServer(function(input, output, session){
       data <- subset(data, End.Av.Weight.BioCat %in% c(input$groupEndAvWeightBioCat))
     }
     
+    
     data <- data[ data$End.Av.Weight >= as.numeric(input$rangeAvWeight[1]) & data$End.Av.Weight <= as.numeric(input$rangeAvWeight[2]) 
                & data$Av.Weight.Deviation >= as.numeric(input$rangeAvWeightDev[1])
                & data$Av.Weight.Deviation <= as.numeric(input$rangeAvWeightDev[2]) 
@@ -297,12 +298,25 @@ shinyServer(function(input, output, session){
     
     class(data$ProductionTimeDays)
     
-#   For debugging  
+# #For debugging  
 # View(data)
-#   str(data)
-#   print(nrow(data))
+# str(data)
+# print(nrow(data))
     return(data)
-  })  
+  })
+
+  variable <- reactive ({ 
+    if(input$HideSidebar == TRUE){
+      HideSidebar(T)
+    }
+     else{HideSidebar(F)}
+    return(x)
+    })
+
+
+output$var <- renderText({
+   variable
+})
   
   
 #---------------------------------------------------------------------------------------------------

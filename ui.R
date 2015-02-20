@@ -17,7 +17,8 @@ Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
 df <- create_dataset(Dataset)
 
 #-----------------------------------------------------------------------------------------------------
-sidebarUni <- sidebarPanel(
+sidebarUni <- sidebarPanel( width = HideSidebar(F),
+  
   #fixed responsive img #added class img
   img(src="Aquamanager-logo.png" ,class = "img-responsive"),
   
@@ -138,16 +139,28 @@ sidebarUni <- sidebarPanel(
 #----------------------------------------------------
 # 
 shinyUI( 
-  navbarPage( theme = "bootstrap.css",
-              "Aquamanager Data Miner", 
-              #---------------------------------------------------------- First MenuPage
-              tabPanel(" Univariate Statistics ", id="MenuPage_1", 
-                       fluidPage( theme = "bootstrap.css", 
-                                 # titlePanel("Exploratory Data Analysis"),
+  navbarPage( 
+              #title="Aquamanager Data Miner",
+              #theme = "bootstrap.css",               
+              tags$head(   
+                tags$link(rel = "stylesheet", type = "text/css", href = "bootstrap.css"),
+                tags$link(rel = "stylesheet", type = "text/css", href = "simple-sidebar.css")
+                
+                  
+               
+                ),
+               
+             
+              #----------------First MenuPage
+              tabPanel(" Univariate Statistics ",id="sidebar-wrapper",  class = "active",#id="MenuPage_1",
+                       fluidPage( #theme = "bootstrap.css", 
+                                 # titlePanel("Exploratory Data Analysis"),                                 
                                   sidebarLayout(
                                     sidebarUni,
                               
-                                    mainPanel(
+                                    mainPanel( width = 10,
+                                               checkboxInput("HideSidebar", "Hide the Sidebar", FALSE),
+                                      #tags$a(href="#menu-toggle", class="btn btn-default" ,id="menu-toggle" ,"Close Sidebar") ,
                                       tabsetPanel(
                                         tabPanel("Histograms",
                                                    fluidRow(column(3, sliderInput("numbins", "Number of bins:", 
@@ -220,7 +233,7 @@ shinyUI(
 
 # ---------------------------------------------------------- Second MenuPage
             tabPanel(" Multivariate Statistics ", id="MenuPage_2", 
-                fluidPage( theme = shinytheme("cerulean"),
+                fluidPage( #theme = shinytheme("cerulean"),
                           #titlePanel("Exploratory Data Analysis"),
                           fluidRow( column(9, radioButtons("radioDimMulti", label = h3("Separate The Dataset By:"), 
                                                       choices = list("None", "Orientation", "System", "Batch", "Section", "Hatchery",
@@ -323,7 +336,7 @@ shinyUI(
 
 #---------------------------------------------------------- Third MenuPage
             tabPanel(" Multidimensional Dashboard ", id="MenuPage_3", 
-                      fluidPage( theme = shinytheme("cerulean"),
+                      fluidPage( #theme = shinytheme("cerulean"),
                                  plotOutput('plotDashboard',height="600px"),
                                  hr(),
                                  fluidRow(
@@ -429,7 +442,7 @@ shinyUI(
 
 #---------------------------------------------------------- Forth MenuPage
 tabPanel(" Regression Models ", id="MenuPage_4", 
-          fluidPage( theme = shinytheme("cerulean"),
+          fluidPage( #theme = shinytheme("cerulean"),
                     sidebarPanel(
                       img(src="Aquamanager-logo.png",class = "img-responsive"),
                       hr(),
@@ -538,7 +551,7 @@ tabPanel(" Regression Models ", id="MenuPage_4",
 
 #---------------------------------------------------------- fifth MenuPage
 tabPanel(" Analysis Of Variance ", id="MenuPage_5", 
-        fluidPage( theme = shinytheme("cerulean"),
+        fluidPage( #theme = shinytheme("cerulean"),
               sidebarPanel(
                      img(src="Aquamanager-logo.png",class = "img-responsive"),
                      hr(),
@@ -579,7 +592,11 @@ tabPanel(" Analysis Of Variance ", id="MenuPage_5",
         ) # end fluidPage
 )  # end tabPanel ANOVA   
 
-
+,tags$script(src="jquery.js"),                
+tags$script(src= ' $("#menu-toggle").click(function(e) {
+                            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+            });')
 
   ) # end navbarPage
 ) # end shinyUI                                               
