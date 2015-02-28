@@ -1,4 +1,4 @@
-### Version 14.02.2015
+### Version 28.02.2015
 # This is the server logic for a Shiny web application.
 # You can find out more about building applications with Shiny here:
 # 
@@ -1822,6 +1822,75 @@ output$plot.TukeyHSD <- renderPlot({
       plot(TukeyHSD(mod))
     })
   }  
+})
+
+#---------------------------------------------------------------------------------------------------
+#     Classification
+#---------------------------------------------------------------------------------------------------
+
+# If the problem is for classification then the targets variable are categorical, else regression
+output$targs.Variables <- renderUI({ 
+  if (input$radioDesTree == 1){
+    var <- list("End.Av.Weight.BioCat", "Class")
+    radioButtons(inputId='TargVar', label=h3('Target Variable:'), choices=var, selected=var[[1]])
+  } else if (input$radioDesTree == 2){
+    var <- list("Econ.FCR.Period", "LTD.Econ.FCR", "SFR.Period", "SGR.Period")
+    radioButtons(inputId='TargVar', label=h3('Target Variable:'), choices=var, selected=var[[1]])
+  } 
+})  # end renderUI targs.Variables
+
+output$preds.Variables <- renderUI({
+  Vars <- names(data)
+  indep.vars <- Vars[ Vars != input$TargVar]
+  selectInput(inputId='preds.Vars', label=h3('Predictors:'), choices=c("All", indep.vars), selected="All", multiple=TRUE)
+})  # end renderUI preds.Variables
+
+
+runClassRegTrees <- reactive({
+  
+  vars <- names(data)
+  indep.vars <- vars[ vars != input$TargVar ]
+  
+  if (input$preds.Vars == "All"){
+    fmla <- as.formula(paste(input$TargVar," ~ ",paste( indep.vars, collapse="+")))
+  }else{       
+    fmla <- as.formula(paste(input$TargVar," ~ ",paste( input$preds.Vars, collapse="+"))) 
+  }
+  
+  # The training set comes from the initial dataset!!!!
+  dset.train <- data[, names(data) %in% vars]   
+  
+  if (input$radioDesTree == 1){
+    # dec.Tree <- rpart(formula=fmla, data=dset.train, method="class", model=T, parms = list(split = "gini") )
+    # dec.Tree <- ctree(formula=fmla, data=dset.train, controls=ctree_control(minsplit=20, minbucket=20, maxdepth=5) )
+    dec.Tree <- rpart(formula=fmla, data=dset.train, method="class", model=T, parms = list(split = "gini"), 
+                      control = rpart.control(minsplit = 50, minbucket = round(50/3), cp = 1e-3, xval = 20))
+    
+    # prune the tree
+    opt <- which.min(dec.Tree$cptable[,"xerror"])
+    cp <- dec.Tree$cptable[opt, "CP"]
+    dec.Tree <- prune( dec.Tree, cp = cp)
+    
+  } else if (input$radioDesTree == 2){   
+    dec.Tree <- rpart(formula=fmla, data=dset.train, method="anova", model=T, parms = list(split = "gini"), 
+                      control = rpart.control(minsplit = 50, minbucket = round(50/3), cp = 1e-3, xval = 20))
+    # prune the tree
+    opt <- which.min(dec.Tree$cptable[,"xerror"])
+    cp <- dec.Tree$cptable[opt, "CP"]
+    dec.Tree <- prune( dec.Tree, cp = cp)
+    
+  }  
+  return(dec.Tree)
+})
+
+output$plot_dec.Tree <- renderPlot({ 
+  class.reg.Tree <- runClassRegTrees()
+  if (input$radioDesTree == 1){
+    plot(as.party(class.reg.Tree))
+  } else if (input$radioDesTree == 2){
+    plot(as.party(class.reg.Tree))
+    # draw.tree(class.reg.Tree, cex=0.7, units="Species", cases="cells", nodeinfo=TRUE, digits=2, print.levels=F)
+  }
 })
 
 

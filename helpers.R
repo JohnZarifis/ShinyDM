@@ -1,4 +1,4 @@
-### Version 14.02.2015
+### Version 28.02.2015
 #
 # ------------------------
 # Create the dataset
@@ -59,7 +59,8 @@ create_dataset <- function(dataset){
                      "End.Av.Weight.BioCat" = dataset$End.Av.Weight.BioCat,
                      "Age" = dataset$AGE, 
                      "Batch.Start.Date" = dmy(dataset$BATCH.START.DATE),
-                     "Days" = interval( dmy(dataset$From), dmy(dataset$To) )%/%days(1)
+                     "Days" = interval( dmy(dataset$From), dmy(dataset$To) )%/%days(1),
+                     "Class" = dataset$CLASS
                     )
   
   #   For debugging  
