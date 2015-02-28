@@ -220,7 +220,7 @@ shinyUI(
 
 # ---------------------------------------------------------- Second MenuPage
             tabPanel(" Multivariate Statistics ", id="MenuPage_2", 
-                fluidPage( theme = shinytheme("cerulean"),
+                fluidPage( #theme = shinytheme("cerulean"),
                           #titlePanel("Exploratory Data Analysis"),
                           fluidRow( column(9, radioButtons("radioDimMulti", label = h3("Separate The Dataset By:"), 
                                                       choices = list("None", "Orientation", "System", "Batch", "Section", "Hatchery",
@@ -323,7 +323,7 @@ shinyUI(
 
 #---------------------------------------------------------- Third MenuPage
             tabPanel(" Multidimensional Dashboard ", id="MenuPage_3", 
-                      fluidPage( theme = shinytheme("cerulean"),
+                      fluidPage( #theme = shinytheme("cerulean"),
                                  plotOutput('plotDashboard',height="600px"),
                                  hr(),
                                  fluidRow(
@@ -429,7 +429,7 @@ shinyUI(
 
 #---------------------------------------------------------- Forth MenuPage
 tabPanel(" Regression Models ", id="MenuPage_4", 
-          fluidPage( theme = shinytheme("cerulean"),
+          fluidPage( #theme = shinytheme("cerulean"),
                     sidebarPanel(
                       img(src="Aquamanager-logo.png",class = "img-responsive"),
                       hr(),
@@ -538,7 +538,7 @@ tabPanel(" Regression Models ", id="MenuPage_4",
 
 #---------------------------------------------------------- fifth MenuPage
 tabPanel(" Analysis Of Variance ", id="MenuPage_5", 
-        fluidPage( theme = shinytheme("cerulean"),
+        fluidPage( # theme = shinytheme("cerulean"),
               sidebarPanel(
                      img(src="Aquamanager-logo.png",class = "img-responsive"),
                      hr(),
