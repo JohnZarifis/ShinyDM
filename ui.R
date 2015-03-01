@@ -580,44 +580,44 @@ tabPanel(" Analysis Of Variance ", id="MenuPage_5",
 #---------------------------------------------------------- sixth MenuPage
 tabPanel(" Classification ", id="MenuPage_6",
          fluidPage( # theme = shinytheme("cerulean"),
-                    titlePanel(" Decision Trees "),
-                    sidebarLayout(
-                      sidebarPanel(
-                        img(src="Aquamanager-logo.png"),
-                        hr(),
-                        img(src="classification.png"),
-                        hr(),
-                        radioButtons("radioDesTree", label = h3("Decision Tree for:"), choices = list("Classification"=1, "Regression"=2), selected=2),
-                        hr(),
-                        uiOutput("targs.Variables"),
-                        hr(),
-                        uiOutput("preds.Variables")
-                      ),  # end sidebarPanel 
-                      mainPanel(tabsetPanel( 
-                        tabPanel("Build the Tree",
-                                 fluidRow(column(12, plotOutput("plot_dec.Tree") ))
-#                                  ,
-#                                  hr(),
-                             #    h4(' Information on the predictive accuracy of the Tree:'),
-                            #     fluidRow(column(12, verbatimTextOutput("info_tree_abs_relacc") )),
-                            #     hr(),
-#                                  fluidRow(column(12, dataTableOutput("info_tree_acc") )),
-#                                  hr(),
-#                                  h4(' Relative Importance:'),      
-#                                  fluidRow(column(12, plotOutput("plot_RegClass.Rel.Impo"))),
-#                                  hr(),
-#                                  fluidRow(column(12, verbatimTextOutput("RegClass.Rel.Impo"))),              
-#                                  hr(),
-#                                  h4(' Rules of the Tree:'),
-#                                  fluidRow(column(12, verbatimTextOutput("print_Tree.rules") ))
-                        ) # end tabPanel "Build"
-                        #    tabPanel("Predict with it",
-                        #                fluidRow(column(12, dataTableOutput(outputId="test.set.class.prediction")))  
-                        #              ) # end tabPanel "Predict"
-                      ) # end tabsetPanel
-                      ) # end mainPanel
-                      
-                    ) # end sidebarLayout
+           sidebarPanel(
+             img(src="Aquamanager-logo.png",class = "img-responsive"),
+             hr(),
+             radioButtons("radioDesTree", label = h3("Decision Tree for:"), choices = list("Classification"=1, "Regression"=2), selected=1),
+             hr(),
+             uiOutput("targs.Variables"),
+             hr(),
+             uiOutput("preds.Variables"),
+             hr(),
+             actionButton(inputId = 'goDT',  label = 'Start Analysis')
+           ),  # end sidebarPanel 
+          mainPanel(tabsetPanel( 
+                tabPanel("Build the Tree",
+                       h4('Formula:'), 
+                       fluidRow(column(12, verbatimTextOutput("fmla.dec.Trees"))),
+                       hr(),
+                       fluidRow(column(12, plotOutput("plot_dec.Tree") )),
+                       
+                       h4(' Information on the predictive accuracy of the Tree:'),
+                       fluidRow(column(12, verbatimTextOutput("info_tree_abs_relacc") )),
+                       hr(),
+                       h4(' Relative Importance:'),      
+                       fluidRow(column(12, plotOutput("plot_RegClass.Rel.Impo"))),
+                       hr(),
+                       fluidRow(column(12, verbatimTextOutput("RegClass.Rel.Impo"))),              
+                       hr(),
+                       fluidRow(column(12, dataTableOutput("info_tree_acc") )),
+                       hr(),
+                       h4(' Rules of the Tree:'),
+                       fluidRow(column(12, verbatimTextOutput("print_Tree.rules") ))
+                       
+                      ), # end tabPanel "Build"
+                tabPanel("Predict with it"
+                      # fluidRow(column(12, dataTableOutput(outputId="test.set.class.prediction")))  
+                      ) # end tabPanel "Predict"
+              ) # end tabsetPanel
+           ) # end mainPanel
+   
          ) # end fluidPage
 ) # end tabPanel " Classification "
 

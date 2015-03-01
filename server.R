@@ -17,11 +17,13 @@ library("lubridate")
 library("plyr")
 library("GGally")
 library("e1071")
+library("rpart")
+library("party")
+library("partykit")
 library("Hmisc")
 library("effects")
 library("car")
 library("relaimpo")
-library("car")
 library("ROCR")
 library("fpc")
 library("randomForest")
@@ -29,7 +31,6 @@ library("maptree")
 library("nlme")
 library("mgcv")
 library("htmltools")
-
 
 
 # load helpers.R file
@@ -1831,7 +1832,7 @@ output$plot.TukeyHSD <- renderPlot({
 # If the problem is for classification then the targets variable are categorical, else regression
 output$targs.Variables <- renderUI({ 
   if (input$radioDesTree == 1){
-    var <- list("End.Av.Weight.BioCat", "Class")
+    var <- list("Class", "End.Av.Weight.BioCat")
     radioButtons(inputId='TargVar', label=h3('Target Variable:'), choices=var, selected=var[[1]])
   } else if (input$radioDesTree == 2){
     var <- list("Econ.FCR.Period", "LTD.Econ.FCR", "SFR.Period", "SGR.Period")
@@ -1840,29 +1841,35 @@ output$targs.Variables <- renderUI({
 })  # end renderUI targs.Variables
 
 output$preds.Variables <- renderUI({
+  data <- passData() 
   Vars <- names(data)
-  indep.vars <- Vars[ Vars != input$TargVar]
-  selectInput(inputId='preds.Vars', label=h3('Predictors:'), choices=c("All", indep.vars), selected="All", multiple=TRUE)
+  indep.vars <- Vars[ Vars != input$TargVar] 
+  selectInput(inputId='preds.Vars', label=h3('Predictors:'), choices=indep.vars, multiple=TRUE)
 })  # end renderUI preds.Variables
 
 
+output$fmla.dec.Trees <- renderText({
+  if (input$goDT == 0){
+    return() }
+  else{ 
+    isolate({   
+        fmla = paste( as.character(input$TargVar), 
+                      paste(as.character(input$preds.Vars), collapse=" + "), sep=" ~ " )
+    })  # end isolate
+  } # end if...else
+})
+
 runClassRegTrees <- reactive({
   
-  vars <- names(data)
-  indep.vars <- vars[ vars != input$TargVar ]
+  list.vars <- list(input$TargVar, input$preds.Vars)
   
-  if (input$preds.Vars == "All"){
-    fmla <- as.formula(paste(input$TargVar," ~ ",paste( indep.vars, collapse="+")))
-  }else{       
-    fmla <- as.formula(paste(input$TargVar," ~ ",paste( input$preds.Vars, collapse="+"))) 
-  }
+  # "data": dataset that based on the user choices in the first page
+  data <- passData()  
+  dset.train <- data[ , names(data) %in% unlist(list.vars) ]
   
-  # The training set comes from the initial dataset!!!!
-  dset.train <- data[, names(data) %in% vars]   
+  fmla <- as.formula( paste(input$TargVar, paste(input$preds.Vars, collapse="+"), sep=" ~ ") )      
   
   if (input$radioDesTree == 1){
-    # dec.Tree <- rpart(formula=fmla, data=dset.train, method="class", model=T, parms = list(split = "gini") )
-    # dec.Tree <- ctree(formula=fmla, data=dset.train, controls=ctree_control(minsplit=20, minbucket=20, maxdepth=5) )
     dec.Tree <- rpart(formula=fmla, data=dset.train, method="class", model=T, parms = list(split = "gini"), 
                       control = rpart.control(minsplit = 50, minbucket = round(50/3), cp = 1e-3, xval = 20))
     
@@ -1884,15 +1891,91 @@ runClassRegTrees <- reactive({
 })
 
 output$plot_dec.Tree <- renderPlot({ 
-  class.reg.Tree <- runClassRegTrees()
-  if (input$radioDesTree == 1){
-    plot(as.party(class.reg.Tree))
-  } else if (input$radioDesTree == 2){
-    plot(as.party(class.reg.Tree))
-    # draw.tree(class.reg.Tree, cex=0.7, units="Species", cases="cells", nodeinfo=TRUE, digits=2, print.levels=F)
+  if (input$goDT == 0){
+    return() }
+  else{ 
+    isolate({  
+        class.reg.Tree <- runClassRegTrees()
+        if (input$radioDesTree == 1){
+            plot(as.party(class.reg.Tree))
+        } else if (input$radioDesTree == 2){
+            plot(as.party(class.reg.Tree))
+        }
+    })
+  }    
+})
+
+output$info_tree_abs_relacc <- renderPrint({
+  if (input$goDT == 0){
+    return() }
+  else{ 
+    isolate({  
+      class.reg.Tree <- runClassRegTrees()
+      n=nrow(class.reg.Tree$model)
+      Root.node.error = class.reg.Tree$frame$dev[1]/n
+      rel.err <- min(class.reg.Tree$cptable[,3])
+      resubstitution.error.rate = rel.err*Root.node.error*100
+      xrel.err <- min(class.reg.Tree$cptable[,4])
+      absolute.cross.validated.error = xrel.err*Root.node.error*100   
+      
+      res.mat <- matrix( c( rel.err*100, resubstitution.error.rate, xrel.err*100, absolute.cross.validated.error ), c(1,4) )
+      colnames(res.mat) <- c( " Rel.Error (%) ", " Resubstitution Error Rate ",  " Cross-Val. Error (%)", " Abs. Cross-Val. Error " )
+      print(res.mat[1,], row.names=FALSE, digits=3, justify="left")
+    })
   }
 })
 
+output$info_tree_acc <- renderDataTable({  
+  if (input$goDT == 0){
+    return() }
+  else{ 
+    isolate({  
+        class.reg.Tree <- runClassRegTrees()
+        table <- class.reg.Tree$cptable   
+        colnames(table)<-c("Complexity Parameter (CP)", "No Splits", "Relative Error", "Cross-Validated Error", "Cross-Validated Standard Deviation" )
+        print(table, digits=3, justify="left", width='minimum')
+    })
+  }
+})
 
+output$RegClass.Rel.Impo <- renderPrint({
+  if (input$goDT == 0){
+    return() }
+  else{ 
+    isolate({  
+        class.reg.Tree <- runClassRegTrees()
+        rel.imp <- 100*class.reg.Tree$variable.importance/sum(class.reg.Tree$variable.importance)
+        print(rel.imp, row.names=FALSE, digits=3, justify="left")
+    })
+  }
+})          
+
+output$plot_RegClass.Rel.Impo <- renderPlot({ 
+  if (input$goDT == 0){
+    return() }
+  else{ 
+    isolate({  
+        class.reg.Tree <- runClassRegTrees()
+        rel.imp <- 100*class.reg.Tree$variable.importance/sum(class.reg.Tree$variable.importance)
+        barplot(rel.imp, xlab='% of Responce Variance', main=paste('Relative Importances for', input$responseVar, sep=' '), horiz=TRUE, 
+                las=1,cex.names=0.8, col='blue')
+    })
+  }
+})
+
+output$print_Tree.rules <- renderPrint({
+  if (input$goDT == 0){
+    return() }
+  else{ 
+    isolate({  
+        class.reg.Tree <- runClassRegTrees()
+        print(class.reg.Tree)
+    })
+  }
+})
+#---------------------------------------------------------------------------------------------------
+# Tab: Predict with the Classification Tree
+#
+  
   
 }) # end shinyServer
