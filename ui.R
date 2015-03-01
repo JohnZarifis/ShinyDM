@@ -611,10 +611,10 @@ tabPanel(" Classification ", id="MenuPage_6",
                        h4(' Rules of the Tree:'),
                        fluidRow(column(12, verbatimTextOutput("print_Tree.rules") ))
                        
-                      ), # end tabPanel "Build"
-                tabPanel("Predict with it"
+                      ) # end tabPanel "Build"
+                # tabPanel("Predict with it"
                       # fluidRow(column(12, dataTableOutput(outputId="test.set.class.prediction")))  
-                      ) # end tabPanel "Predict"
+                # ) # end tabPanel "Predict"
               ) # end tabsetPanel
            ) # end mainPanel
    
