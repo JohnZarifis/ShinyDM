@@ -21,8 +21,23 @@ df <- create_dataset(Dataset)
 
 header <- dashboardHeader(
   title = "Aqua Miner",
+  dropdownMenu(badgeStatus = "success",
+               menuItem("Dashboard",tabName = "dashboard", icon = icon("dashboard")),
+               menuItem("Widgets", icon = icon("th"), tabName = "widgets", badgeLabel = "new",
+                        badgeColor = "green"),
+               menuItem("Charts", icon = icon("bar-chart-o"),
+                        menuSubItem("Sub-item 1", tabName = "subitem1"),
+                        menuSubItem("Sub-item 2", tabName = "subitem2"),
+                        menuSubItem(sliderInput("orders", "Orders", min = 1, max = 500, value = 120))
+               )
+               
+               
+               ),
   # Messages
   dropdownMenu(type = "messages", badgeStatus = "success",
+               menuItem("Dashboard",tabName = "dashboard", icon = icon("dashboard")),
+               menuItem("Widgets", icon = icon("th"), tabName = "widgets", badgeLabel = "new",
+                        badgeColor = "green"),
                messageItem("Support Team",
                            "Message content here.",
                            time = "5 mins"
@@ -39,7 +54,7 @@ header <- dashboardHeader(
   # Notifications
   dropdownMenu(type = "notifications", badgeStatus = "warning",
                notificationItem(icon = icon("users"), status = "info",
-                                "5 new members joined today"
+                                "5 new members joined today",href = "#shiny-tab-widgets"
                ),
                notificationItem(icon = icon("warning"), status = "danger",
                                 "Very long description here that may not fit into the page and may cause design problems"
@@ -82,7 +97,9 @@ sidebar <- dashboardSidebar(
     menuItem("Charts", icon = icon("bar-chart-o"),
              menuSubItem("Sub-item 1", tabName = "subitem1"),
              menuSubItem("Sub-item 2", tabName = "subitem2"),
-             menuSubItem(sliderInput("orders", "Orders", min = 1, max = 500, value = 120))
+             sliderInput("orders1", "Orders", min = 1, max = 500, value = 12),
+             menuSubItem(sliderInput("months1", label = "Months to Predict",
+                         value = 72, min = 12, max = 144, step = 12, ticks = FALSE))
     ),
     menuItem("Source code for app", icon = icon("file-code-o"),
              href = "https://gist.github.com/wch/8957ee5e2d79770abf9a")
@@ -108,7 +125,7 @@ body <- dashboardBody(
             # Boxes
             fluidRow(
               box(status = "primary", width = 6,
-                  sliderInput("orders", "Orders", min = 1, max = 500, value = 120),
+                  sliderInput("orders", "Orders", min = 1, max = 500, value = 420),
                   selectInput("progress", "Progress",
                               choices = c("0%" = 0, "20%" = 20, "40%" = 40, "60%" = 60, "80%" = 80,
                                           "100%" = 100)
