@@ -17,7 +17,7 @@ Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
 df <- create_dataset(Dataset)
 
 #-----------------------------------------------------------------------------------------------------
-sidebarUni <- sidebarPanel( width = HideSidebar(F),
+sidebarUni <- sidebarPanel( width = 4,
   
   #fixed responsive img #added class img
   img(src="Aquamanager-logo.png" ,class = "img-responsive"),
@@ -158,7 +158,7 @@ shinyUI(
                                   sidebarLayout(
                                     sidebarUni,
                               
-                                    mainPanel( width = 10,
+                                    mainPanel( width = 8,
                                                checkboxInput("HideSidebar", "Hide the Sidebar", FALSE),
                                       #tags$a(href="#menu-toggle", class="btn btn-default" ,id="menu-toggle" ,"Close Sidebar") ,
                                       tabsetPanel(
