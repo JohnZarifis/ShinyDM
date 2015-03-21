@@ -140,6 +140,7 @@ sidebarUni <- sidebarPanel(
 shinyUI( 
   navbarPage( theme = "bootstrap.css",
               "Aquamanager Data Miner", 
+              
               #---------------------------------------------------------- First MenuPage
               tabPanel(" Univariate Statistics ", id="MenuPage_1", 
                        fluidPage( theme = "bootstrap.css", 
