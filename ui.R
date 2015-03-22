@@ -17,11 +17,12 @@ Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
 # Call function to create the dataset for analysis
 df <- create_dataset(Dataset)
 
-#-------------------------------Header------------------------------------------------------
+#----------------Header------------------------------------------------------
 
 header <- dashboardHeader(
   title = "Aqua Miner",
   # Messages
+  
   dropdownMenu(type = "messages", badgeStatus = "success",
                menuItem("Dashboard",tabName = "dashboard", icon = icon("dashboard")),
                menuItem("Widgets", icon = icon("th"), tabName = "widgets", badgeLabel = "new",
@@ -77,9 +78,16 @@ header <- dashboardHeader(
 #---------------Sidebar----------------------------------------------------------------------
 
 sidebar <- dashboardSidebar(
+  img(src="Aquamanager-logo.png" ,class = "img-responsive"),
+  actionButton(inputId = 'goUniPlot',  label = ' Refresh Univariate plots',icon =icon("signal")),
+  #actionButton("goButton", "Go!"),
   #---sidebarSearchForm(label = "Enter approval number", "approvalText", "approvalButton"),
+  
   sidebarMenu(
-    menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+    menuItem("Navigation",  icon = icon("navicon"),
+             menuSubItem("Univariate", tabName = "Univariate",icon = icon("signal")),
+             menuSubItem("Sub-item 2", tabName = "subitem2")
+             ),
     menuItem("Widgets", icon = icon("th"), tabName = "widgets", badgeLabel = "new",
              badgeColor = "green"),
     menuItem("Charts", icon = icon("bar-chart-o"),
@@ -87,47 +95,101 @@ sidebar <- dashboardSidebar(
              menuSubItem("Sub-item 2", tabName = "subitem2")
              
     ),
-    menuItem("Filters",icon = icon("bar-chart-o"),
-             menuSubItem( sliderInput("orders", "Orders", min = 1, max = 500, value = 120)),
+    menuItem("Filters",icon = icon("shield"),
+             menuSubItem( icon=NULL,sliderInput("orders", "Orders", min = 1, max = 500, value = 120)),
              menuSubItem( selectInput("progress", "Progress",
                                       choices = c("0%" = 0, "20%" = 20, "40%" = 40, "60%" = 60, "80%" = 80,
                                                   "100%" = 100)
                          ) )
     ),
-    menuItem("Source code for app", icon = icon("file-code-o"),
-             href = "https://gist.github.com/wch/8957ee5e2d79770abf9a")
+  
+    menuItem("Dimensions",icon = icon("cubes"),
+             menuSubItem(icon=NULL,
+               selectInput(inputId='groupOrientation', label='Orientation', choices=c("All", unique(as.character(df$Orientation))), selected="All", multiple=TRUE)),
+             menuSubItem(icon = NULL,
+               selectInput(inputId='groupSystem', label='System', choices=c("All", unique(as.character(df$System))), selected="All", multiple=TRUE)),
+             menuSubItem(icon = NULL,
+              selectInput(inputId='groupBatch', label='Batch', choices=c("All", unique(as.character(df$Batch))), selected="All", multiple=TRUE))
+             
+             )
+    
   )
+  
+  
 )
-#-----------------------Body--------------------------------------------------------------------
+#---------------Body--------------------------------------------------------------------
 body <- dashboardBody(
   tabItems(
-    tabItem("dashboard",
-            # valueBoxes
-            fluidRow(
-              valueBox(
-                uiOutput("orderNum"), "New Orders", icon = icon("credit-card")
-              ),
-              valueBox(
-                uiOutput("progress"), "Progress", icon = uiOutput("progressIcon"),
-                color = "purple"
-              ),
-              # An entire box can be in a uiOutput
-              uiOutput("approvalBox")
-            ),
-            
-            # Boxes
-            fluidRow(
-              box(status = "primary", width = 6
-                  
-                 
-              ),
-              box(title = "Histogram box title", width = 6,
-                  status = "warning", solidHeader = TRUE, collapsible = TRUE,
-                  plotOutput("plot", height = 250)
-              )
+    tabItem("Univariate",
+            mainPanel(
+              tabsetPanel(
+                tabPanel("Histograms",
+                         fluidRow(column(3,sliderInput("numbins", "Number of bins:", 
+                                                       min = 5, max = 100, 
+                                                       value = 20, step=1))
+                                 ), 
+                         fluidRow(plotOutput("histPlotAvWeight")),
+                         fluidRow( plotOutput("histPlotPeriod.FCR")),
+                         fluidRow( plotOutput("histPlotEcon.FCR")),
+                         fluidRow( plotOutput("histPlotPeriod.SFR")),
+                         fluidRow( plotOutput("histPlotPeriod.SGR")),
+                         fluidRow( plotOutput("histPlotMortality")),
+                         fluidRow( plotOutput("histPlotPeriod.Day.Degrees")),
+                         fluidRow( plotOutput("histPlotAvg.Temperature"))
+                ), # end tabPanel Histograms 
+                tabPanel("Density Plots",
+                         fluidRow(plotOutput("densPlotAvWeight")),
+                         fluidRow(plotOutput("densPlotPeriod.FCR")),
+                         fluidRow(plotOutput("densPlotEcon.FCR")),
+                         fluidRow(plotOutput("densPlotPeriod.SFR")),
+                         fluidRow(plotOutput("densPlotPeriod.SGR")),
+                         fluidRow(plotOutput("densPlotMortality")),
+                         fluidRow(plotOutput("densPlotPeriod.Day.Degrees")),
+                         fluidRow(plotOutput("densPlotAvg.Temperature"))
+                ), # end tabPanel Density Plots
+                tabPanel("Boxplots",
+                         fluidRow(plotOutput("boxPlotAvWeight")),
+                         fluidRow(plotOutput("boxPlotPeriod.FCR")),
+                         fluidRow(plotOutput("boxPlotEcon.FCR")),
+                         fluidRow(plotOutput("boxPlotPeriod.SFR")),
+                         fluidRow(plotOutput("boxPlotPeriod.SGR")),
+                         fluidRow(plotOutput("boxPlotMortality")),
+                         fluidRow(plotOutput("boxPlotPeriod.Day.Degrees")),
+                         fluidRow(plotOutput("boxPlotAvg.Temperature"))
+                ), # end tabPanel BoxPlots
+                tabPanel("Summary Statistics", 
+                         h4("End Average Weight:"),
+                         tableOutput("summary_stats_EndAvWeight"),
+                         hr(),
+                         h4("Period FCR:"),
+                         tableOutput("summary_stats_PeriodFCR"),
+                         hr(),
+                         h4("LTD Econ FCR:"),
+                         tableOutput("summary_stats_EconFCR"),
+                         hr(),
+                         h4("Period SFR:"),
+                         tableOutput("summary_stats_PeriodSFR"),
+                         hr(),
+                         h4("Period SGR:"),
+                         tableOutput("summary_stats_PeriodSGR"),
+                         hr(),
+                         h4("LTD Mortality:"),
+                         tableOutput("summary_stats_Mortality"),
+                         hr(),
+                         h4("Period Thermal Age:"),
+                         tableOutput("summary_stats_Period.Day.Degrees"),
+                         hr(),
+                         h4("Avg. Temperature:"),
+                         tableOutput("summary_stats_Avg.Temp")
+                ), # end tabPanel Summary Statistics
+                tabPanel("Data", 
+                         textOutput("Dataset for processing..."),
+                         hr(),
+                         dataTableOutput("dataset") 
+                )  # end tabPanel Data
+              ) # end tabsetPanel
             )
-            
-    ),
+ ),
     
     tabItem("widgets",
             fluidRow(
@@ -167,4 +229,4 @@ body <- dashboardBody(
 
 
 #--------------------------------------------
-sidebarUni <-dashboardPage(header, sidebar, body)
+dashboardPage(header, sidebar, body)
