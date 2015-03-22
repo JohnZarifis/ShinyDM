@@ -109,8 +109,13 @@ sidebar <- dashboardSidebar(
              menuSubItem(icon = NULL,
                selectInput(inputId='groupSystem', label='System', choices=c("All", unique(as.character(df$System))), selected="All", multiple=TRUE)),
              menuSubItem(icon = NULL,
-              selectInput(inputId='groupBatch', label='Batch', choices=c("All", unique(as.character(df$Batch))), selected="All", multiple=TRUE))
-             
+              selectInput(inputId='groupBatch', label='Batch', choices=c("All", unique(as.character(df$Batch))), selected="All", multiple=TRUE)),
+             menuSubItem(icon=NULL,
+              selectInput(inputId='groupSection', label='Section', choices=c("All", unique(as.character(df$Section))), selected="All", multiple=TRUE)),
+             menuSubItem(icon = NULL,
+              selectInput(inputId='groupOriginMonth', label='Origin.Month', choices=c("All", unique(as.character(df$Origin.Month))), selected="All", multiple=TRUE)),
+             menuSubItem(icon = NULL,
+              selectInput(inputId='groupOriginYear', label='Origin.Year', choices=c("All", unique(as.character(df$Origin.Year))), selected="All", multiple=TRUE))
              )
     
   )
