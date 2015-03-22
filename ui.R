@@ -17,16 +17,29 @@ Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
 # Call function to create the dataset for analysis
 df <- create_dataset(Dataset)
 
-#----------------Header------------------------------------------------------
+#--------------Header------------------------------------------------------
 
 header <- dashboardHeader(
   title = "Aqua Miner",
+  dropdownMenu( badgeStatus = "warning",icon = icon("users"),
+    
+    .list = list(
+      tags$li(sliderInput("orders", "Orders", min = 1, max = 500, value = 120)),
+      tags$li(sliderInput("rangeAvWeight", "End.Av.Weight:", min = min(as.double(df$End.Av.Weight)), 
+                          max = max(as.double(df$End.Av.Weight)), 
+                          value = c(min(as.double(df$End.Av.Weight)), max(as.double(df$End.Av.Weight))),
+                          step=1.0, round=TRUE, sep=".")),
+      tags$li(radioButtons("radioDimUni", label = h3("Separate The Dataset By:"), 
+                           choices = list("None", "Orientation", "System", "Section", "Batch", "Hatchery",
+                                          "Origin.Month", "Origin.Year", "Start.Av.Weight.BioCat", 
+                                          "End.Av.Weight.BioCat", "Actual.Feed"), selected = "None")),
+      tags$li(sliderInput("orders", "Orders", min = 1, max = 500, value = 120))
+      
+    )
+    ),
   # Messages
-  
   dropdownMenu(type = "messages", badgeStatus = "success",
-               menuItem("Dashboard",tabName = "dashboard", icon = icon("dashboard")),
-               menuItem("Widgets", icon = icon("th"), tabName = "widgets", badgeLabel = "new",
-                        badgeColor = "green"),
+               
                messageItem("Support Team",
                            "Message content here.",
                            time = "5 mins"
@@ -56,6 +69,9 @@ header <- dashboardHeader(
                ),
                notificationItem(icon = icon("user", lib = "glyphicon"),
                                 status = "danger", "You changed your username"
+               ),
+               notificationItem(icon = icon("user", lib = "glyphicon"),
+                                status = "danger", selectInput(inputId='groupOrientation', label='Orientation', choices=c("All", unique(as.character(df$Orientation))), selected="All", multiple=TRUE)
                )
   ),
   # Tasks
@@ -74,7 +90,7 @@ header <- dashboardHeader(
                )
   )
 )
-
+#--------------End Header-----
 #---------------Sidebar----------------------------------------------------------------------
 
 sidebar <- dashboardSidebar(
@@ -97,7 +113,7 @@ sidebar <- dashboardSidebar(
     ),
     menuItem("Filters",icon = icon("shield"),
              menuSubItem( icon=NULL,sliderInput("orders", "Orders", min = 1, max = 500, value = 120)),
-             menuSubItem( selectInput("progress", "Progress",
+             menuSubItem(icon=NULL, selectInput("progress", "Progress",
                                       choices = c("0%" = 0, "20%" = 20, "40%" = 40, "60%" = 60, "80%" = 80,
                                                   "100%" = 100)
                          ) )
@@ -116,8 +132,21 @@ sidebar <- dashboardSidebar(
               selectInput(inputId='groupOriginMonth', label='Origin.Month', choices=c("All", unique(as.character(df$Origin.Month))), selected="All", multiple=TRUE)),
              menuSubItem(icon = NULL,
               selectInput(inputId='groupOriginYear', label='Origin.Year', choices=c("All", unique(as.character(df$Origin.Year))), selected="All", multiple=TRUE))
-             )
-    
+             ),
+    menuItem("Dimensions",icon = icon("cubes"),
+             menuSubItem(icon=NULL,
+                         selectInput(inputId='groupOrientation', label='Orientation', choices=c("All", unique(as.character(df$Orientation))), selected="All", multiple=TRUE)),
+             menuSubItem(icon = NULL,
+                         selectInput(inputId='groupSystem', label='System', choices=c("All", unique(as.character(df$System))), selected="All", multiple=TRUE)),
+             menuSubItem(icon = NULL,
+                         selectInput(inputId='groupBatch', label='Batch', choices=c("All", unique(as.character(df$Batch))), selected="All", multiple=TRUE)),
+             menuSubItem(icon=NULL,
+                         selectInput(inputId='groupSection', label='Section', choices=c("All", unique(as.character(df$Section))), selected="All", multiple=TRUE)),
+             menuSubItem(icon = NULL,
+                         selectInput(inputId='groupOriginMonth', label='Origin.Month', choices=c("All", unique(as.character(df$Origin.Month))), selected="All", multiple=TRUE)),
+             menuSubItem(icon = NULL,
+                         selectInput(inputId='groupOriginYear', label='Origin.Year', choices=c("All", unique(as.character(df$Origin.Year))), selected="All", multiple=TRUE))
+    )
   )
   
   
