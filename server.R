@@ -31,6 +31,7 @@ library("maptree")
 library("nlme")
 library("mgcv")
 library("htmltools")
+library("metricsgraphics")
 
 
 # load helpers.R file
