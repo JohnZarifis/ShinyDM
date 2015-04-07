@@ -5,15 +5,15 @@
 # ------------------------
 create_dataset <- function(dataset){
   
-  data <- data.frame('Orientation' = substr(dataset$Unit,1,1), 
-                     'System' = substr(dataset$Unit,2,2),
-                     'Cage' = substr(dataset$Unit,nchar(as.character(dataset$Unit))-1,nchar(as.character(dataset$Unit))-1),
-                     'Section' = substr(dataset$Unit,nchar(as.character(dataset$Unit)),nchar(as.character(dataset$Unit))),
+  data <- data.frame(
+                     'Region' = dataset$Region,
+                     'Site' = dataset$Site,
                      'Unit' = dataset$Unit,
                      'Batch' = dataset$Batch, 
                      "Hatchery" = dataset$Hatchery, 
                      "Origin.Year" = as.character(dataset$Origin.Year), 
                      "Origin.Month" = dataset$Origin.Month,
+                     'Current.Grading' = dataset$Current.Grading,
                      "From" = dmy(dataset$From), 
                      "To" = dmy(dataset$To), 
                      "Month.Sampling" = month(dataset$To,label = TRUE),
@@ -53,12 +53,8 @@ create_dataset <- function(dataset){
                      "Feeding.Policy" = dataset$Feeding.Policy, 
                      "Period.Day.Degrees" = dataset$Period.Day.Degrees,
                      "Start.Av.Weight.Category" =  dataset$Start.Av..Weight.Category,
-                     "End.Av.Weight.Category" = dataset$End.Av..Weight.Category,
-                     "Final.Harvest" = dataset$Final.Harvest,
-                     "Start.Av.Weight.BioCat" = dataset$Start.Av.Weight.BioCat,
-                     "End.Av.Weight.BioCat" = dataset$End.Av.Weight.BioCat,
-                     "Age" = dataset$AGE, 
-                     "Batch.Start.Date" = dmy(dataset$BATCH.START.DATE),
+                     "End.Av.Weight.Category" = dataset$End.Av..Weight.Category,                     
+                     "Age" = dataset$AGE,                     
                      "Days" = interval( dmy(dataset$From), dmy(dataset$To) )%/%days(1),
                      "Class" = dataset$CLASS
                     )

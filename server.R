@@ -31,6 +31,7 @@ library("maptree")
 library("nlme")
 library("mgcv")
 library("htmltools")
+library("XLConnect")
 
 
 # load helpers.R file
@@ -39,7 +40,9 @@ source("helpers.R")
 # load dataset 
 #Datamining281114 <- read.delim("Datamining281114.csv", header = TRUE, sep = ";", dec=".")
 
-Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
+#Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
+#Dataset <- readWorksheetFromFile("TSIPOYRA-2014 BATCHES-ANON.xlsx",sheet =1)
+Dataset <- read.delim("TSIPOYRA-2014 BATCHES-ANON-2.csv", header = TRUE, sep = ";", dec=".")
 # Call function to create the dataset for analysis
 data <- create_dataset(Dataset)
 #
@@ -241,17 +244,17 @@ shinyServer(function(input, output, session){
   #---------------------------------------------------------------------------------------------------
   passData <- reactive({
        
-    if (input$groupOrientation != "All"){ 
-      data <- subset(data, Orientation %in% c(input$groupOrientation)) 
+    if (input$groupRegion != "All"){ 
+      data <- subset(data, Region %in% c(input$groupOrientation)) 
     }
-    if (input$groupSystem != "All"){ 
-      data <- subset(data, System %in% c(input$groupSystem))
+    if (input$groupSite != "All"){ 
+      data <- subset(data, Site %in% c(input$groupSystem))
     }
     if (input$groupBatch != "All"){ 
       data <- subset(data, Batch %in% c(input$groupBatch))
     }
-    if (input$groupSection != "All"){ 
-      data <- subset(data, Section %in% c(input$groupSection))
+    if (input$groupUnit != "All"){ 
+      data <- subset(data, Unit %in% c(input$groupSection))
     }
     if (input$groupHatchery != "All"){ 
       data <- subset(data, Hatchery %in% c(input$groupHatchery))
@@ -271,12 +274,10 @@ shinyServer(function(input, output, session){
     if (input$groupSupplier != "All"){ 
       data <- subset(data, Supplier %in% c(input$groupSupplier))
     }
-    if (input$groupStartAvWeightBioCat != "All"){ 
-      data <- subset(data, Start.Av.Weight.BioCat %in% c(input$groupStartAvWeightBioCat))
+    if (input$groupCurrent.Grading != "All"){ 
+      data <- subset(data, Current.Grading %in% c(input$groupCurrent.Grading))
     }
-    if (input$groupEndAvWeightBioCat != "All"){ 
-      data <- subset(data, End.Av.Weight.BioCat %in% c(input$groupEndAvWeightBioCat))
-    }
+    
     
     data <- data[ data$End.Av.Weight >= as.numeric(input$rangeAvWeight[1]) & data$End.Av.Weight <= as.numeric(input$rangeAvWeight[2]) 
                & data$Av.Weight.Deviation >= as.numeric(input$rangeAvWeightDev[1])
@@ -1832,7 +1833,7 @@ output$plot.TukeyHSD <- renderPlot({
 # If the problem is for classification then the targets variable are categorical, else regression
 output$targs.Variables <- renderUI({ 
   if (input$radioDesTree == 1){
-    var <- list("Class", "End.Av.Weight.BioCat")
+    var <- list("Class", "Current.Grading")
     radioButtons(inputId='TargVar', label=h3('Target Variable:'), choices=var, selected=var[[1]])
   } else if (input$radioDesTree == 2){
     var <- list("Econ.FCR.Period", "LTD.Econ.FCR", "SFR.Period", "SGR.Period")

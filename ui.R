@@ -1,17 +1,18 @@
-### Version 28.02.2015
+### Version Bream.
 
 library("shiny")
 library("lubridate")
 library("mgcv")
 library("htmltools")
+library("XLConnect")
 
 
 # load helpers.R file
 source("helpers.R")
 
 #Datamining281114 <- read.delim("Datamining281114.csv", header = TRUE, sep = ";", dec=".")
-Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
-
+Dataset <- read.delim("TSIPOYRA-2014 BATCHES-ANON-2.csv", header = TRUE, sep = ";", dec=".")
+#Dataset <- readWorksheetFromFile("TSIPOYRA-2014 BATCHES-ANON.xlsx",sheet =1)
 
 # Call function to create the dataset for analysis
 df <- create_dataset(Dataset)
@@ -23,10 +24,10 @@ sidebarUni <- sidebarPanel(
   
   h2("Dimensions"),
   fluidRow(column(6,
-                  selectInput(inputId='groupOrientation', label='Orientation', choices=c("All", unique(as.character(df$Orientation))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupSystem', label='System', choices=c("All", unique(as.character(df$System))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupRegion', label='Region', choices=c("All", unique(as.character(df$Region))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupSite', label='Site', choices=c("All", unique(as.character(df$Site))), selected="All", multiple=TRUE),
                   selectInput(inputId='groupBatch', label='Batch', choices=c("All", unique(as.character(df$Batch))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupSection', label='Section', choices=c("All", unique(as.character(df$Section))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupUnit', label='Unit', choices=c("All", unique(as.character(df$Unit))), selected="All", multiple=TRUE),
                   selectInput(inputId='groupOriginMonth', label='Origin.Month', choices=c("All", unique(as.character(df$Origin.Month))), selected="All", multiple=TRUE),
                   selectInput(inputId='groupOriginYear', label='Origin.Year', choices=c("All", unique(as.character(df$Origin.Year))), selected="All", multiple=TRUE)),
            column(6,
@@ -34,8 +35,8 @@ sidebarUni <- sidebarPanel(
                   selectInput(inputId='groupFood', label='Actual.Feed', choices=c("All", unique(as.character(df$Actual.Feed))), selected="All", multiple=TRUE),
                   selectInput(inputId='groupFood.Category', label='Feed.Category', choices=c("All", unique(as.character(df$Feed.Category))), selected="All", multiple=TRUE),
                   selectInput(inputId='groupSupplier', label='Supplier', choices=c("All", unique(as.character(df$Supplier))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupStartAvWeightBioCat', label='Start.Av.Weight.BioCat', choices=c("All", unique(as.character(df$Start.Av.Weight.BioCat))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupEndAvWeightBioCat', label='End.Av.Weight.BioCat', choices=c("All", unique(as.character(df$End.Av.Weight.BioCat))), selected="All", multiple=TRUE))),
+                  selectInput(inputId='groupCurrent.Grading', label='Current.Grading', choices=c("All", unique(as.character(df$Current.Grading))), selected="All", multiple=TRUE))),
+                 
   dateRangeInput('dateRangeFrom',
                  label = paste(' From: '),
                  start = min( ymd(df$From)-days(0) ), 
@@ -112,9 +113,9 @@ sidebarUni <- sidebarPanel(
   
   hr(),
   radioButtons("radioDimUni", label = h3("Separate The Dataset By:"), 
-               choices = list("None", "Orientation", "System", "Section", "Batch", "Hatchery",
-                              "Origin.Month", "Origin.Year", "Start.Av.Weight.BioCat", 
-                              "End.Av.Weight.BioCat", "Actual.Feed"), selected = "None"),
+               choices = list("None", "Region", "Site", "Unit", "Batch", "Hatchery",
+                              "Origin.Month", "Origin.Year", "Current.Grading", 
+                              "Actual.Feed"), selected = "None"),
   
   hr(),
   actionButton(inputId = 'goUniPlot',  label = 'Refresh Univariate plots')
@@ -224,9 +225,9 @@ shinyUI(
                 fluidPage( #theme = shinytheme("cerulean"),
                           #titlePanel("Exploratory Data Analysis"),
                           fluidRow( column(9, radioButtons("radioDimMulti", label = h3("Separate The Dataset By:"), 
-                                                      choices = list("None", "Orientation", "System", "Batch", "Section", "Hatchery",
-                                                        "Origin.Month", "Origin.Year", "Start.Av.Weight.BioCat", 
-                                                        "End.Av.Weight.BioCat", "Actual.Feed"), selected = "None", inline = TRUE)),
+                                                      choices = list("None", "Region", "Site", "Batch", "Unit", "Hatchery",
+                                                        "Origin.Month", "Origin.Year", "Current.Grading", 
+                                                         "Actual.Feed"), selected = "None", inline = TRUE)),
                                     column(3, actionButton(inputId = 'goMultiPlot',  label = 'Refresh Multivariate plots'))
                           ), # end fluidRow
                           hr(),
@@ -548,7 +549,7 @@ tabPanel(" Analysis Of Variance ", id="MenuPage_5",
                                         selected="Econ.FCR.Period"),
                      hr(),
                      checkboxGroupInput(inputId='Ind.Vars', label=h3('Independent Variable(s):'), 
-                                        choices=c("Actual.Feed", "End.Av.Weight.BioCat", "Feed.Category", 
+                                        choices=c("Actual.Feed", "Current.Grading","End.Av.Weight.Category", "Feed.Category", 
                                                      "Feeding.Policy", "System", "Orientation", "Origin.Month", "Origin.Year"), 
                                         selected="Actual.Feed"),
                      hr(),
