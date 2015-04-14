@@ -31,8 +31,8 @@ library("maptree")
 library("nlme")
 library("mgcv")
 library("htmltools")
+library("htmlwidgets")
 library("metricsgraphics")
-
 
 # load helpers.R file
 source("helpers.R")
@@ -1206,7 +1206,6 @@ output$cor.stats.EconFCR.AvgTemp <- renderPrint({
 
 datasetMD <- reactive({
   data <- passData()
-#  data <- data[sample(nrow(data), input$sampleSize),]
   data <- data[  (data$From >= ymd(input$MD.dateRangeFrom[1]) & data$From <= ymd(input$MD.dateRangeFrom[2])) 
                & (data$To >= ymd(input$MD.dateRangeTo[1]) & data$To <= ymd(input$MD.dateRangeTo[2])) , ]
   
@@ -1264,7 +1263,6 @@ output$plotDashboard <- renderPlot({
 
 #  datasetMD <- reactive({
 #   data <- passData()
-#   #  data <- data[sample(nrow(data), input$sampleSize),]
 #   data <- data[  (data$From >= ymd(input$MD.dateRangeFrom[1]) & data$From <= ymd(input$MD.dateRangeFrom[2])) 
 #                  & (data$To >= ymd(input$MD.dateRangeTo[1]) & data$To <= ymd(input$MD.dateRangeTo[2])) , ]
 #  })
@@ -1287,16 +1285,16 @@ output$plotDashboard <- renderPlot({
 #     print(plot.dashboard)
 #     
 #  })
-# 
-# #  print(plot.dashboard)
-# #    mjs_point(point_size = 1.5, color_accessor=input$color, color_type="category", 
-# #               size_accessor=Biomass, least_squares=TRUE) %>% mjs_labs(x="Average Weight", y="FCR")
-# #   
-#   
-#   
-# ##})
 
+#  print(plot.dashboard)
+#    mjs_point(point_size = 1.5, color_accessor=input$color, color_type="category", 
+#               size_accessor=Biomass, least_squares=TRUE) %>% mjs_labs(x="Average Weight", y="FCR")
+#   
+  
+  
+##})
 
+#---------------------------------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------------------------------
 #     Regression

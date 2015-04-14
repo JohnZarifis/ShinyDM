@@ -2,8 +2,6 @@
 
 library("shiny")
 library("lubridate")
-library("mgcv")
-library("htmltools")
 
 
 # load helpers.R file
@@ -427,7 +425,7 @@ shinyUI(
 #                              ) # end fluidRow
 #                       ) # end fluidPage
 #                     ),  # end tabPanel Multidimensional Interactive Dashboard   
-
+#
 #---------------------------------------------------------- Forth MenuPage
 tabPanel(" Regression Models ", id="MenuPage_4", 
           fluidPage( #theme = shinytheme("cerulean"),
