@@ -1,4 +1,4 @@
-### Version Bream - Bass
+### Version Bream 
 # This is the server logic for a Shiny web application.
 # You can find out more about building applications with Shiny here:
 # 
@@ -1825,6 +1825,194 @@ output$plot.TukeyHSD <- renderPlot({
     })
   }  
 })
+
+#---------------------------------------------------------------------------------------------------
+#     Support Vector Machines
+#---------------------------------------------------------------------------------------------------
+# If the problem is for classification then the targets variable are categorical, else regression
+output$targs.SVMs.Variables <- renderUI({ 
+  if (input$radioSVMs == 1){
+    var <- list("Class", "Current.Grading")
+    radioButtons(inputId='Targ.SVMs.Var', label=h3('Target Variable:'), choices=var, selected=var[[1]])
+  } else if (input$radioSVMs == 2){
+    var <- list("Econ.FCR.Period", "LTD.Econ.FCR", "SFR.Period", "SGR.Period")
+    radioButtons(inputId='Targ.SVMs.Var', label=h3('Target Variable:'), choices=var, selected=var[[1]])
+  } 
+})  # end renderUI targs.Variables
+
+output$preds.SVMs.Variables <- renderUI({
+  data <- passData() 
+  Vars <- names(data)
+  indep.vars <- Vars[ Vars != input$Targ.SVMs.Var] 
+  selectInput(inputId='preds.SVMs.Vars', label=h3('Predictors:'), choices=indep.vars, multiple=TRUE)
+})  # end renderUI preds.Variables
+
+
+output$TestOpts <- renderUI({
+  if (is.null(input$testingOptions))
+    return()
+  
+  # Depending on input$testingOptions, we'll generate a different
+  # UI component and send it to the client.
+  switch(input$testingOptions,
+         #"Cross Validation" 
+         "1" = sliderInput("folds", "Folds:",min = 1, max = 20, value = 10),
+         #"Random Split" 
+         "2" = sliderInput("percentage", "Percentage for training:", min = 0, max = 100, value = 80)
+  )
+})
+
+output$fmla.SVM <- renderText({
+  if (input$goSVM == 0){
+    return() }
+  else{ 
+    isolate({   
+      fmla = paste( as.character(input$Targ.SVMs.Var), 
+                    paste(as.character(input$preds.SVMs.Vars), collapse=" + "), sep=" ~ " )
+    })  # end isolate
+  } # end if...else
+})
+
+#------------------------------------- SVM function
+runSVM <- reactive({
+  
+  list.vars <- list(input$Targ.SVMs.Var, input$preds.SVMs.Vars)
+  
+  # "data": dataset that based on the user choices in the first page
+  data <- passData()  
+  dset.train <- data[ , names(data) %in% unlist(list.vars) ]
+  
+  fmla <- as.formula( paste(input$Targ.SVMs.Var, paste(input$preds.SVMs.Vars, collapse="+"), sep=" ~ ") )      
+  
+  # if radioSVMs=1 -> Classification, 
+  if (input$radioSVMs == 1){
+    
+    # cross-validation
+    if ( input$testingOptions == 1 ){
+      svm.fit <- tune(svm, fmla, data=dset.train, type="nu-classification", kernel="radial", 
+                      ranges=list(cost=c(0.1,1,10,50,100,150,200), gamma=c(0.5,1,2,3,4)),
+                      tunecontrol = tune.control(sampling ="cross",cross=input$folds, 
+                      sampling.aggregate = mean, sampling.dispersion = sd), nu=0.5)
+      svm.model <- svm.fit$best.model
+     
+    }else{
+      # random split
+      perc <- input$percentage/100
+      svm.fit <- tune(svm, fmla, data=dset.train, type="nu-classification", kernel="radial", 
+                        ranges=list(cost=c(0.1,1,10,50,100,150,200), gamma=c(0.5,1,2,3,4)),
+                        tunecontrol = tune.control(sampling ="fix", fix=perc, 
+                        sampling.aggregate = mean, sampling.dispersion = sd), nu=0.5)
+      svm.model <- svm.fit$best.model
+    } 
+  # else if radioSVMs=2 -> Regression  
+  } else if (input$radioSVMs == 2){   
+   
+    # cross-validation
+    if ( input$testingOptions == 1 ){
+      svm.fit <- tune(svm, fmla, data=dset.train, type="nu-regression", kernel="radial", 
+                      ranges=list(cost=c(0.1,1,10,50,100,150,200), gamma=c(0.5,1,2,3,4)), nu=0.5, 
+                      tunecontrol = tune.control(sampling ="cross",cross=input$folds, 
+                      sampling.aggregate = mean, sampling.dispersion = sd) )
+                            
+      svm.model <- svm.fit$best.model  
+    }else{
+      # random split
+      perc <- input$percentage/100
+      svm.fit <- tune(svm, fmla, data=dset.train, type="nu-regression", kernel="radial", 
+                      ranges=list(cost=c(0.1,1,10,50,100,150,200), gamma=c(0.5,1,2,3,4)), nu=0.5, 
+                      tunecontrol = tune.control(sampling ="fix",fix=perc, 
+                      sampling.aggregate = mean, sampling.dispersion = sd) )
+      
+      svm.model <- svm.fit$best.model  
+    }
+   
+  }  # end first if...else
+  
+  return(svm.model)
+})
+#----------------------------------------------------
+
+output$summary.svm <- renderPrint({
+  if (input$goSVM == 0){
+    return() }
+  else{ 
+    isolate({   
+      if ( !is.null(input$Targ.SVMs.Var) ){
+        svm.mod <- runSVM()
+        s <- summary(svm.mod)
+        
+        if (input$radioSVMs == 1){
+              res <- list( "Method:"=s$call$method,"Type:"=s$call$type, "Kernel:"=s$call$kernel, 
+                     "Gamma:"= s$gamma, "Cost:"=s$cost, 
+                     "nSV"=data.frame("Class levels"=s$levels, "Support Vectors per class"= s$nSV) )
+        }else{
+              res <- list( "Method:"=s$call$method,"Type:"=s$call$type, "Kernel:"=s$call$kernel, 
+                       "Gamma:"= s$gamma, "Cost:"=s$cost)
+        }
+          
+        print(res) 
+                     
+      }else{ 
+        print(data.frame(Warning="Please select Model Parameters."))
+      }
+    }) # end isolate
+  } # end if...else
+})    
+
+output$validate.svm <- renderPrint({
+  if (input$goSVM == 0){
+    return() }
+  else{ 
+    isolate({   
+      if ( !is.null(input$Targ.SVMs.Var) ){ 
+        
+        # list of variables to examine
+        list.vars <- list(input$Targ.SVMs.Var, input$preds.SVMs.Vars)
+        # "data": dataset that based on the user choices in the first page
+        data <- passData()  
+        dset <- data[ , names(data) %in% unlist(list.vars) ]
+        # call svm model
+        svm.mod <- runSVM()
+        
+        # create a subset of data as testing set so as to evaluate the accuracy of the model
+        nr=nrow(dset)
+        perc = 1 #50/100
+        ids <- sort(ceiling(sample( seq(1,nr), nr*perc, replace = FALSE)))
+        ds.test <- data[ ids, ]
+        ds.test <- data
+        targ <- input$Targ.SVMs.Var
+        
+        # if svm is for classification
+        if (input$radioSVMs == 1){
+          pred <- predict(svm.mod, ds.test )
+          confmat <- table( true=as.matrix(ds.test[,targ]), as.matrix(pred) )
+          
+          accuracy <- sum(diag(confmat))/sum(confmat)*100
+          error_rate <- 100-accuracy
+          
+          results.SVM <- list("Confusion Matrix " =confmat, "Accuracy"=accuracy, "Error Rate"=error_rate)
+          
+        } else{
+          # if svm is for regression
+          pred <- predict(svm.mod, ds.test )
+          rmse <- sqrt( mean( (as.matrix(pred)-as.matrix(ds.test[,targ]))^2 ) ) 
+          results.SVM <- list("Root Mean Square Error "= rmse )
+        }
+      
+          print( results.SVM )
+      }else{ 
+          print(data.frame(Warning="Please select Model Parameters."))
+      }
+      
+    }) # end isolate
+  } # end if...else
+})    
+
+
+
+
+
+
 
 #---------------------------------------------------------------------------------------------------
 #     Classification
