@@ -579,34 +579,42 @@ tabPanel(" Analysis Of Variance ", id="MenuPage_5",
 
 
 #---------------------------------------------------------- sixth MenuPage
-tabPanel(" Support Vector Machines ", id="MenuPage_6",
+tabPanel(" Machine Learning Models ", id="MenuPage_6",
          fluidPage( # theme = shinytheme("cerulean"),
            sidebarPanel(
              img(src="Aquamanager-logo.png",class = "img-responsive"),
              hr(),
-             radioButtons("radioSVMs", label = h3("SVMs for:"), choices = list("Classification"=1, "Regression"=2), selected=1),
+             uiOutput("targs.ML.Variables"),
              hr(),
-             uiOutput("targs.SVMs.Variables"),
+             uiOutput("preds.ML.Variables"),
              hr(),
-             uiOutput("preds.SVMs.Variables"),
+             radioButtons("radioML", label = h3("Choose model:"), choices = list("Support Vector Machines"=1,
+                                                        "Generalised Linear Model"=2), selected=1),
              hr(),
              radioButtons(inputId="testingOptions",label = h3("Testing Options:"), 
                           choices = list("Cross Validation" = 1, "Random Split" = 2), selected=1),
              hr(),
              uiOutput("TestOpts"),
              hr(),
-             actionButton(inputId = 'goSVM',  label = 'Start Analysis')
+             actionButton(inputId = 'goAnalysis',  label = 'Start Analysis')
            ),  # end sidebarPanel 
            mainPanel(tabsetPanel( 
-             tabPanel("Build the SVM",
+             tabPanel("Build the Model",
                       h4('Formula:'), 
-                      fluidRow(column(12, verbatimTextOutput("fmla.SVM"))),
+                      fluidRow(column(12, verbatimTextOutput("fmla.model"))),
                       hr(),
                       h4('Summary:'),
-                      fluidRow(column(12, verbatimTextOutput("summary.svm"))),
+                      fluidRow(column(12, verbatimTextOutput("summary.model"))),
                       hr(),
-                      h4('Validate the SVM model:'),
-                      fluidRow(column(12, verbatimTextOutput("validate.svm")))
+                      h4('Evaluate the model:'),
+                      fluidRow(column(12, verbatimTextOutput("validate.model"))),
+                      
+                      #------ relative importance
+                      hr(),
+                      h4(' Relative Importance:'),      
+                      fluidRow(column(12, plotOutput("plot_ML.Rel.Impo",height="400px"))),
+                      hr(),
+                      fluidRow(column(12, verbatimTextOutput("ML.Rel.Impo")))
                       
              ), # end tabPanel "Build"
              tabPanel("Predict with it",

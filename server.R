@@ -17,6 +17,9 @@ library("lubridate")
 library("plyr")
 library("GGally")
 library("e1071")
+library("caret")
+library("pROC")
+library("glmnet")
 library("rpart")
 library("party")
 library("partykit")
@@ -31,7 +34,6 @@ library("maptree")
 library("nlme")
 library("mgcv")
 library("htmltools")
-
 
 
 # load helpers.R file
@@ -1827,24 +1829,20 @@ output$plot.TukeyHSD <- renderPlot({
 })
 
 #---------------------------------------------------------------------------------------------------
-#     Support Vector Machines
-#---------------------------------------------------------------------------------------------------
-# If the problem is for classification then the targets variable are categorical, else regression
-output$targs.SVMs.Variables <- renderUI({ 
-  if (input$radioSVMs == 1){
-    var <- list("Class", "Current.Grading")
-    radioButtons(inputId='Targ.SVMs.Var', label=h3('Target Variable:'), choices=var, selected=var[[1]])
-  } else if (input$radioSVMs == 2){
-    var <- list("Econ.FCR.Period", "LTD.Econ.FCR", "SFR.Period", "SGR.Period")
-    radioButtons(inputId='Targ.SVMs.Var', label=h3('Target Variable:'), choices=var, selected=var[[1]])
-  } 
+#     Machine Learning Models (Support Vector Machines, Generalised Linear Model)
+#     ---------------------------------------------------------------------------
+#     Study only classification problems then the targets variable are categorical
+#----------------------------------------------------------------------------------------------------
+output$targs.ML.Variables <- renderUI({ 
+    var <- list("Class")
+    radioButtons(inputId='Targ.ML.Var', label=h3('Target Variable:'), choices=var, selected=var[[1]])
 })  # end renderUI targs.Variables
 
-output$preds.SVMs.Variables <- renderUI({
+output$preds.ML.Variables <- renderUI({
   data <- passData() 
   Vars <- names(data)
-  indep.vars <- Vars[ Vars != input$Targ.SVMs.Var] 
-  selectInput(inputId='preds.SVMs.Vars', label=h3('Predictors:'), choices=indep.vars, multiple=TRUE)
+  ind.vars <- Vars[ Vars != input$Targ.ML.Var] 
+  selectInput(inputId='preds.ML.Vars', label=h3('Predictors:'), choices=ind.vars, multiple=TRUE)
 })  # end renderUI preds.Variables
 
 
@@ -1862,13 +1860,13 @@ output$TestOpts <- renderUI({
   )
 })
 
-output$fmla.SVM <- renderText({
-  if (input$goSVM == 0){
+output$fmla.model <- renderText({
+  if (input$goAnalysis == 0){
     return() }
   else{ 
     isolate({   
-      fmla = paste( as.character(input$Targ.SVMs.Var), 
-                    paste(as.character(input$preds.SVMs.Vars), collapse=" + "), sep=" ~ " )
+      fmla = paste( as.character(input$Targ.ML.Var), 
+                    paste(as.character(input$preds.ML.Vars), collapse=" + "), sep=" ~ " )
     })  # end isolate
   } # end if...else
 })
@@ -1876,80 +1874,104 @@ output$fmla.SVM <- renderText({
 #------------------------------------- SVM function
 runSVM <- reactive({
   
-  list.vars <- list(input$Targ.SVMs.Var, input$preds.SVMs.Vars)
+  list.vars <- list(input$Targ.ML.Var, input$preds.ML.Vars)
   
   # "data": dataset that based on the user choices in the first page
   data <- passData()  
   dset.train <- data[ , names(data) %in% unlist(list.vars) ]
   
-  fmla <- as.formula( paste(input$Targ.SVMs.Var, paste(input$preds.SVMs.Vars, collapse="+"), sep=" ~ ") )      
+  fmla <- as.formula( paste(input$Targ.ML.Var, paste(input$preds.ML.Vars, collapse="+"), sep=" ~ ") )      
   
-  # if radioSVMs=1 -> Classification, 
-  if (input$radioSVMs == 1){
+  # cross-validation
+  if ( input$testingOptions == 1 ){
     
-    # cross-validation
-    if ( input$testingOptions == 1 ){
-      svm.fit <- tune(svm, fmla, data=dset.train, type="nu-classification", kernel="radial", 
-                      ranges=list(cost=c(0.1,1,10,50,100,150,200), gamma=c(0.5,1,2,3,4)),
-                      tunecontrol = tune.control(sampling ="cross",cross=input$folds, 
-                      sampling.aggregate = mean, sampling.dispersion = sd), nu=0.5)
-      svm.model <- svm.fit$best.model
-     
-    }else{
-      # random split
-      perc <- input$percentage/100
-      svm.fit <- tune(svm, fmla, data=dset.train, type="nu-classification", kernel="radial", 
-                        ranges=list(cost=c(0.1,1,10,50,100,150,200), gamma=c(0.5,1,2,3,4)),
-                        tunecontrol = tune.control(sampling ="fix", fix=perc, 
-                        sampling.aggregate = mean, sampling.dispersion = sd), nu=0.5)
-      svm.model <- svm.fit$best.model
-    } 
-  # else if radioSVMs=2 -> Regression  
-  } else if (input$radioSVMs == 2){   
+    fitControl <- trainControl(## 10-fold CV
+      method = "repeatedcv",
+      number = input$folds,
+      ## repeated ten times
+      repeats = 10, 
+      ## Estimate class probabilities
+      classProbs = TRUE,
+      returnData = TRUE,
+      ## Evaluate performance using 
+      ## the following function
+      summaryFunction = twoClassSummary)
+    
+    svmFit <- train(fmla, data=dset.train, method = "svmRadial", trControl = fitControl, metric="ROC")
    
-    # cross-validation
-    if ( input$testingOptions == 1 ){
-      svm.fit <- tune(svm, fmla, data=dset.train, type="nu-regression", kernel="radial", 
-                      ranges=list(cost=c(0.1,1,10,50,100,150,200), gamma=c(0.5,1,2,3,4)), nu=0.5, 
-                      tunecontrol = tune.control(sampling ="cross",cross=input$folds, 
-                      sampling.aggregate = mean, sampling.dispersion = sd) )
-                            
-      svm.model <- svm.fit$best.model  
-    }else{
-      # random split
-      perc <- input$percentage/100
-      svm.fit <- tune(svm, fmla, data=dset.train, type="nu-regression", kernel="radial", 
-                      ranges=list(cost=c(0.1,1,10,50,100,150,200), gamma=c(0.5,1,2,3,4)), nu=0.5, 
-                      tunecontrol = tune.control(sampling ="fix",fix=perc, 
-                      sampling.aggregate = mean, sampling.dispersion = sd) )
-      
-      svm.model <- svm.fit$best.model  
-    }
-   
-  }  # end first if...else
+  }
+  else{
+    # random split
+    perc <- input$percentage/100
+    set.seed(998)
+    Class <- input$Targ.ML.Var
+    inTraining <- createDataPartition(dset.train$Class, p = perc, list = FALSE)
+    training <- dset.train[ inTraining,]
+    testing  <- dset.train[-inTraining,]
+    fitControl <- trainControl(classProbs = TRUE, returnData = TRUE,summaryFunction = twoClassSummary)
+
+    svmFit <- train(fmla, data=training, method = "svmRadial", trControl = fitControl, metric="ROC")
+    
+  } 
+  
+  svm.model <- svmFit
   
   return(svm.model)
 })
 #----------------------------------------------------
 
-output$summary.svm <- renderPrint({
-  if (input$goSVM == 0){
+#------------------------------------- GLM function
+runGLM <- reactive({
+  
+  list.vars <- list(input$Targ.ML.Var, input$preds.ML.Vars)
+  targ <- input$Targ.ML.Var
+  
+  # "data": dataset that based on the user choices in the first page
+  data <- passData()  
+  dset.train <- data[ , names(data) %in% unlist(list.vars) ]
+  
+  fmla <- as.formula( paste(input$Targ.ML.Var, paste(input$preds.ML.Vars, collapse="+"), sep=" ~ ") )      
+ 
+  # cross-validation
+  if ( input$testingOptions == 1 ){
+    dummy.ds <- dummyVars(fmla,data=dset.train, fullRank=F)
+    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train),"Class"= dset.train$Class) #input$Targ.ML.Var)
+  
+    dummy.dset.train$Class <- ifelse(dummy.dset.train$Class=='GOOD',1,0)
+    
+    fitControl <- trainControl(## 10-fold CV
+      method = "repeatedcv",
+      number = 10,
+      ## repeated ten times
+      repeats = 10)
+    
+      glmnetFit <- train(Class~., data=dummy.dset.train, method = "glmnet", trControl = fitControl)
+    
+  }
+#   else{
+#     # random split
+#    
+#   }
+     
+})
+
+#----------------------------------------------------
+output$summary.model <- renderPrint({
+  if (input$goAnalysis == 0){
     return() }
   else{ 
     isolate({   
-      if ( !is.null(input$Targ.SVMs.Var) ){
-        svm.mod <- runSVM()
-        s <- summary(svm.mod)
-        
-        if (input$radioSVMs == 1){
-              res <- list( "Method:"=s$call$method,"Type:"=s$call$type, "Kernel:"=s$call$kernel, 
-                     "Gamma:"= s$gamma, "Cost:"=s$cost, 
-                     "nSV"=data.frame("Class levels"=s$levels, "Support Vectors per class"= s$nSV) )
+      if ( !is.null(input$Targ.ML.Var) ){
+        # if SVM 
+        if (input$radioML == 1){
+            svm.mod <- runSVM()
+            res <- svm.mod$results[rownames(svm.mod$bestTune),]
         }else{
-              res <- list( "Method:"=s$call$method,"Type:"=s$call$type, "Kernel:"=s$call$kernel, 
-                       "Gamma:"= s$gamma, "Cost:"=s$cost)
+        # if GLM
+          gml.mod <- runGLM()
+          res <- gml.mod$results[rownames(gml.mod$bestTune),]
         }
-          
+        
         print(res) 
                      
       }else{ 
@@ -1959,20 +1981,17 @@ output$summary.svm <- renderPrint({
   } # end if...else
 })    
 
-output$validate.svm <- renderPrint({
-  if (input$goSVM == 0){
+output$validate.model <- renderPrint({
+  if (input$goAnalysis == 0){
     return() }
   else{ 
     isolate({   
-      if ( !is.null(input$Targ.SVMs.Var) ){ 
-        
+      if ( !is.null(input$Targ.ML.Var) ){ 
         # list of variables to examine
-        list.vars <- list(input$Targ.SVMs.Var, input$preds.SVMs.Vars)
+        list.vars <- list(input$Targ.ML.Var, input$preds.ML.Vars)
         # "data": dataset that based on the user choices in the first page
         data <- passData()  
         dset <- data[ , names(data) %in% unlist(list.vars) ]
-        # call svm model
-        svm.mod <- runSVM()
         
         # create a subset of data as testing set so as to evaluate the accuracy of the model
         nr=nrow(dset)
@@ -1980,26 +1999,25 @@ output$validate.svm <- renderPrint({
         ids <- sort(ceiling(sample( seq(1,nr), nr*perc, replace = FALSE)))
         ds.test <- data[ ids, ]
         ds.test <- data
-        targ <- input$Targ.SVMs.Var
+        targ <- input$Targ.ML.Var
         
-        # if svm is for classification
-        if (input$radioSVMs == 1){
-          pred <- predict(svm.mod, ds.test )
-          confmat <- table( true=as.matrix(ds.test[,targ]), as.matrix(pred) )
-          
-          accuracy <- sum(diag(confmat))/sum(confmat)*100
-          error_rate <- 100-accuracy
-          
-          results.SVM <- list("Confusion Matrix " =confmat, "Accuracy"=accuracy, "Error Rate"=error_rate)
-          
-        } else{
-          # if svm is for regression
-          pred <- predict(svm.mod, ds.test )
-          rmse <- sqrt( mean( (as.matrix(pred)-as.matrix(ds.test[,targ]))^2 ) ) 
-          results.SVM <- list("Root Mean Square Error "= rmse )
+        # if SVM 
+        if (input$radioML == 1){
+        
+            # call svm model
+            svm.mod <- runSVM()
+            testPred <- predict(svm.mod, ds.test )
+            confmat <- confusionMatrix(testPred, ds.test[ ,targ])
+               
+        }else{
+            # if GLM
+            gml.mod <- runGLM()
+            testPred <- predict(gml.mod, ds.test )
+            confmat <- confusionMatrix(testPred, ds.test[ ,targ])
         }
       
-          print( results.SVM )
+        results.model<-confmat
+        print( results.model )
       }else{ 
           print(data.frame(Warning="Please select Model Parameters."))
       }
@@ -2009,9 +2027,61 @@ output$validate.svm <- renderPrint({
 })    
 
 
+output$plot_ML.Rel.Impo <- renderPlot({ 
+  if (input$goAnalysis == 0){
+    return() }
+  else{ 
+    isolate({ 
+      # if SVM 
+      if (input$radioML == 1){
+        
+          svm.mod <- runSVM()
+          RocImp <- varImp(svm.mod, scale = TRUE)
+          plot(RocImp) 
+      
+      }
+      else{
+          # if GLM
+          gml.mod <- runGLM()
+          RocImp <- varImp(gml.mod, scale = FALSE)
+          
+          results <- data.frame(row.names(RocImp$importance),RocImp$importance$Overall)
+          results$VariableName <- rownames(RocImp)
+          colnames(results) <- c('VariableName','Class')
+          results <- results[order(results$Class),]
+          #results <- results[(results$Class != 0),]
+          
+          par(mar=c(5,15,4,2)) # increase y-axis margin. 
+          xx <- barplot(results$Class, width = 0.25, 
+                        main = paste("Variable Importance using GLM model"), horiz = T, 
+                        xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
+                        col = ifelse((results$Class > 0), 'blue', 'red')) 
+          axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6) 
+          
+      }
+    })
+  }
+})
 
-
-
+output$ML.Rel.Impo <- renderPrint({ 
+  if (input$goAnalysis == 0){
+    return() }
+  else{ 
+    isolate({  
+      # if SVM 
+      if (input$radioML == 1){
+        svm.mod <- runSVM()
+        RocImp <- varImp(svm.mod, scale = FALSE)
+        print(RocImp, digits=3, justify="left")
+      }
+      else{
+        gml.mod <- runGLM()
+        RocImp <- varImp(gml.mod, scale = FALSE)
+        print(RocImp, digits=3, justify="left")
+      }
+   })
+  }
+})
 
 
 #---------------------------------------------------------------------------------------------------

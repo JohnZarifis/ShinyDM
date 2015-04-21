@@ -2,15 +2,15 @@ source("helpers.R")
 library("lubridate")
 library("e1071")
 library("caret")
+library("pROC")
+library("glmnet")
 
 Dataset <- read.delim("TSIPOYRA-2014 BATCHES-ANON-2.csv", header = TRUE, sep = ";", dec=".")
 data <- create_dataset(Dataset)
 
-#data <- data[data$Class=='GOOD', ]
-
 targ <- "Class"
-preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight", "Origin.Month")
-
+#preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight", "Origin.Month")
+preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
 fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") ) 
 
 # perc = 80/100
@@ -40,50 +40,80 @@ fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") )
 # print(res)
 
 # #------------------------------------------------------
+#     Caret package
+#
 # ds.tr1 <- data[ , names(data) %in% unlist(list(preds,targ))]
+# 
+# fitControl <- trainControl(## 10-fold CV
+#   method = "repeatedcv",
+#   number = 10, 
+#   ## repeated ten times
+#   repeats = 1,
+#   ## Estimate class probabilities
+#   classProbs = TRUE,
+#   returnData = TRUE,
+#   ## Evaluate performance using 
+#   ## the following function
+#   summaryFunction = twoClassSummary)
+# 
+# svmFit <- train(fmla.cl, data=ds.tr1, method = "svmRadial", trControl = fitControl, metric="ROC")
+# 
+# svmFit.best.acc.kappa <- svmFit$results[rownames(svmFit$bestTune),]
+#   
+# RocImp <- varImp(svmFit, scale = FALSE)
+# RocImp
+# 
+# plot(RocImp)
+# 
+# 
+# testPred <- predict(svmFit, ds.tr1[,preds])
+# confusionMatrix(testPred, ds.tr1$Class)
+
+
+# 
+# 
+# predictions <- predict(object=svmFit$finalModel, ds.tr1[,targ], type='prob')
+
+# perc <- 80/100
+# set.seed(998)
+# Cl <- targ
+# inTraining <- createDataPartition(ds.tr1$Cl, p = perc, list = FALSE)
+# training <- ds.tr1[ inTraining,]
+# testing  <- ds.tr1[-inTraining,]
+# 
+# fitControl <- trainControl(classProbs = TRUE)
+# svmFit <- train(fmla.cl, data=training, method = "svmRadial", trControl = fitControl, metric="ROC")
+# 
+# predictions <- predict(object=svmFit, testing[,targ], type='prob')
+
+
+
+#------------------------------------------------------
+
+# ds.tr2 <- data[ , names(data) %in% unlist(list(preds,targ))]
+# 
+# targ <- "Class"
+# preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
+# 
+# fmla <- as.formula(paste(" ",paste(preds, collapse="+"), sep=" ~ ") )
+# dummy.ds <- dummyVars(fmla,data=ds.tr2, fullRank=F)
+# dummy.ds.tr2 <- data.frame(predict(dummy.ds, newdata = ds.tr2),"Class"=ds.tr2$Class)
+# dummy.ds.tr2$Class <- ifelse(dummy.ds.tr2$Class=='GOOD',1,0)
 # 
 # fitControl <- trainControl(## 10-fold CV
 #   method = "repeatedcv",
 #   number = 10,
 #   ## repeated ten times
 #   repeats = 10)
-# 
 #   
-# svmFit <- train(fmla.cl, data=ds.tr1, method = "svmRadial", trControl = fitControl)
+# svmFit2 <- train(Class~., data=dummy.ds.tr2, method = "svmRadial", trControl = fitControl)
 #   
-# svmFit.best.acc.kappa <- svmFit$results[rownames(svmFit$bestTune),]
-#   
-# RocImp <- varImp(  svmFit, scale = FALSE)
-# RocImp
+# svmFit2.best.acc.kappa <- svmFit2$results[rownames(svmFit2$bestTune),]
 # 
-# plot(RocImp)
+# RocImp2 <- varImp(svmFit2,scale=F)
+# RocImp2
 # 
-# #------------------------------------------------------
-
-ds.tr2 <- data[ , names(data) %in% unlist(list(preds,targ))]
-
-targ <- "Class"
-preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
-
-fmla <- as.formula(paste(" ",paste(preds, collapse="+"), sep=" ~ ") )
-dummy.ds <- dummyVars(fmla,data=ds.tr2, fullRank=F)
-dummy.ds.tr2 <- data.frame(predict(dummy.ds, newdata = ds.tr2),"Class"=ds.tr2$Class)
-dummy.ds.tr2$Class <- ifelse(dummy.ds.tr2$Class=='GOOD',1,0)
-
-fitControl <- trainControl(## 10-fold CV
-  method = "repeatedcv",
-  number = 10,
-  ## repeated ten times
-  repeats = 10)
-  
-svmFit2 <- train(Class~., data=dummy.ds.tr2, method = "svmRadial", trControl = fitControl)
-  
-svmFit2.best.acc.kappa <- svmFit2$results[rownames(svmFit2$bestTune),]
-
-RocImp2 <- varImp(svmFit2,scale=F)
-RocImp2
-
-plot(RocImp2)
+# plot(RocImp2)
 # 
 # results <- data.frame(row.names(RocImp2$importance),RocImp2$importance$Overall)
 # results$VariableName <- rownames(RocImp2)
@@ -154,43 +184,49 @@ plot(RocImp2)
 
 
 #--------------------------------------------
-# ds.tr3 <- data[ , names(data) %in% unlist(list(preds,targ))]
-# 
-# fmla <- as.formula(paste(targ,paste(preds, collapse="+"), sep=" ~ ") )
-# dummy.ds <- dummyVars(fmla,data=ds.tr3, fullRank=F)
-# dummy.ds.tr3 <- data.frame(predict(dummy.ds, newdata = ds.tr3),"Class"=ds.tr3$Class)
-# 
-# dummy.ds.tr3$Class <- ifelse(dummy.ds.tr3$Class=='GOOD',1,0)
-# 
-# View(dummy.ds.tr3)
-# 
-# fitControl <- trainControl(## 10-fold CV
-#   method = "repeatedcv",
-#   number = 10,
-#   ## repeated ten times
-#   repeats = 10)
-# 
-# glmnetFit <- train(Class~., data=dummy.ds.tr3, method = "glmnet", trControl = fitControl)
-# 
-# RocImp3 <- varImp(glmnetFit,scale=F)
-# RocImp3
-# 
-# plot(RocImp3)
-# 
-# 
-# results <- data.frame(row.names(RocImp3$importance),RocImp3$importance$Overall)
-# results$VariableName <- rownames(RocImp3)
-# colnames(results) <- c('VariableName','Class')
-# results <- results[order(results$Class),]
-# results <- results[(results$Class != 0),]
-# 
-# par(mar=c(5,15,4,2)) # increase y-axis margin. 
-# xx <- barplot(results$Class, width = 0.85, 
-#               main = paste("Variable Importance using GLM model"), horiz = T, 
-#               xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
-#               col = ifelse((results$Class > 0), 'green', 'red')) 
-# axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
-# 
+ds.tr3 <- data[ , names(data) %in% unlist(list(preds,targ))]
+
+fmla <- as.formula(paste(targ,paste(preds, collapse="+"), sep=" ~ ") )
+dummy.ds <- dummyVars(fmla,data=ds.tr3, fullRank=F)
+dummy.ds.tr3 <- data.frame(predict(dummy.ds, newdata = ds.tr3),"Class"=ds.tr3$Class)
+
+dummy.ds.tr3$Class <- ifelse(dummy.ds.tr3$Class=='GOOD',1,0)
+
+View(dummy.ds.tr3)
+
+fitControl <- trainControl(## 10-fold CV
+  method = "repeatedcv",
+  number = 10,
+  ## repeated ten times
+  repeats = 10,
+  ## Estimate class probabilities
+  classProbs = TRUE,
+  returnData = TRUE,
+  ## Evaluate performance using 
+  ## the following function
+  summaryFunction = twoClassSummary)
+
+glmnetFit <- train(Class~., data=dummy.ds.tr3, method = "glmnet", trControl = fitControl,metric="ROC")
+
+RocImp3 <- varImp(glmnetFit,scale=F)
+RocImp3
+
+plot(RocImp3)
+
+
+results <- data.frame(row.names(RocImp3$importance),RocImp3$importance$Overall)
+results$VariableName <- rownames(RocImp3)
+colnames(results) <- c('VariableName','Class')
+results <- results[order(results$Class),]
+results <- results[(results$Class != 0),]
+
+par(mar=c(5,15,4,2)) # increase y-axis margin. 
+xx <- barplot(results$Class, width = 0.25, 
+              main = paste("Variable Importance using GLM model"), horiz = T, 
+              xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
+              col = ifelse((results$Class > 0), 'blue', 'red')) 
+axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
+
 
 
 #--------------- cross validation
