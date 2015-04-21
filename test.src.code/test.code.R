@@ -6,6 +6,8 @@ library("caret")
 Dataset <- read.delim("TSIPOYRA-2014 BATCHES-ANON-2.csv", header = TRUE, sep = ";", dec=".")
 data <- create_dataset(Dataset)
 
+#data <- data[data$Class=='GOOD', ]
+
 targ <- "Class"
 preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight", "Origin.Month")
 
@@ -58,15 +60,54 @@ fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") )
 # 
 # #------------------------------------------------------
 
-# ds.tr2 <- data[ , names(data) %in% unlist(list(preds,targ))]
+ds.tr2 <- data[ , names(data) %in% unlist(list(preds,targ))]
+
+targ <- "Class"
+preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
+
+fmla <- as.formula(paste(" ",paste(preds, collapse="+"), sep=" ~ ") )
+dummy.ds <- dummyVars(fmla,data=ds.tr2, fullRank=F)
+dummy.ds.tr2 <- data.frame(predict(dummy.ds, newdata = ds.tr2),"Class"=ds.tr2$Class)
+dummy.ds.tr2$Class <- ifelse(dummy.ds.tr2$Class=='GOOD',1,0)
+
+fitControl <- trainControl(## 10-fold CV
+  method = "repeatedcv",
+  number = 10,
+  ## repeated ten times
+  repeats = 10)
+  
+svmFit2 <- train(Class~., data=dummy.ds.tr2, method = "svmRadial", trControl = fitControl)
+  
+svmFit2.best.acc.kappa <- svmFit2$results[rownames(svmFit2$bestTune),]
+
+RocImp2 <- varImp(svmFit2,scale=F)
+RocImp2
+
+plot(RocImp2)
+# 
+# results <- data.frame(row.names(RocImp2$importance),RocImp2$importance$Overall)
+# results$VariableName <- rownames(RocImp2)
+# colnames(results) <- c('VariableName','Class')
+# results <- results[order(results$Class),]
+# results <- results[(results$Class != 0),]
+# 
+# par(mar=c(5,15,4,2)) # increase y-axis margin. 
+# xx <- barplot(results$Class, width = 0.85, 
+#               main = paste("Variable Importance using SVM model"), horiz = T, 
+#               xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
+#               col = ifelse((results$Class > 0), 'green', 'red')) 
+# axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
+
+#---------------------------------
+
+# dummy.ds.good <- dummy.ds.tr2[dummy.ds.tr2$Class==1,]
 # 
 # targ <- "Class"
 # preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
 # 
 # fmla <- as.formula(paste(" ",paste(preds, collapse="+"), sep=" ~ ") )
-# dummy.ds <- dummyVars(fmla,data=ds.tr2, fullRank=F)
-# dummy.ds.tr2 <- data.frame(predict(dummy.ds, newdata = ds.tr2),"Class"=ds.tr2$Class)
-# 
+# dummy.ds <- dummyVars(fmla,data=dummy.ds.good, fullRank=F)
+# dummy.ds.good <- data.frame(predict(dummy.ds, newdata = dummy.ds.good),"Class"=dummy.ds.good$Class)
 # 
 # fitControl <- trainControl(## 10-fold CV
 #   method = "repeatedcv",
@@ -74,58 +115,82 @@ fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") )
 #   ## repeated ten times
 #   repeats = 10)
 # 
-#   
-# svmFit2 <- train(Class~., data=dummy.ds.tr2, method = "svmRadial", trControl = fitControl)
-#   
-# svmFit2.best.acc.kappa <- svmFit2$results[rownames(svmFit2$bestTune),]
+# svmFitg <- train(Class~., data=dummy.ds.good, method = "svmRadial", trControl = fitControl)
 # 
-# RocImp2 <- varImp(svmFit2)
-# RocImp2
+# svmFitg.best.acc.kappa <- svmFitg$results[rownames(svmFitg$bestTune),]
 # 
-# plot(RocImp2)
+# RocImpg <- varImp(svmFitg,scale=F)
+# RocImpg
+# 
+# plot(RocImpg)
+# 
+# results <- data.frame(row.names(RocImpg$importance),RocImpg$importance$Overall)
+# results$VariableName <- rownames(RocImpg)
+# colnames(results) <- c('VariableName','Class')
+# results <- results[order(results$Class),]
+# results <- results[(results$Class != 0),]
+# 
+# par(mar=c(5,15,4,2)) # increase y-axis margin. 
+# xx <- barplot(results$Class, width = 0.85, 
+#               main = paste("Variable Importance using SVM model - good class"), horiz = T, 
+#               xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
+#               col = ifelse((results$Class > 0), 'green', 'red')) 
+# axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
+# 
+# 
+# 
+# dummy.ds.bad <- dummy.ds.tr2[dummy.ds.tr2$Class==0,]
+
+
+
+
+
+
+
+
+
+
+
+
 
 #--------------------------------------------
-ds.tr3 <- data[ , names(data) %in% unlist(list(preds,targ))]
-
-fmla <- as.formula(paste(targ,paste(preds, collapse="+"), sep=" ~ ") )
-dummy.ds <- dummyVars(fmla,data=ds.tr3, fullRank=F)
-dummy.ds.tr3 <- data.frame(predict(dummy.ds, newdata = ds.tr3),"Class"=ds.tr3$Class)
-
-View(dummy.ds.tr3)
-
-fitControl <- trainControl(## 10-fold CV
-  method = "repeatedcv",
-  number = 10,
-  ## repeated ten times
-  repeats = 10)
-
-glmnetFit <- train(Class~., data=dummy.ds.tr3, method = "glmnet", trControl = fitControl)
-
-RocImp3 <- varImp(glmnetFit)
-RocImp3
-
-plot(RocImp3)
-
-
-results <- data.frame(row.names(RocImp3$importance),RocImp3$importance$Overall)
-results$VariableName <- rownames(RocImp3)
-colnames(results) <- c('VariableName','Class')
-results <- results[order(results$Class),]
-results <- results[(results$Class != 0),]
-
-par(mar=c(5,15,4,2)) # increase y-axis margin. 
-xx <- barplot(results$Class, width = 0.85, 
-              main = paste("Variable Importance -","Class"), horiz = T, 
-              xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
-              col = ifelse((results$Class > 0), 'green', 'red')) 
-axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
-
-
-
-
-
-
-
+# ds.tr3 <- data[ , names(data) %in% unlist(list(preds,targ))]
+# 
+# fmla <- as.formula(paste(targ,paste(preds, collapse="+"), sep=" ~ ") )
+# dummy.ds <- dummyVars(fmla,data=ds.tr3, fullRank=F)
+# dummy.ds.tr3 <- data.frame(predict(dummy.ds, newdata = ds.tr3),"Class"=ds.tr3$Class)
+# 
+# dummy.ds.tr3$Class <- ifelse(dummy.ds.tr3$Class=='GOOD',1,0)
+# 
+# View(dummy.ds.tr3)
+# 
+# fitControl <- trainControl(## 10-fold CV
+#   method = "repeatedcv",
+#   number = 10,
+#   ## repeated ten times
+#   repeats = 10)
+# 
+# glmnetFit <- train(Class~., data=dummy.ds.tr3, method = "glmnet", trControl = fitControl)
+# 
+# RocImp3 <- varImp(glmnetFit,scale=F)
+# RocImp3
+# 
+# plot(RocImp3)
+# 
+# 
+# results <- data.frame(row.names(RocImp3$importance),RocImp3$importance$Overall)
+# results$VariableName <- rownames(RocImp3)
+# colnames(results) <- c('VariableName','Class')
+# results <- results[order(results$Class),]
+# results <- results[(results$Class != 0),]
+# 
+# par(mar=c(5,15,4,2)) # increase y-axis margin. 
+# xx <- barplot(results$Class, width = 0.85, 
+#               main = paste("Variable Importance using GLM model"), horiz = T, 
+#               xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
+#               col = ifelse((results$Class > 0), 'green', 'red')) 
+# axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
+# 
 
 
 #--------------- cross validation

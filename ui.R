@@ -4,7 +4,7 @@ library("shiny")
 library("lubridate")
 library("mgcv")
 library("htmltools")
-library("XLConnect")
+
 
 
 # load helpers.R file

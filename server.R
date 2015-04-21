@@ -31,7 +31,7 @@ library("maptree")
 library("nlme")
 library("mgcv")
 library("htmltools")
-library("XLConnect")
+
 
 
 # load helpers.R file
