@@ -1945,7 +1945,7 @@ runGLM <- reactive({
       ## repeated ten times
       repeats = 10)
     
-      glmnetFit <- train(Class~., data=dummy.dset.train, method = "glmnet", trControl = fitControl)
+    glmnetFit <- train(Class~., data=dummy.dset.train, method = "glmnet", trControl = fitControl)
     
   }
 #   else{
@@ -1992,31 +1992,47 @@ output$validate.model <- renderPrint({
         # "data": dataset that based on the user choices in the first page
         data <- passData()  
         dset <- data[ , names(data) %in% unlist(list.vars) ]
-        
-        # create a subset of data as testing set so as to evaluate the accuracy of the model
-        nr=nrow(dset)
-        perc = 1 #50/100
-        ids <- sort(ceiling(sample( seq(1,nr), nr*perc, replace = FALSE)))
-        ds.test <- data[ ids, ]
-        ds.test <- data
         targ <- input$Targ.ML.Var
         
         # if SVM 
         if (input$radioML == 1){
         
-            # call svm model
-            svm.mod <- runSVM()
-            testPred <- predict(svm.mod, ds.test )
-            confmat <- confusionMatrix(testPred, ds.test[ ,targ])
-               
+          # create a subset of data as testing set so as to evaluate the accuracy of the model
+          nr=nrow(dset)
+          perc = 1 #50/100
+          ids <- sort(ceiling(sample( seq(1,nr), nr*perc, replace = FALSE)))
+          ds.test <- dset[ ids, ]
+        
+          # call svm model
+          svm.mod <- runSVM()
+          testPred <- predict(svm.mod, ds.test )
+          confmat <- confusionMatrix(testPred, ds.test[ ,targ])
+          
+          results.model<-confmat
+          
         }else{
-            # if GLM
-            gml.mod <- runGLM()
-            testPred <- predict(gml.mod, ds.test )
-            confmat <- confusionMatrix(testPred, ds.test[ ,targ])
+          # if GLM
+          fmla <- as.formula( paste(input$Targ.ML.Var, paste(input$preds.ML.Vars, collapse="+"), sep=" ~ ") ) 
+          # create a subset of data as testing set so as to evaluate the accuracy of the model
+          dummy.ds <- dummyVars(fmla,data=dset, fullRank=F)
+          dummy.dset <- data.frame(predict(dummy.ds, newdata = dset),"Class"= dset$Class) #input$Targ.ML.Var)
+          dummy.dset$Class <- ifelse(dummy.dset$Class=='GOOD',1,0)
+          predictorsNames <- names(dummy.dset)[names(dummy.dset) != targ]  
+          
+          nr=nrow(dummy.dset)
+          perc = 1 #50/100
+          ids <- sort(ceiling(sample( seq(1,nr), nr*perc, replace = FALSE)))
+          dummy.ds.test <- dummy.dset[ ids, ]
+         
+          gml.mod <- runGLM()
+          testPred <- predict(gml.mod, dummy.ds.test[ , predictorsNames] )
+          auc <- roc(dummy.ds.test[,targ], testPred)
+          
+          results.model<-auc$auc
+          
         }
       
-        results.model<-confmat
+        
         print( results.model )
       }else{ 
           print(data.frame(Warning="Please select Model Parameters."))
@@ -2049,7 +2065,7 @@ output$plot_ML.Rel.Impo <- renderPlot({
           results$VariableName <- rownames(RocImp)
           colnames(results) <- c('VariableName','Class')
           results <- results[order(results$Class),]
-          #results <- results[(results$Class != 0),]
+          results <- results[(results$Class != 0),]
           
           par(mar=c(5,15,4,2)) # increase y-axis margin. 
           xx <- barplot(results$Class, width = 0.25, 

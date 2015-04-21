@@ -612,7 +612,7 @@ tabPanel(" Machine Learning Models ", id="MenuPage_6",
                       #------ relative importance
                       hr(),
                       h4(' Relative Importance:'),      
-                      fluidRow(column(12, plotOutput("plot_ML.Rel.Impo",height="400px"))),
+                      fluidRow(column(12, plotOutput("plot_ML.Rel.Impo",height="600px"))),
                       hr(),
                       fluidRow(column(12, verbatimTextOutput("ML.Rel.Impo")))
                       

@@ -173,16 +173,6 @@ fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") )
 
 
 
-
-
-
-
-
-
-
-
-
-
 #--------------------------------------------
 ds.tr3 <- data[ , names(data) %in% unlist(list(preds,targ))]
 
@@ -192,40 +182,55 @@ dummy.ds.tr3 <- data.frame(predict(dummy.ds, newdata = ds.tr3),"Class"=ds.tr3$Cl
 
 dummy.ds.tr3$Class <- ifelse(dummy.ds.tr3$Class=='GOOD',1,0)
 
-View(dummy.ds.tr3)
+predictorsNames <- names(dummy.ds.tr3)[names(dummy.ds.tr3) != targ]
 
 fitControl <- trainControl(## 10-fold CV
   method = "repeatedcv",
   number = 10,
   ## repeated ten times
-  repeats = 10,
-  ## Estimate class probabilities
-  classProbs = TRUE,
-  returnData = TRUE,
-  ## Evaluate performance using 
-  ## the following function
-  summaryFunction = twoClassSummary)
+  repeats = 10
+  )
 
-glmnetFit <- train(Class~., data=dummy.ds.tr3, method = "glmnet", trControl = fitControl,metric="ROC")
+glmnetFit <- train(Class~., data=dummy.ds.tr3, method = "glmnet", trControl = fitControl)
 
-RocImp3 <- varImp(glmnetFit,scale=F)
-RocImp3
+nr=nrow(dummy.ds.tr3)
+perc = 1 #50/100
+ids <- sort(ceiling(sample( seq(1,nr), nr*perc, replace = FALSE)))
+dummy.ds.test <- dummy.ds.tr3[ ids, ]
 
-plot(RocImp3)
+testPred <- predict(glmnetFit, dummy.ds.test[ , predictorsNames] )
+
+auc <- roc(dummy.ds.test[,targ], testPred)
+print(auc$auc)
+#confmat <- confusionMatrix(testPred, dummy.ds.test[ ,targ])
 
 
-results <- data.frame(row.names(RocImp3$importance),RocImp3$importance$Overall)
-results$VariableName <- rownames(RocImp3)
-colnames(results) <- c('VariableName','Class')
-results <- results[order(results$Class),]
-results <- results[(results$Class != 0),]
 
-par(mar=c(5,15,4,2)) # increase y-axis margin. 
-xx <- barplot(results$Class, width = 0.25, 
-              main = paste("Variable Importance using GLM model"), horiz = T, 
-              xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
-              col = ifelse((results$Class > 0), 'blue', 'red')) 
-axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
+
+# RocImp3 <- varImp(glmnetFit,scale=F)
+# RocImp3
+# 
+# plot(RocImp3)
+# 
+# 
+# results <- data.frame(row.names(RocImp3$importance),RocImp3$importance$Overall)
+# results$VariableName <- rownames(RocImp3)
+# colnames(results) <- c('VariableName','Class')
+# results <- results[order(results$Class),]
+# results <- results[(results$Class != 0),]
+# 
+# par(mar=c(5,15,4,2)) # increase y-axis margin. 
+# xx <- barplot(results$Class, width = 0.25, 
+#               main = paste("Variable Importance using GLM model"), horiz = T, 
+#               xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
+#               col = ifelse((results$Class > 0), 'blue', 'red')) 
+# axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
+
+
+
+
+
+
 
 
 
