@@ -37,13 +37,61 @@ fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") )
 # 
 # print(res)
 
-#------------------------------------------------------
-ds.tr1 <- data[ , names(data) %in% unlist(list(preds,targ))]
-ds.tr1.Dummy <- dummyVars( " ~ Site + Region + Hatchery + Days + Econ.FCR.Period + Actual.Feed+ End.Av.Weight + Origin.Month", data=ds.tr1, fullRank=F)
-train.ds <- data.frame(predict(ds.tr1.Dummy, newdata = ds.tr1))
+# #------------------------------------------------------
+# ds.tr1 <- data[ , names(data) %in% unlist(list(preds,targ))]
+# 
+# fitControl <- trainControl(## 10-fold CV
+#   method = "repeatedcv",
+#   number = 10,
+#   ## repeated ten times
+#   repeats = 10)
+# 
+#   
+# svmFit <- train(fmla.cl, data=ds.tr1, method = "svmRadial", trControl = fitControl)
+#   
+# svmFit.best.acc.kappa <- svmFit$results[rownames(svmFit$bestTune),]
+#   
+# RocImp <- varImp(  svmFit, scale = FALSE)
+# RocImp
+# 
+# plot(RocImp)
+# 
+# #------------------------------------------------------
 
-train.dset <- data.frame(train.ds, "Class"=ds.tr1$Class)
+# ds.tr2 <- data[ , names(data) %in% unlist(list(preds,targ))]
+# 
+# targ <- "Class"
+# preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
+# 
+# fmla <- as.formula(paste(" ",paste(preds, collapse="+"), sep=" ~ ") )
+# dummy.ds <- dummyVars(fmla,data=ds.tr2, fullRank=F)
+# dummy.ds.tr2 <- data.frame(predict(dummy.ds, newdata = ds.tr2),"Class"=ds.tr2$Class)
+# 
+# 
+# fitControl <- trainControl(## 10-fold CV
+#   method = "repeatedcv",
+#   number = 10,
+#   ## repeated ten times
+#   repeats = 10)
+# 
+#   
+# svmFit2 <- train(Class~., data=dummy.ds.tr2, method = "svmRadial", trControl = fitControl)
+#   
+# svmFit2.best.acc.kappa <- svmFit2$results[rownames(svmFit2$bestTune),]
+# 
+# RocImp2 <- varImp(svmFit2)
+# RocImp2
+# 
+# plot(RocImp2)
 
+#--------------------------------------------
+ds.tr3 <- data[ , names(data) %in% unlist(list(preds,targ))]
+
+fmla <- as.formula(paste(targ,paste(preds, collapse="+"), sep=" ~ ") )
+dummy.ds <- dummyVars(fmla,data=ds.tr3, fullRank=F)
+dummy.ds.tr3 <- data.frame(predict(dummy.ds, newdata = ds.tr3),"Class"=ds.tr3$Class)
+
+View(dummy.ds.tr3)
 
 fitControl <- trainControl(## 10-fold CV
   method = "repeatedcv",
@@ -51,16 +99,33 @@ fitControl <- trainControl(## 10-fold CV
   ## repeated ten times
   repeats = 10)
 
-  
-svmFit <- train(x=ds.tr1.Dummy$vars, y="Class", data=train.dset, 
-                  method = "svmRadial",
-                  trControl = fitControl)
-  
-  
-RocImp <- varImp(  svmFit, scale = FALSE)
-RocImp
+glmnetFit <- train(Class~., data=dummy.ds.tr3, method = "glmnet", trControl = fitControl)
 
-plot(RocImp, scale=F)
+RocImp3 <- varImp(glmnetFit)
+RocImp3
+
+plot(RocImp3)
+
+
+results <- data.frame(row.names(RocImp3$importance),RocImp3$importance$Overall)
+results$VariableName <- rownames(RocImp3)
+colnames(results) <- c('VariableName','Class')
+results <- results[order(results$Class),]
+results <- results[(results$Class != 0),]
+
+par(mar=c(5,15,4,2)) # increase y-axis margin. 
+xx <- barplot(results$Class, width = 0.85, 
+              main = paste("Variable Importance -","Class"), horiz = T, 
+              xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
+              col = ifelse((results$Class > 0), 'green', 'red')) 
+axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
+
+
+
+
+
+
+
 
 
 #--------------- cross validation
@@ -72,6 +137,7 @@ plot(RocImp, scale=F)
 #                    sampling.aggregate = mean, sampling.dispersion = sd) )  
 # 
 # best.svm.fit.cl.cr <- svm.fit.cl.cr$best.model
+# 
 # # pred <- predict(best.svm.fit.cl.cr, ds.ts1 )
 # # confmat <- table(true=ds.ts1[,targ],pred)
 # # print(confmat)
