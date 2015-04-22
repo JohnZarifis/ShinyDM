@@ -1847,6 +1847,17 @@ output$preds.ML.Variables <- renderUI({
 })  # end renderUI preds.Variables
 
 
+output$set.values.ML.Predictors <- renderUI({
+  list.predictors <- list(input$preds.ML.Vars)
+  num.preds <- length(list.predictors)
+  
+  lapply(1:num.preds, function(i) {
+        numericInput(paste0(list.predictors[[i]]), label = h4( as.character(list.predictors[[i]]) ), value = NA)  
+    } # end function
+  ) # end lapply
+}) # end renderUI
+
+
 output$TestOpts <- renderUI({
   if (is.null(input$testingOptions))
     return()

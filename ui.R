@@ -625,7 +625,13 @@ tabPanel(" Machine Learning Models ", id="MenuPage_6",
              tabPanel("Predict with it",
                       
                       # predict response value using user-defined values for each predictor  
-                      h3("Input Variables (predictors):"),
+                      h3("Set values to Predictors (Input Variables):"),
+                      
+                      uiOutput("set.values.ML.Predictors"), 
+                      
+          
+
+                      
 #                       fluidRow(column(3, numericInput('num_Start.Av.Weight', label = h4("Start.Av.Weight"), value = NA)),
 #                                column(3, numericInput("num_Days", label = h4("Days"), value = NA)),
 #                                column(3, numericInput('num_Period.Feed.Qty', label = h4("Period.Feed.Qty"), value = NA)),
