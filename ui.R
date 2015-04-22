@@ -624,33 +624,19 @@ tabPanel(" Machine Learning Models ", id="MenuPage_6",
              ), # end tabPanel "Build"
              tabPanel("Predict with it",
                       
-                      # predict response value using user-defined values for each predictor  
-                      h3("Set values to Predictors (Input Variables):"),
-                      
-                      uiOutput("set.values.ML.Predictors"), 
-                      
-          
-
-                      
-#                       fluidRow(column(3, numericInput('num_Start.Av.Weight', label = h4("Start.Av.Weight"), value = NA)),
-#                                column(3, numericInput("num_Days", label = h4("Days"), value = NA)),
-#                                column(3, numericInput('num_Period.Feed.Qty', label = h4("Period.Feed.Qty"), value = NA)),
-#                                column(3, numericInput('num_Suggested.Feed.Qty', label = h4("Suggested.Feed.Qty"), value = NA))
-#                       ),
-#                       fluidRow(column(3, numericInput('num_FCR', label = h4("Econ.FCR.Period"), value = NA)),
-#                                column(3, numericInput('num_SFR.Period', label = h4("SFR.Period"), value = NA)),
-#                                column(3, numericInput('num_SGR.Period', label = h4("SGR.Period"), value = NA))
-#                       ),
-#                       fluidRow(column(3, numericInput('num_LTD.Mortality', label = h4("LTD.Mortality"), value = NA)),
-#                                column(3, numericInput("num_Avg.Temperature", label = h4("Avg.Temperature"), value = NA)),
-#                                column(3, numericInput('num_End.Av.Weight', label = h4("End.Av.Weight"), value = NA))
-#                       ),
-                       hr(),
-                       actionButton(inputId = 'goPredict',  label = 'Start prediction'),
-                      hr(),
-                      h2("Prediction...")
-#                       fluidRow(column(12, verbatimTextOutput("value")))
-            
+              # predict response value using user-defined values for each predictor  
+              fluidRow(column(6,   
+                          h3("Set values to Predictors:"),
+                          uiOutput("dyn_input")
+                        ), 
+                        hr(),
+                        column(6, 
+                          actionButton(inputId = 'goMLPredict',  label = 'Start prediction'),
+                          hr(),
+                          h3("Prediction with ML model..."),
+                          fluidRow(column(12, verbatimTextOutput("prediction.value.ML")))
+                        ) # end column
+              ) # end fluidRow 
             ) # end tabPanel "Predict"
            ) # end tabsetPanel
          ) # end mainPanel

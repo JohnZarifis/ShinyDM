@@ -1846,18 +1846,6 @@ output$preds.ML.Variables <- renderUI({
   selectInput(inputId='preds.ML.Vars', label=h3('Predictors:'), choices=ind.vars, multiple=TRUE)
 })  # end renderUI preds.Variables
 
-
-output$set.values.ML.Predictors <- renderUI({
-  list.predictors <- list(input$preds.ML.Vars)
-  num.preds <- length(list.predictors)
-  
-  lapply(1:num.preds, function(i) {
-        numericInput(paste0(list.predictors[[i]]), label = h4( as.character(list.predictors[[i]]) ), value = NA)  
-    } # end function
-  ) # end lapply
-}) # end renderUI
-
-
 output$TestOpts <- renderUI({
   if (is.null(input$testingOptions))
     return()
@@ -2103,6 +2091,7 @@ output$ML.Rel.Impo <- renderPrint({
         print(RocImp, digits=3, justify="left")
       }
       else{
+        # if GLMnet
         gml.mod <- runGLM()
         RocImp <- varImp(gml.mod, scale = FALSE)
         print(RocImp, digits=3, justify="left")
@@ -2110,6 +2099,75 @@ output$ML.Rel.Impo <- renderPrint({
    })
   }
 })
+
+#---------------------------------------------------------------------------------------------------
+# Tab: Predict with Machine Learning Models
+#
+
+output$dyn_input <- renderUI({
+  
+    data <- passData()
+    list.predictors <- input$preds.ML.Vars
+    num.preds <- length(list.predictors)
+    
+    inputs <- lapply(1:num.preds, function(i) {
+    input_name <- paste0("input", i, sep="_")
+    fluidRow(column(width=6, 
+                if ( is.factor( data[, list.predictors[[i]]] ) )
+                {
+                  list.values <- unique( data[, list.predictors[[i]]] )
+                  selectInput(inputId=input_name, label=h4( as.character(list.predictors[[i]]) ), 
+                              choices=as.character(list.values), multiple=FALSE)
+                }else{  
+                  numericInput( input_name, label = h4( as.character(list.predictors[[i]]) ), value = NA)
+                } # end if...else
+              ) # end column
+            ) # end fluidRow
+      } # end function
+    ) # end lapply
+    
+    do.call(tagList, inputs)
+}) 
+
+# predict value regarding the predictors' values
+output$prediction.value.ML <- renderPrint({ 
+  
+  if (input$goMLPredict == 0){
+    return() }
+  else{ 
+    isolate({
+      
+      # load the model SVM or GLMnet 
+      if (input$radioML == 1){
+        ML.model <- runSVM()
+      }else{
+        ML.model <- runGLM()
+      }
+      
+      # create an instance from the input values 
+      list.predictors <- input$preds.ML.Vars
+      num.preds <- length(list.predictors)
+      
+      newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
+      newdata <- lapply(1:num.preds, function(i) {
+                       input_name <- paste0("input", i, sep="")
+                       input[[ input_name ]]
+                    } # end function
+                )# end lapply
+      names(newdata) <- list.predictors
+    print(newdata)
+      pred_val <- predict(ML.model, newdata)
+      names(pred_val) <- as.character(input$responseVar)
+      
+      return( pred_val )
+    })
+  }
+  
+})
+
+
+
+
 
 
 #---------------------------------------------------------------------------------------------------

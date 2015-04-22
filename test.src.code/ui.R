@@ -17,7 +17,11 @@ shinyUI(fluidPage(
       
       h2("Set values to predictors"),
       # UI output
-      uiOutput("dyn_input")
+      uiOutput("dyn_input"),
+      
+      br(),
+      h2("Prediction..."),
+      fluidRow(column(12, verbatimTextOutput("value")))
       
     )
   )

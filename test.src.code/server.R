@@ -30,15 +30,48 @@ output$dyn_input <- renderUI({
   list.predictors <- input$explanatory.Variables
   num.preds <- length(list.predictors)
   
-  inputs <- lapply(1:num.preds, function(i) {
-      input_name <- paste0("input", i, sep="_")
+  set.inputs.list <- lapply(1:num.preds, function(i) {
+      input_name <- paste0("input", i, sep="")
      # wellPanel(      
       numericInput( input_name, label = h4( as.character(list.predictors[[i]]) ), value = NA)
     #  )
   })
   
  } # end else
- do.call(tagList, inputs)
+ do.call(tagList, set.inputs.list)
 }) 
+
+#-------------------------------- 
+output$value <- renderPrint({
+  if (input$goSetValues == 0){
+    return() }
+  else{ 
+    list.predictors <- input$explanatory.Variables
+    num.preds <- length(list.predictors)
+    
+    newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
+    #newdata <- data.frame()
+    newdata <- lapply(1:num.preds, function(i) {
+        input_name <- paste0("input", i, sep="")
+        input[[ input_name ]]
+      #  print( input[[ input_name ]] )
+       
+      } # end function
+      
+    )# end lapply
+    
+    names(newdata) <- list.predictors
+   # View( newdata )
+    
+    print( newdata )
+  } # end if...else
+  
+})
+
+
+
+
+
+
 
 })
