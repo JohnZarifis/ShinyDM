@@ -281,7 +281,8 @@ shinyServer(function(input, output, session){
     }
     
     
-    data <- data[ data$End.Av.Weight >= as.numeric(input$rangeAvWeight[1]) & data$End.Av.Weight <= as.numeric(input$rangeAvWeight[2]) 
+    data <- data[ data$End.Av.Weight >= as.numeric(input$rangeAvWeight[1]) & data$End.Av.Weight <= as.numeric(input$rangeAvWeight[2])
+               & data$Start.Av.Weight >= as.numeric(input$rangeStAvWeight[1]) & data$Start.Av.Weight <= as.numeric(input$rangeStAvWeight[2])
                & data$Av.Weight.Deviation >= as.numeric(input$rangeAvWeightDev[1])
                & data$Av.Weight.Deviation <= as.numeric(input$rangeAvWeightDev[2]) 
                & data$Econ.FCR.Period >= as.numeric(input$rangePeriod.FCR[1]) & data$Econ.FCR.Period <= as.numeric(input$rangePeriod.FCR[2]) 
