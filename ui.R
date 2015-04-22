@@ -11,7 +11,7 @@ library("htmltools")
 source("helpers.R")
 
 #Datamining281114 <- read.delim("Datamining281114.csv", header = TRUE, sep = ";", dec=".")
-Dataset <- read.delim("TSIPOYRA-2014 BATCHES-ANON-2.csv", header = TRUE, sep = ";", dec=".")
+Dataset <- read.delim("bream2014.csv", header = TRUE, sep = ";", dec=",")
 #Dataset <- readWorksheetFromFile("TSIPOYRA-2014 BATCHES-ANON.xlsx",sheet =1)
 
 # Call function to create the dataset for analysis
@@ -120,7 +120,7 @@ sidebarUni <- sidebarPanel(
   radioButtons("radioDimUni", label = h3("Separate The Dataset By:"), 
                choices = list("None", "Region", "Site", "Unit", "Batch", "Hatchery",
                               "Origin.Month", "Origin.Year", "Current.Grading", 
-                              "Actual.Feed"), selected = "None"),
+                              "Feed Type"="Actual.Feed","Feed.Category","Feed Supplier"="Supplier"), selected = "None"),
   
   hr(),
   actionButton(inputId = 'goUniPlot',  label = 'Refresh Univariate plots')
@@ -232,7 +232,7 @@ shinyUI(
                           fluidRow( column(9, radioButtons("radioDimMulti", label = h3("Separate The Dataset By:"), 
                                                       choices = list("None", "Region", "Site", "Batch", "Unit", "Hatchery",
                                                         "Origin.Month", "Origin.Year", "Current.Grading", 
-                                                         "Actual.Feed"), selected = "None", inline = TRUE)),
+                                                        "Feed Type"="Actual.Feed","Feed.Category","Feed Supplier"="Supplier"), selected = "None", inline = TRUE)),
                                     column(3, actionButton(inputId = 'goMultiPlot',  label = 'Refresh Multivariate plots'))
                           ), # end fluidRow
                           hr(),

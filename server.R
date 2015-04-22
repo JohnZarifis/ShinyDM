@@ -44,7 +44,7 @@ source("helpers.R")
 
 #Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
 #Dataset <- readWorksheetFromFile("TSIPOYRA-2014 BATCHES-ANON.xlsx",sheet =1)
-Dataset <- read.delim("TSIPOYRA-2014 BATCHES-ANON-2.csv", header = TRUE, sep = ";", dec=".")
+Dataset <- read.delim("bream2014.csv", header = TRUE, sep = ";", dec=",")
 # Call function to create the dataset for analysis
 data <- create_dataset(Dataset)
 #
