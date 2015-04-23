@@ -56,12 +56,16 @@ create_dataset <- function(dataset){
                      "End.Av.Weight.Category" = dataset$End.Av..Weight.Category,                     
                      "Age" = dataset$AGE,                     
                      "Days" = interval( dmy(dataset$From), dmy(dataset$To) )%/%days(1),
-                     "Class" = dataset$CLASS
+                     "Class" = dataset$CLASS,
+                     "Period.Mortality" = dataset$Period.Mortality..,
+                     "LTD.Day.Degrees" = dataset$LTD.Day.Degrees,
+                     "Fastings.No" = dataset$Fastings.No,
+                     "FastingsPerc"=dataset$Fastings..
                     )
   
-  #   For debugging  
-  #  View(data)
-  #   str(data)
+  # For debugging  
+  # View(data)
+  # str(data)
   # print(nrow(data))
   
   return(data)

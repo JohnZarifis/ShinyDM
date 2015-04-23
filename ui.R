@@ -44,7 +44,7 @@ sidebarUni <- sidebarPanel(
                  min = min( ymd(df$From)-days(0) ),
                  max = max( ymd(df$From)+days(1)),
                  separator = " to ", format = "dd/mm/yyyy",
-                 startview = 'year', language = 'pt', weekstart = 0
+                 startview = 'year', language = 'el', weekstart = 0
   ),
   dateRangeInput('dateRangeTo',
                  label = paste(' To: '),
@@ -53,7 +53,7 @@ sidebarUni <- sidebarPanel(
                  min = min( ymd(df$To)-days(1) ),
                  max = max( ymd(df$To)+days(1) ),
                  separator = " to ", format = "dd/mm/yyyy",
-                 startview = 'year', language = 'pt', weekstart = 0
+                 startview = 'year', language = 'el', weekstart = 0
   ),
   
   hr(),
@@ -82,7 +82,25 @@ sidebarUni <- sidebarPanel(
                   sliderInput("rangeAvg.Temp", "Avg.Temperature:", min = min(as.double(df$Avg.Temperature)), 
                               max = max(as.double(df$Avg.Temperature)), 
                               value = c(min(as.double(df$Avg.Temperature)), max(as.double(df$Avg.Temperature))), 
-                              step=0.5, round=-2, sep=".")),
+                              step=0.5, round=-2, sep="."),
+                  sliderInput("rangeAge", "LTD Production Time:", min = min(as.double(df$Age)), 
+                              max = max(as.double(df$Age)), 
+                              value = c(min(as.double(df$Age)), max(as.double(df$Age))), 
+                              step=10, round = TRUE, sep="."),
+                  sliderInput("rangePeriod.Mortality", "Period Mortality % :", min = min(as.double(df$Period.Mortality)), 
+                              max = max(as.double(df$Period.Mortality)), 
+                              value = c(min(as.double(df$Period.Mortality)), max(as.double(df$Period.Mortality))), 
+                              step=0.01, round =-2, sep="."),
+                  sliderInput("rangeLTD.Day.Degrees", "LTD Day Degrees :", min = min(as.double(df$LTD.Day.Degrees)), 
+                              max = max(as.double(df$LTD.Day.Degrees)), 
+                              value = c(min(as.double(df$LTD.Day.Degrees)), max(as.double(df$LTD.Day.Degrees))), 
+                              step=10, round = TRUE, sep="."),
+                  sliderInput("rangeDays", "Days Between Samplings :", min = min(as.double(df$Days)), 
+                              max = max(as.double(df$Days)), 
+                              value = c(min(as.double(df$Days)), max(as.double(df$Days))), 
+                              step=1, round = TRUE, sep=".")
+                  
+                  ),
            column(6,
                   sliderInput("rangeAvWeight", "End.Av.Weight:", min = min(as.double(df$End.Av.Weight)), 
                               max = max(as.double(df$End.Av.Weight)), 
@@ -96,7 +114,7 @@ sidebarUni <- sidebarPanel(
                               max = max(as.double(df$SGR.Period)), 
                               value = c(min(as.double(df$SGR.Period)), max(as.double(df$SGR.Period))), step=0.1, 
                               round=-2, sep="."),
-                  sliderInput("rangeLTD.Mortality", "LTD.Mortality:", 
+                  sliderInput("rangeLTD.Mortality", "LTD.Mortality %:", 
                               min = min(as.double(df$LTD.Mortality)),
                               max = max(as.double(df$LTD.Mortality)), 
                               value = c(min(as.double(df$LTD.Mortality)), 
@@ -113,7 +131,22 @@ sidebarUni <- sidebarPanel(
                               max = max(as.double(df$Period.Feed.Qty), na.rm=TRUE), 
                               value = c(min(as.double(df$Period.Feed.Qty)), 
                                         max(as.double(df$Period.Feed.Qty))), 
-                              step=10, round=TRUE, sep="."))
+                              step=10, round=TRUE, sep="."),
+                  sliderInput("rangeFastings.No", " Number of Fastings:", 
+                              min = min(as.double(df$Fastings.No), na.rm=TRUE), 
+                              max = max(as.double(df$Fastings.No), na.rm=TRUE), 
+                              value = c(min(as.double(df$Fastings.No)), 
+                                        max(as.double(df$Fastings.No))), 
+                              step=1, round=TRUE, sep="."),
+                  sliderInput("rangeFastingsPerc", " Perc of Fastings:", 
+                              min = min(as.double(df$FastingsPerc), na.rm=TRUE), 
+                              max = max(as.double(df$FastingsPerc), na.rm=TRUE), 
+                              value = c(min(as.double(df$FastingsPerc)), 
+                                        max(as.double(df$FastingsPerc))), 
+                              step=0.01, round=-2, sep=".")
+                  
+                  
+                  )
   ), # end fluid row
   
   hr(),
@@ -329,7 +362,7 @@ shinyUI(
             ),  # end tabPanel " Multivariate Statistics "  
 
 #---------------------------------------------------------- Third MenuPage
-            tabPanel(" Multidimensional Dashboard ", id="MenuPage_3", 
+            tabPanel("Dashboard ", id="MenuPage_3", 
                       fluidPage( #theme = shinytheme("cerulean"),
                                  plotOutput('plotDashboard',height="600px"),
                                  hr(),

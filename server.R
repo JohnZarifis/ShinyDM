@@ -291,14 +291,24 @@ shinyServer(function(input, output, session){
                & data$SGR.Period >= as.numeric(input$rangePeriod.SGR[1]) & data$SGR.Period <= as.numeric(input$rangePeriod.SGR[2]) 
                & data$SFR.Period >= as.numeric(input$rangePeriod.SFR[1]) & data$SFR.Period <= as.numeric(input$rangePeriod.SFR[2]) 
                & data$LTD.Mortality >= as.numeric(input$rangeLTD.Mortality[1]) & data$LTD.Mortality <= as.numeric(input$rangeLTD.Mortality[2])
-               & data$Period.Day.Degrees >= as.numeric(input$rangePeriod.Day.Degrees[1]) & 
-                      data$Period.Day.Degrees <= as.numeric(input$rangePeriod.Day.Degrees[2])
-               & data$Avg.Temperature >= as.numeric(input$rangeAvg.Temp[1]) & 
-                      data$Avg.Temperature <= as.numeric(input$rangeAvg.Temp[2])
+               & data$Period.Day.Degrees >= as.numeric(input$rangePeriod.Day.Degrees[1]) 
+               & data$Period.Day.Degrees <= as.numeric(input$rangePeriod.Day.Degrees[2])
+               & data$Avg.Temperature >= as.numeric(input$rangeAvg.Temp[1]) 
+               & data$Avg.Temperature <= as.numeric(input$rangeAvg.Temp[2])
                & (data$From >= ymd(input$dateRangeFrom[1]) & data$From <= ymd(input$dateRangeFrom[2])) 
                & (data$To >= ymd(input$dateRangeTo[1]) & data$To <= ymd(input$dateRangeTo[2])) 
-               & data$Period.Feed.Qty >= as.numeric(input$rangePeriod.Feed.Qty[1]) & 
-                 data$Period.Feed.Qty <= as.numeric(input$rangePeriod.Feed.Qty[2])
+               & data$Period.Feed.Qty >= as.numeric(input$rangePeriod.Feed.Qty[1]) 
+               & data$Period.Feed.Qty <= as.numeric(input$rangePeriod.Feed.Qty[2])
+               & data$FastingsPerc >= as.numeric(input$rangeFastingsPerc[1]) 
+               & data$FastingsPerc <= as.numeric(input$rangeFastingsPerc[2])
+               & data$Fastings.No >= as.numeric(input$rangeFastings.No[1]) 
+               & data$Fastings.No <= as.numeric(input$rangeFastings.No[2])
+               & data$LTD.Day.Degrees >= as.numeric(input$rangeLTD.Day.Degrees[1]) 
+               & data$LTD.Day.Degrees <= as.numeric(input$rangeLTD.Day.Degrees[2])
+               & data$Period.Mortality >= as.numeric(input$rangePeriod.Mortality[1]) 
+               & data$Period.Mortality <= as.numeric(input$rangePeriod.Mortality[2])
+               & data$Age >= as.numeric(input$rangeAge[1]) 
+               & data$Age <= as.numeric(input$rangeAge[2])
               , ]
     
     class(data$ProductionTimeDays)
