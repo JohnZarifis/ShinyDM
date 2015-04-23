@@ -15,6 +15,7 @@ library("psych")
 library("RColorBrewer")
 library("lubridate")
 library("plyr")
+library("dplyr")
 library("GGally")
 library("e1071")
 library("caret")
@@ -1658,15 +1659,6 @@ output$bar.Rel.Impo <- renderPlot({
 #---------------------------------------------------------------------------------------------------
 # Tab: Predict with Regression Model
 #
-# output$inpts_explanatoryVar <- renderUI({
-#                 lapply(1:length(input$explanatory.Variables), function(i) {
-#                   name <- paste0('num_', input$explanatory.Variables[i]) 
-#                   numericInput(name, label = h4(paste0("Numeric input for ",  
-#                                       input$explanatory.Variables[i])), value = NA) 
-#                 })
-# })
-  
-
 output$pred.actual.plot <- renderPlot({
   if (input$goRegression == 0){
     return() }
@@ -1675,61 +1667,73 @@ output$pred.actual.plot <- renderPlot({
       fit <- runRegression()
       data <- passData()
       newds <- subset(data, select=input$explanatory.Variables)
-
+      
       preds <- predict(fit,newdata = newds)
       
       df <- data.frame( subset(data,select=input$responseVar), preds ) 
       names(df) <- c( "Actual", "Prediction" )
-      View(df)
       ggplot(df, aes_string(x="Actual", y="Prediction") ) + geom_point() + geom_abline(col="red")
     })
   }
 })
 
 
-output$value <- renderPrint({ 
+output$dyn_input.Regression <- renderUI({
   
-  if (input$goPredict == 0){
+  data <- passData()
+  list.predictors <- input$explanatory.Variables
+  num.preds <- length(list.predictors)
+  
+  inputs <- lapply(1:num.preds, function(i) {
+    input_name <- paste0("input", i, sep="")
+    fluidRow(column(width=6, 
+                    if ( is.factor( data[, list.predictors[[i]]] ) )
+                    {
+                      list.values <- unique( data[, list.predictors[[i]]] )
+                      selectInput(inputId=input_name, label=h4( as.character(list.predictors[[i]]) ), 
+                                  choices=as.character(list.values), multiple=FALSE)
+                    }else{  
+                      numericInput( input_name, label = h4( as.character(list.predictors[[i]]) ), value = NA)
+                    } # end if...else
+    ) # end column
+    ) # end fluidRow
+  } # end function
+  ) # end lapply
+  
+  do.call(tagList, inputs)
+}) 
+
+# predict value regarding the predictors' values
+output$prediction.value.Regression <- renderPrint({ 
+  
+  if (input$goRegressionPredict == 0){
     return() }
   else{ 
     isolate({
-        fit <- runRegression()
       
-        if (!is.null(input$num_FCR)){
-           newdata <- data.frame('Econ.FCR.Period'= input$num_FCR)
-        }
-        if (!is.null(input$num_Days)){
-           newdata <- cbind(newdata, 'Days'=input$num_Days)
-        }
-        if (!is.null(input$num_Start.Av.Weight)){
-          newdata <- cbind(newdata, "Start.Av.Weight"=input$num_Start.Av.Weight)
-        }
-        if (!is.null(input$num_Period.Feed.Qty)){
-          newdata <- cbind(newdata, 'Period.Feed.Qty'=input$num_Period.Feed.Qty)
-        }
-        if (!is.null(input$num_Suggested.Feed.Qty)){
-          newdata <- cbind(newdata,  'Suggested.Feed.Qty'=input$num_Suggested.Feed.Qty)
-        }
-        if (!is.null(input$num_SFR.Period)){
-          newdata <- cbind(newdata, "SFR.Period"=input$num_SFR.Period)
-        }
-        if (!is.null(input$num_SGR.Period)){
-          newdata <- cbind(newdata, "SGR.Period"=input$num_SGR.Period)
-        }
-        if (!is.null(input$num_End.Av.Weight)){
-          newdata <- cbind(newdata,  "End.Av.Weight"=input$num_End.Av.Weight)
-        }
-        if (!is.null(input$num_LTD.Mortality)){
-          newdata <- cbind(newdata,"LTD.Mortality"=input$num_LTD.Mortality)
-        }
-        if (!is.null(input$num_Avg.Temperature)){
-          newdata <- cbind(newdata,"Avg.Temperature"=input$num_Avg.Temperature)
-        }
-        pred_val <- predict(fit, newdata)
-        names(pred_val) <- as.character(input$responseVar)
-        return( pred_val )
-    })
-  }
+      # load the model SVM or GLMnet 
+      fit <- runRegression()
+      
+      # create an instance from the input values 
+      list.predictors <- input$explanatory.Variables
+      num.preds <- length(list.predictors)
+      
+      newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
+      newdata <- lapply(1:num.preds, function(i) {
+        input_name <- paste0("input", i, sep="")
+        input[[ input_name ]]
+      } # end function
+      )# end lapply
+      names(newdata) <- list.predictors
+      
+      pred_val <- predict(fit, newdata)
+      names(pred_val) <- as.character(input$responseVar)
+      
+      regression.response <- data.frame(pred_val, stringsAsFactors = FALSE)
+      print( regression.response )
+      
+    }) # end isolate
+  } # end if...else
   
 })
 
@@ -2032,8 +2036,7 @@ output$validate.model <- renderPrint({
           
         }
       
-        
-        print( results.model )
+       print( results.model )
       }else{ 
           print(data.frame(Warning="Please select Model Parameters."))
       }
@@ -2052,7 +2055,7 @@ output$plot_ML.Rel.Impo <- renderPlot({
       if (input$radioML == 1){
         
           svm.mod <- runSVM()
-          RocImp <- varImp(svm.mod, scale = TRUE)
+          RocImp <- varImp(svm.mod, scale = FALSE)
           plot(RocImp) 
       
       }
@@ -2111,7 +2114,7 @@ output$dyn_input <- renderUI({
     num.preds <- length(list.predictors)
     
     inputs <- lapply(1:num.preds, function(i) {
-    input_name <- paste0("input", i, sep="_")
+    input_name <- paste0("input", i, sep="")
     fluidRow(column(width=6, 
                 if ( is.factor( data[, list.predictors[[i]]] ) )
                 {
@@ -2132,10 +2135,10 @@ output$dyn_input <- renderUI({
 # predict value regarding the predictors' values
 output$prediction.value.ML <- renderPrint({ 
   
-  if (input$goMLPredict == 0){
-    return() }
-  else{ 
-    isolate({
+ if (input$goMLPredict == 0){
+   return() }
+ else{ 
+   isolate({
       
       # load the model SVM or GLMnet 
       if (input$radioML == 1){
@@ -2152,21 +2155,20 @@ output$prediction.value.ML <- renderPrint({
       newdata <- lapply(1:num.preds, function(i) {
                        input_name <- paste0("input", i, sep="")
                        input[[ input_name ]]
-                    } # end function
+                  } # end function
                 )# end lapply
       names(newdata) <- list.predictors
-    print(newdata)
+   
       pred_val <- predict(ML.model, newdata)
-      names(pred_val) <- as.character(input$responseVar)
+      names(pred_val) <- as.character(input$Targ.ML.Var)
       
-      return( pred_val )
-    })
-  }
+      ml.response <- data.frame(pred_val, stringsAsFactors = FALSE)
+      print( ml.response )
+    
+    }) # end isolate
+  } # end if...else
   
 })
-
-
-
 
 
 
@@ -2321,6 +2323,84 @@ output$print_Tree.rules <- renderPrint({
 #---------------------------------------------------------------------------------------------------
 # Tab: Predict with the Classification Tree
 #
+output$dyn_input.DT <- renderUI({
   
+  data <- passData()
+  list.predictors <- input$preds.Vars
+  num.preds <- length(list.predictors)
+  
+  inputs <- lapply(1:num.preds, function(i) {
+    input_name <- paste0("input", i, sep="")
+    fluidRow(column(width=6, 
+                    if ( is.factor( data[, list.predictors[[i]]] ) )
+                    {
+                      list.values <- unique( data[, list.predictors[[i]]] )
+                      selectInput(inputId=input_name, label=h4( as.character(list.predictors[[i]]) ), 
+                                  choices=as.character(list.values), multiple=FALSE)
+                    }else{  
+                      numericInput( input_name, label = h4( as.character(list.predictors[[i]]) ), value = NA)
+                    } # end if...else
+    ) # end column
+    ) # end fluidRow
+  } # end function
+  ) # end lapply
+  
+  do.call(tagList, inputs)
+}) 
+
+# predict value regarding the predictors' values
+output$prediction.value.DT <- renderPrint({ 
+  
+  if (input$goDTPredict == 0){
+    return() }
+  else{ 
+    isolate({
+      
+      # load the model 
+      class.reg.Tree <- runClassRegTrees()
+      
+      # create an instance from the input values 
+      list.predictors <- input$preds.Vars
+      num.preds <- length(list.predictors)
+      
+      newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
+      newdata <- lapply(1:num.preds, function(i) {
+        input_name <- paste0("input", i, sep="")
+        input[[ input_name ]]
+      } # end function
+      )# end lapply
+      names(newdata) <- list.predictors
+      
+      print(newdata)
+      print( class(newdata) )
+      
+      pred_val <- predict(class.reg.Tree, newdata)
+      names(pred_val) <- as.character(input$TargVar)
+      
+      DT.response <- data.frame(pred_val) #, stringsAsFactors = FALSE)
+      print( DT.response )
+      
+     }) # end isolate
+  } # end if...else
+  
+}) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
 }) # end shinyServer

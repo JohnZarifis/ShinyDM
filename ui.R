@@ -515,27 +515,19 @@ tabPanel(" Regression Models ", id="MenuPage_4",
                                  fluidRow(column(12, plotOutput("pred.actual.plot"))),
                                  hr(),
                                  # predict response value using user-defined values for each predictor  
-                                 h2("Numeric inputs:"),
-                                 fluidRow(column(3, numericInput('num_Start.Av.Weight', label = h4("Start.Av.Weight"), value = NA)),
-                                          column(3, numericInput("num_Days", label = h4("Days"), value = NA)),
-                                          column(3, numericInput('num_Period.Feed.Qty', label = h4("Period.Feed.Qty"), value = NA)),
-                                          column(3, numericInput('num_Suggested.Feed.Qty', label = h4("Suggested.Feed.Qty"), value = NA))
-                                 ),
-                                 fluidRow(column(3, numericInput('num_FCR', label = h4("Econ.FCR.Period"), value = NA)),
-                                          column(3, numericInput('num_SFR.Period', label = h4("SFR.Period"), value = NA)),
-                                          column(3, numericInput('num_SGR.Period', label = h4("SGR.Period"), value = NA))
-                                 ),
-                                 fluidRow(column(3, numericInput('num_LTD.Mortality', label = h4("LTD.Mortality"), value = NA)),
-                                          column(3, numericInput("num_Avg.Temperature", label = h4("Avg.Temperature"), value = NA)),
-                                          column(3, numericInput('num_End.Av.Weight', label = h4("End.Av.Weight"), value = NA))
-                                 ),
-                                 hr(),
-                                 actionButton(inputId = 'goPredict',  label = 'Start prediction'),
-                                 hr(),
-                                 h2("Prediction..."),
-                                 fluidRow(column(12, verbatimTextOutput("value")))
-                               
-                        ) # end tabPanel "Predict"
+                                 fluidRow(column(6,   
+                                                 h3("Set values to Predictors:"),
+                                                 uiOutput("dyn_input.Regression")
+                                         ), 
+                                         hr(),
+                                         column(6, 
+                                                actionButton(inputId = 'goRegressionPredict',  label = 'Start prediction'),
+                                                hr(),
+                                                h3("Prediction with Regression model..."),
+                                                fluidRow(column(12, verbatimTextOutput("prediction.value.Regression")))
+                                         ) # end column
+                                 ) # end fluidRow 
+                          ) # end tabPanel "Predict"
                       ) # end tabsetPanel 
                     ) # end mainPanel
 
@@ -679,18 +671,28 @@ tabPanel(" Classification ", id="MenuPage_7",
                        h4(' Rules of the Tree:'),
                        fluidRow(column(12, verbatimTextOutput("print_Tree.rules") ))
                        
-                      ) # end tabPanel "Build"
-                # tabPanel("Predict with it"
-                      # fluidRow(column(12, dataTableOutput(outputId="test.set.class.prediction")))  
-                # ) # end tabPanel "Predict"
+                      ), # end tabPanel "Build"
+                tabPanel("Predict with it",
+                      
+                      # predict response value using user-defined values for each predictor  
+                      fluidRow(column(6,   
+                                      h3("Set values to Predictors:"),
+                                      uiOutput("dyn_input.DT")
+                      ), 
+                      hr(),
+                      column(6, 
+                             actionButton(inputId = 'goDTPredict',  label = 'Start prediction'),
+                             hr(),
+                             h3("Prediction with Classification/Regression Trees..."),
+                             fluidRow(column(12, verbatimTextOutput("prediction.value.DT")))
+                      ) # end column
+                      ) # end fluidRow 
+                ) # end tabPanel "Predict"
               ) # end tabsetPanel
            ) # end mainPanel
    
          ) # end fluidPage
 ) # end tabPanel " Classification "
-
-
-
 
 
   ) # end navbarPage

@@ -54,16 +54,16 @@ output$value <- renderPrint({
     newdata <- lapply(1:num.preds, function(i) {
         input_name <- paste0("input", i, sep="")
         input[[ input_name ]]
-      #  print( input[[ input_name ]] )
+      print( input[[ input_name ]] )
        
       } # end function
       
     )# end lapply
     
     names(newdata) <- list.predictors
-   # View( newdata )
+   View( newdata )
     
-    print( newdata )
+    print( names(newdata) )
   } # end if...else
   
 })
