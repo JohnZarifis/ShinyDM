@@ -4,6 +4,7 @@ library("shiny")
 library("lubridate")
 library("mgcv")
 library("htmltools")
+library(rpivotTable)
 
 
 
@@ -251,7 +252,12 @@ shinyUI(
                                                     textOutput("Dataset for processing..."),
                                                     hr(),
                                                     dataTableOutput("dataset") 
-                                        )  # end tabPanel Data
+                                        ),# end tabPanel Data
+                                        tabPanel("Pivot", 
+                                                 rpivotTable::rpivotTableOutput('foo')
+                                                 
+                                                 #rpivotTableOutput('foo') 
+                                        )
                                        ) # end tabsetPanel
                                     )# end mainPanel
                                   ) # end sidebarLayout

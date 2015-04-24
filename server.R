@@ -35,6 +35,7 @@ library("maptree")
 library("nlme")
 library("mgcv")
 library("htmltools")
+library(rpivotTable)
 
 
 # load helpers.R file
@@ -757,6 +758,18 @@ output$summary_stats_Avg.Temp <- renderTable({
 output$dataset <- renderDataTable({
   data <- passData() 
 })
+
+#---------------------------------------------------------------------------------------------------
+#     Dislpay Pivot (Data)
+#---------------------------------------------------------------------------------------------------
+# Dislpay dataset
+
+
+output$foo <- rpivotTable::renderRpivotTable({
+  rpivotTable::rpivotTable(data <- passData())
+})
+
+
 
 #---------------------------------------------------------------------------------------------------
 #     Scatter Matrix Plots & Scatter Plots
