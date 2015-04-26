@@ -762,12 +762,12 @@ output$dataset <- renderDataTable({
 #---------------------------------------------------------------------------------------------------
 #     Dislpay Pivot (Data)
 #---------------------------------------------------------------------------------------------------
-# Dislpay dataset
+# Dislpay pivot
 
 
-output$foo <- rpivotTable::renderRpivotTable({
-  rpivotTable::rpivotTable(data <- passData())
-})
+# output$foo <- rpivotTable::renderRpivotTable({
+#   rpivotTable::rpivotTable(data <- passData())
+# })
 
 
 

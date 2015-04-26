@@ -252,12 +252,13 @@ shinyUI(
                                                     textOutput("Dataset for processing..."),
                                                     hr(),
                                                     dataTableOutput("dataset") 
-                                        ),# end tabPanel Data
-                                        tabPanel("Pivot", 
-                                                 rpivotTable::rpivotTableOutput('foo')
-                                                 
-                                                 #rpivotTableOutput('foo') 
                                         )
+#                                         ,# end tabPanel Data
+#                                         tabPanel("Pivot", 
+#                                                  rpivotTable::rpivotTableOutput('foo')
+#                                                  
+#                                                  #rpivotTableOutput('foo') 
+#                                         )
                                        ) # end tabsetPanel
                                     )# end mainPanel
                                   ) # end sidebarLayout
