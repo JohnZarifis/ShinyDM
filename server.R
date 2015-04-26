@@ -36,6 +36,7 @@ library("nlme")
 library("mgcv")
 library("htmltools")
 library(rpivotTable)
+library(readxl)
 
 
 # load helpers.R file
@@ -46,7 +47,8 @@ source("helpers.R")
 
 #Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
 #Dataset <- readWorksheetFromFile("TSIPOYRA-2014 BATCHES-ANON.xlsx",sheet =1)
-Dataset <- read.delim("bream2014.csv", header = TRUE, sep = ";", dec=",")
+#Dataset <- read.delim("bream2014.csv", header = TRUE, sep = ";", dec=",")
+Dataset <- read_excel("bream2014.xlsx",sheet = 1 ,col_names = TRUE)
 # Call function to create the dataset for analysis
 data <- create_dataset(Dataset)
 #
@@ -296,8 +298,10 @@ shinyServer(function(input, output, session){
                & data$Period.Day.Degrees <= as.numeric(input$rangePeriod.Day.Degrees[2])
                & data$Avg.Temperature >= as.numeric(input$rangeAvg.Temp[1]) 
                & data$Avg.Temperature <= as.numeric(input$rangeAvg.Temp[2])
+               #& (data$From >= input$dateRangeFrom[1] & data$From <= input$dateRangeFrom[2]) 
+               #& (data$To >= input$dateRangeTo[1] & data$To <= input$dateRangeTo[2])
                & (data$From >= ymd(input$dateRangeFrom[1]) & data$From <= ymd(input$dateRangeFrom[2])) 
-               & (data$To >= ymd(input$dateRangeTo[1]) & data$To <= ymd(input$dateRangeTo[2])) 
+               & (data$To >= ymd(input$dateRangeTo[1]) & data$To <= ymd(input$dateRangeTo[2]))
                & data$Period.Feed.Qty >= as.numeric(input$rangePeriod.Feed.Qty[1]) 
                & data$Period.Feed.Qty <= as.numeric(input$rangePeriod.Feed.Qty[2])
                & data$FastingsPerc >= as.numeric(input$rangeFastingsPerc[1]) 

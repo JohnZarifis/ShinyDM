@@ -5,6 +5,7 @@ library("lubridate")
 library("mgcv")
 library("htmltools")
 library(rpivotTable)
+library(readxl)
 
 
 
@@ -12,11 +13,12 @@ library(rpivotTable)
 source("helpers.R")
 
 #Datamining281114 <- read.delim("Datamining281114.csv", header = TRUE, sep = ";", dec=".")
-Dataset <- read.delim("bream2014.csv", header = TRUE, sep = ";", dec=",")
+#Dataset <- read.delim("bream2014.csv", header = TRUE, sep = ";", dec=",")
 #Dataset <- readWorksheetFromFile("TSIPOYRA-2014 BATCHES-ANON.xlsx",sheet =1)
-
+Dataset <- read_excel("bream2014.xlsx",sheet = 1 ,col_names = TRUE)
 # Call function to create the dataset for analysis
 df <- create_dataset(Dataset)
+#View(df)
 
 #-----------------------------------------------------------------------------------------------------
 sidebarUni <- sidebarPanel(
