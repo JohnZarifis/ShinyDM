@@ -48,7 +48,11 @@ source("helpers.R")
 #Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
 #Dataset <- readWorksheetFromFile("TSIPOYRA-2014 BATCHES-ANON.xlsx",sheet =1)
 #Dataset <- read.delim("bream2014.csv", header = TRUE, sep = ";", dec=",")
-Dataset <- read_excel("bream2014.xlsx",sheet = 1 ,col_names = TRUE)
+#Dataset <- read_excel("bream2014.xlsx",sheet = 1 ,col_names = TRUE)
+
+pathname = paste(getwd(), "bream2014.xlsx", sep="/")
+Dataset <- read_excel(pathname, sheet = 1 ,col_names = TRUE, na='na')
+
 # Call function to create the dataset for analysis
 data <- create_dataset(Dataset)
 #
@@ -344,6 +348,20 @@ output$histPlotAvWeight <- renderPlot({
   }
 })
 #...................................................... H2
+output$histPlotAvWeightDeviation <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- histPlot(graphData, x="Av.Weight.Deviation", nbins = input$numbins, group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
+#...................................................... H3
 output$histPlotPeriod.FCR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -356,7 +374,7 @@ output$histPlotPeriod.FCR <- renderPlot({
     })
   }
 })
-#...................................................... H3
+#...................................................... H4
 output$histPlotEcon.FCR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -369,7 +387,7 @@ output$histPlotEcon.FCR <- renderPlot({
     })
   }
 })
-#...................................................... H4
+#...................................................... H5
 output$histPlotPeriod.SFR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -382,7 +400,7 @@ output$histPlotPeriod.SFR <- renderPlot({
     })
   }
 })
-#...................................................... H5
+#...................................................... H6
 output$histPlotPeriod.SGR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -395,7 +413,7 @@ output$histPlotPeriod.SGR <- renderPlot({
     })
   }
 })
-#...................................................... H6
+#...................................................... H7
 output$histPlotMortality <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -408,7 +426,7 @@ output$histPlotMortality <- renderPlot({
     })
   }
 })
-#...................................................... H7
+#...................................................... H8
 output$histPlotPeriod.Day.Degrees <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -421,7 +439,7 @@ output$histPlotPeriod.Day.Degrees <- renderPlot({
     })
   }
 })
-#...................................................... H8
+#...................................................... H9
 output$histPlotAvg.Temperature <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -452,7 +470,20 @@ output$densPlotAvWeight <- renderPlot({
     })
   }
 })
-#...................................................... D2
+#...................................................... D1
+output$densPlotAvWeightDeviation <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- densityPlot( graphData, x="Av.Weight.Deviation", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+#...................................................... D3
 output$densPlotPeriod.FCR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -465,7 +496,7 @@ output$densPlotPeriod.FCR <- renderPlot({
     })
   }
 })
-#...................................................... D3
+#...................................................... D4
 output$densPlotEcon.FCR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -478,7 +509,7 @@ output$densPlotEcon.FCR <- renderPlot({
     })
   }
 })
-#...................................................... D4
+#...................................................... D5
 output$densPlotPeriod.SFR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -491,7 +522,7 @@ output$densPlotPeriod.SFR <- renderPlot({
     })
   }
 })
-#...................................................... D5
+#...................................................... D6
 output$densPlotPeriod.SGR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -504,7 +535,7 @@ output$densPlotPeriod.SGR <- renderPlot({
     })
   }
 })
-#...................................................... D6
+#...................................................... D7
 output$densPlotMortality <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -517,7 +548,7 @@ output$densPlotMortality <- renderPlot({
     })
   }
 })
-#...................................................... D7
+#...................................................... D8
 output$densPlotPeriod.Day.Degrees <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -530,7 +561,7 @@ output$densPlotPeriod.Day.Degrees <- renderPlot({
     })
   }
 })
-#...................................................... D8
+#...................................................... D9
 output$densPlotAvg.Temperature <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -562,6 +593,19 @@ output$boxPlotAvWeight <- renderPlot({
   }
 })
 #...................................................... B2
+output$boxPlotAvWeightDeviation <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- boxPlots( graphData, x="Av.Weight.Deviation", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+#...................................................... B3
 output$boxPlotPeriod.FCR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -574,7 +618,7 @@ output$boxPlotPeriod.FCR <- renderPlot({
     })
   }
 })
-#...................................................... B3
+#...................................................... B4
 output$boxPlotEcon.FCR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -587,7 +631,7 @@ output$boxPlotEcon.FCR <- renderPlot({
     })
   }
 })
-#...................................................... B4
+#...................................................... B5
 output$boxPlotPeriod.SFR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -600,7 +644,7 @@ output$boxPlotPeriod.SFR <- renderPlot({
     })
   }
 })
-#...................................................... B5
+#...................................................... B6
 output$boxPlotPeriod.SGR <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -613,7 +657,7 @@ output$boxPlotPeriod.SGR <- renderPlot({
     })
   }
 })
-#...................................................... B6
+#...................................................... B7
 output$boxPlotMortality <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -626,7 +670,7 @@ output$boxPlotMortality <- renderPlot({
     })
   }
 })
-#...................................................... B7
+#...................................................... B8
 output$boxPlotPeriod.Day.Degrees <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -639,7 +683,7 @@ output$boxPlotPeriod.Day.Degrees <- renderPlot({
     })
   }
 })
-#...................................................... B8
+#...................................................... B9
 output$boxPlotAvg.Temperature <- renderPlot({ 
   # Re-run when button is clicked
   if (input$goUniPlot == 0){
@@ -664,6 +708,18 @@ output$summary_stats_EndAvWeight <- renderTable({
       data <- passData()
       data_stats <- sum_stats(data, measurevar="End.Av.Weight", groupvars=input$radioDimUni,
                                  na.rm=FALSE, conf.interval=.95, .drop=TRUE)
+    })
+    return(data_stats)
+  }
+})  
+output$summary_stats_AvWeightDeviation <- renderTable({
+  if (input$goUniPlot == 0) { 
+    return() }
+  else{ 
+    isolate({  
+      data <- passData()
+      data_stats <- sum_stats(data, measurevar="Av.Weight.Deviation", groupvars=input$radioDimUni,
+                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
     })
     return(data_stats)
   }
@@ -1906,6 +1962,7 @@ output$fmla.model <- renderText({
 runSVM <- reactive({
   
   list.vars <- list(input$Targ.ML.Var, input$preds.ML.Vars)
+  Class <- input$Targ.ML.Var
   
   # "data": dataset that based on the user choices in the first page
   data <- passData()  
@@ -1916,19 +1973,20 @@ runSVM <- reactive({
   # cross-validation
   if ( input$testingOptions == 1 ){
     
+    dummy.ds <- dummyVars(fmla,data=dset.train, fullRank=F)
+    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train),"Class"= dset.train$Class) #input$Targ.ML.Var)
+   
+    # dummy.dset.train$Class <- ifelse(dummy.dset.train$Class=='GOOD',1,0)
+    
     fitControl <- trainControl(## 10-fold CV
       method = "repeatedcv",
       number = input$folds,
       ## repeated ten times
       repeats = 10, 
-      ## Estimate class probabilities
       classProbs = TRUE,
-      returnData = TRUE,
-      ## Evaluate performance using 
-      ## the following function
-      summaryFunction = twoClassSummary)
-    
-    svmFit <- train(fmla, data=dset.train, method = "svmRadial", trControl = fitControl, metric="ROC")
+      returnData = TRUE)
+   
+    svmFit <- train(Class~., data=dummy.dset.train, method = "svmRadial", trControl = fitControl, metric="ROC")
    
   }
   else{
@@ -1936,12 +1994,19 @@ runSVM <- reactive({
     perc <- input$percentage/100
     set.seed(998)
     Class <- input$Targ.ML.Var
-    inTraining <- createDataPartition(dset.train$Class, p = perc, list = FALSE)
-    training <- dset.train[ inTraining,]
-    testing  <- dset.train[-inTraining,]
-    fitControl <- trainControl(classProbs = TRUE, returnData = TRUE,summaryFunction = twoClassSummary)
+    
+    dummy.ds <- dummyVars(fmla,data=dset.train, fullRank=F)
+    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train),"Class"= dset.train$Class) #input$Targ.ML.Var)
+    
+    # dummy.dset.train$Class <- ifelse(dummy.dset.train$Class=='GOOD',1,0)
+    
+    inTraining <- createDataPartition(dummy.dset.train$Class, p = perc, list = FALSE)
+    training <- dummy.dset.train[ inTraining,]
+    testing  <- dummy.dset.train[-inTraining,]
+    
+    fitControl <- trainControl(classProbs = TRUE, returnData = TRUE)
 
-    svmFit <- train(fmla, data=training, method = "svmRadial", trControl = fitControl, metric="ROC")
+    svmFit <- train(Class~., data=training, method = "svmRadial", trControl = fitControl, metric="ROC")
     
   } 
   
@@ -1955,7 +2020,7 @@ runSVM <- reactive({
 runGLM <- reactive({
   
   list.vars <- list(input$Targ.ML.Var, input$preds.ML.Vars)
-  targ <- input$Targ.ML.Var
+  Class <- input$Targ.ML.Var
   
   # "data": dataset that based on the user choices in the first page
   data <- passData()  
@@ -1978,11 +2043,28 @@ runGLM <- reactive({
     
     glmnetFit <- train(Class~., data=dummy.dset.train, method = "glmnet", trControl = fitControl)
     
-  }
-#   else{
-#     # random split
-#    
-#   }
+  }else{
+    # random split
+
+    perc <- input$percentage/100
+    set.seed(998)
+    Class <- input$Targ.ML.Var
+    
+    dummy.ds <- dummyVars(fmla,data=dset.train, fullRank=F)
+    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train),"Class"= dset.train$Class) #input$Targ.ML.Var)
+    
+    dummy.dset.train$Class <- ifelse(dummy.dset.train$Class=='GOOD',1,0)
+
+    inTraining <- createDataPartition(dummy.dset.train$Class, p = perc, list = FALSE)
+    training <- dummy.dset.train[ inTraining,]
+    testing  <- dummy.dset.train[-inTraining,]
+    
+    glmnetFit <- train(Class~., data=training, method = "glmnet") 
+    
+   }
+  
+   glmnet.model <- glmnetFit  
+   return(glmnet.model)
      
 })
 
@@ -1999,8 +2081,8 @@ output$summary.model <- renderPrint({
             res <- svm.mod$results[rownames(svm.mod$bestTune),]
         }else{
         # if GLM
-          gml.mod <- runGLM()
-          res <- gml.mod$results[rownames(gml.mod$bestTune),]
+            gml.mod <- runGLM()
+            res <- gml.mod$results[rownames(gml.mod$bestTune),]
         }
         
         print(res) 
@@ -2020,6 +2102,8 @@ output$validate.model <- renderPrint({
       if ( !is.null(input$Targ.ML.Var) ){ 
         # list of variables to examine
         list.vars <- list(input$Targ.ML.Var, input$preds.ML.Vars)
+        fmla <- as.formula( paste(input$Targ.ML.Var, paste(input$preds.ML.Vars, collapse="+"), sep=" ~ ") )
+        
         # "data": dataset that based on the user choices in the first page
         data <- passData()  
         dset <- data[ , names(data) %in% unlist(list.vars) ]
@@ -2028,33 +2112,36 @@ output$validate.model <- renderPrint({
         # if SVM 
         if (input$radioML == 1){
         
-          # create a subset of data as testing set so as to evaluate the accuracy of the model
-          nr=nrow(dset)
-          perc = 1 #50/100
-          ids <- sort(ceiling(sample( seq(1,nr), nr*perc, replace = FALSE)))
-          ds.test <- dset[ ids, ]
-        
-          # call svm model
-          svm.mod <- runSVM()
-          testPred <- predict(svm.mod, ds.test )
-          confmat <- confusionMatrix(testPred, ds.test[ ,targ])
-          
-          results.model<-confmat
-          
-        }else{
-          # if GLM
-          fmla <- as.formula( paste(input$Targ.ML.Var, paste(input$preds.ML.Vars, collapse="+"), sep=" ~ ") ) 
-          # create a subset of data as testing set so as to evaluate the accuracy of the model
-          dummy.ds <- dummyVars(fmla,data=dset, fullRank=F)
+          dummy.ds <- dummyVars(fmla, data=dset, fullRank=F)
           dummy.dset <- data.frame(predict(dummy.ds, newdata = dset),"Class"= dset$Class) #input$Targ.ML.Var)
-          dummy.dset$Class <- ifelse(dummy.dset$Class=='GOOD',1,0)
+          
           predictorsNames <- names(dummy.dset)[names(dummy.dset) != targ]  
           
           nr=nrow(dummy.dset)
           perc = 1 #50/100
           ids <- sort(ceiling(sample( seq(1,nr), nr*perc, replace = FALSE)))
           dummy.ds.test <- dummy.dset[ ids, ]
+      
+          # call svm model
+          svm.mod <- runSVM()
+          testPred <- predict(svm.mod, dummy.ds.test )
+          confmat <- confusionMatrix(testPred, dummy.ds.test[ ,targ])
+          
+          results.model<-confmat
+          
+        }else{
+          # if GLM
          
+          dummy.ds <- dummyVars(fmla, data=dset, fullRank=F)
+          dummy.dset <- data.frame(predict(dummy.ds, newdata = dset),"Class"= dset$Class) #input$Targ.ML.Var)
+          
+          predictorsNames <- names(dummy.dset)[names(dummy.dset) != targ]  
+          
+          nr=nrow(dummy.dset)
+          perc = 1 #50/100
+          ids <- sort(ceiling(sample( seq(1,nr), nr*perc, replace = FALSE)))
+          dummy.ds.test <- dummy.dset[ ids, ]
+          
           gml.mod <- runGLM()
           testPred <- predict(gml.mod, dummy.ds.test[ , predictorsNames] )
           auc <- roc(dummy.ds.test[,targ], testPred)
@@ -2063,9 +2150,9 @@ output$validate.model <- renderPrint({
           
         }
       
-       print( results.model )
+        print( results.model )
       }else{ 
-          print(data.frame(Warning="Please select Model Parameters."))
+        print(data.frame(Warning="Please select Model Parameters."))
       }
       
     }) # end isolate
@@ -2133,6 +2220,38 @@ output$ML.Rel.Impo <- renderPrint({
 #---------------------------------------------------------------------------------------------------
 # Tab: Predict with Machine Learning Models
 #
+predict.with.ML.Model <- reactive({
+  # load the model SVM or GLMnet 
+  if (input$radioML == 1){
+    ML.model <- runSVM()
+  }else{
+    ML.model <- runGLM()
+  }
+  
+  # create an instance from the input values 
+  list.predictors <- input$preds.ML.Vars
+  num.preds <- length(list.predictors)
+  targ <- input$Targ.ML.Var
+  fmla <- as.formula( paste(" ", paste(input$preds.ML.Vars, collapse="+"), sep=" ~ ") )
+  
+  newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
+  newdata <- lapply(1:num.preds, function(i) {
+    input_name <- paste0("input", i, sep="")
+    input[[ input_name ]]
+  } # end function
+  )# end lapply
+  names(newdata) <- list.predictors
+  
+  dummy.newdata <- dummyVars(fmla, data=newdata, fullRank=F)
+  dummy.newdata <- data.frame(predict(dummy.newdata, newdata = newdata))
+  predict.Names <- names(dummy.newdata)
+ 
+  pred_ML_model <- predict(ML.model, dummy.newdata)
+  names(pred_ML_model) <- as.character(input$Targ.ML.Var)
+  
+  return(pred_ML_model)
+  
+})
 
 output$dyn_input <- renderUI({
   
@@ -2165,34 +2284,15 @@ output$prediction.value.ML <- renderPrint({
  if (input$goMLPredict == 0){
    return() }
  else{ 
-   isolate({
+     isolate({
+       
+        pred_val <- predict.with.ML.Model()
+        names(pred_val) <- as.character(input$Targ.ML.Var)
+        
+        ml.response <- data.frame(pred_val, stringsAsFactors = FALSE)
+        print( ml.response )
       
-      # load the model SVM or GLMnet 
-      if (input$radioML == 1){
-        ML.model <- runSVM()
-      }else{
-        ML.model <- runGLM()
-      }
-      
-      # create an instance from the input values 
-      list.predictors <- input$preds.ML.Vars
-      num.preds <- length(list.predictors)
-      
-      newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
-      newdata <- lapply(1:num.preds, function(i) {
-                       input_name <- paste0("input", i, sep="")
-                       input[[ input_name ]]
-                  } # end function
-                )# end lapply
-      names(newdata) <- list.predictors
-   
-      pred_val <- predict(ML.model, newdata)
-      names(pred_val) <- as.character(input$Targ.ML.Var)
-      
-      ml.response <- data.frame(pred_val, stringsAsFactors = FALSE)
-      print( ml.response )
-    
-    }) # end isolate
+     }) # end isolate
   } # end if...else
   
 })

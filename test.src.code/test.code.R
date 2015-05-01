@@ -96,21 +96,92 @@ fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") )
 # preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
 # 
 # fmla <- as.formula(paste(" ",paste(preds, collapse="+"), sep=" ~ ") )
-# dummy.ds <- dummyVars(fmla,data=ds.tr2, fullRank=F)
+# dummy.ds <- dummyVars(fmla.cl,data=ds.tr2, fullRank=F)
 # dummy.ds.tr2 <- data.frame(predict(dummy.ds, newdata = ds.tr2),"Class"=ds.tr2$Class)
 # dummy.ds.tr2$Class <- ifelse(dummy.ds.tr2$Class=='GOOD',1,0)
+# 
 # 
 # fitControl <- trainControl(## 10-fold CV
 #   method = "repeatedcv",
 #   number = 10,
 #   ## repeated ten times
-#   repeats = 10)
+#   repeats = 10
+#   )
+# 
+# glmnetFit <- train(Class~., data=dummy.ds.tr2, method = "glmnet", trControl = fitControl)
+
+# perc <- 80/100
+# set.seed(998)
+# inTraining <- createDataPartition(dummy.ds.tr2$Class, p = perc, list = FALSE)
+# training <- dummy.ds.tr2[ inTraining,]
+# testing  <- dummy.ds.tr2[-inTraining,]
+# 
+# glmnetFit <- train(Class~., data=training, method = "glmnet") 
+# predictorsNames <- names(training)
+# 
+# testPred <- predict(glmnetFit, testing[ , predictorsNames] )
+# auc <- roc(testing[,targ], testPred)
+# print(auc$auc)
+# 
+# RocImp2 <- varImp(glmnetFit,scale=F)
+# RocImp2
+# 
+# plot(RocImp2)
+
+#=======================================
+# predict one arbitrary value
+# ds.ts <- data[1,names(data) %in% c(preds,targ)]
+# dum.ds.ts <- dummyVars(fmla,data=ds.ts , fullRank=F)
+# dum.ds.ts1 <- data.frame(predict(dum.ds.ts, newdata = ds.ts, "Class"=data[1,targ]))
+# predictors.Names <- names(dum.ds.ts1)[names(dum.ds.ts1) != targ]
+# testPred.instance <- predict(svmFit, dum.ds.ts1[ , predictors.Names] )
+#testPred.instance <- predict(glmnetFit, dum.ds.ts1[ , predictors.Names] )
+
+#=======================================
+
+
+#------------------------------------------------------------------
+# nr=nrow(dummy.ds.tr2)
+# perc = 80/100
+# ids <- sort(ceiling(sample( seq(1,nr), nr*perc, replace = FALSE)))
+# dummy.ds.test <- dummy.ds.tr2[ ids, ]
+# predictorsNames <- names(training)
+# testPred <- predict(glmnetFit, dummy.ds.test[ , predictorsNames] )
+# 
+# auc <- roc(dummy.ds.test[,targ], testPred)
+# print(auc$auc)
+#confmat <- confusionMatrix(testPred, dummy.ds.test[ ,targ])
+
+#------------------------------------------------------------------
+# perc <- 80/100
+# set.seed(998)
+# inTraining <- createDataPartition(dummy.ds.tr2$Class, p = perc, list = FALSE)
+# training <- dummy.ds.tr2[ inTraining,]
+# testing  <- dummy.ds.tr2[-inTraining,]
+# 
+# fitControl <- trainControl(classProbs = TRUE, returnData = TRUE, summaryFunction = twoClassSummary)
+# 
+# svmFit <- train(Class~., data=training, method = "svmRadial", trControl = fitControl, metric="ROC")
+
+
+# fitControl <- trainControl(## 10-fold CV
+#   method = "repeatedcv",
+#   number = 5,
+#   ## repeated ten times
+#   repeats = 10,
+#   ## Estimate class probabilities
+#   classProbs = TRUE,
+#   returnData = TRUE,
+#   ## Evaluate performance using 
+#   ## the following function
+#   summaryFunction = twoClassSummary)
 #   
 # svmFit2 <- train(Class~., data=dummy.ds.tr2, method = "svmRadial", trControl = fitControl)
-#   
+# #   
 # svmFit2.best.acc.kappa <- svmFit2$results[rownames(svmFit2$bestTune),]
 # 
-# RocImp2 <- varImp(svmFit2,scale=F)
+# 
+# RocImp2 <- varImp(svmFit,scale=F)
 # RocImp2
 # 
 # plot(RocImp2)
@@ -121,11 +192,12 @@ fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") )
 # results <- results[order(results$Class),]
 # results <- results[(results$Class != 0),]
 # 
+# 
 # par(mar=c(5,15,4,2)) # increase y-axis margin. 
-# xx <- barplot(results$Class, width = 0.85, 
+# xx <- barplot(results$Class, width = 0.75, 
 #               main = paste("Variable Importance using SVM model"), horiz = T, 
 #               xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
-#               col = ifelse((results$Class > 0), 'green', 'red')) 
+#               col = ifelse((results$Class > 0), 'blue', 'red')) 
 # axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
 
 #---------------------------------
@@ -166,7 +238,7 @@ fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") )
 #               xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
 #               col = ifelse((results$Class > 0), 'green', 'red')) 
 # axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
-# 
+
 # 
 # 
 # dummy.ds.bad <- dummy.ds.tr2[dummy.ds.tr2$Class==0,]
@@ -180,7 +252,7 @@ fmla <- as.formula(paste(targ,paste(preds, collapse="+"), sep=" ~ ") )
 dummy.ds <- dummyVars(fmla,data=ds.tr3, fullRank=F)
 dummy.ds.tr3 <- data.frame(predict(dummy.ds, newdata = ds.tr3),"Class"=ds.tr3$Class)
 
-dummy.ds.tr3$Class <- ifelse(dummy.ds.tr3$Class=='GOOD',1,0)
+#dummy.ds.tr3$Class <- ifelse(dummy.ds.tr3$Class=='GOOD',1,0)
 
 predictorsNames <- names(dummy.ds.tr3)[names(dummy.ds.tr3) != targ]
 
@@ -202,29 +274,36 @@ testPred <- predict(glmnetFit, dummy.ds.test[ , predictorsNames] )
 
 auc <- roc(dummy.ds.test[,targ], testPred)
 print(auc$auc)
-#confmat <- confusionMatrix(testPred, dummy.ds.test[ ,targ])
+confmat <- confusionMatrix(testPred, dummy.ds.test[ ,targ])
+
+#=======================================
+# predict one arbitrary value
+ds.ts <- data[1,names(data) %in% c(preds,targ)]
+dum.ds.ts <- dummyVars(fmla,data=ds.ts , fullRank=F)
+dum.ds.ts1 <- data.frame(predict(dum.ds.ts, newdata = ds.ts, "Class"=data[1,targ]))
+predict.Names <- names(dum.ds.ts1)[names(dum.ds.ts1) != targ]
+testPred.instance <- predict(glmnetFit, dum.ds.ts1[ , predictorsNames] )
+#=======================================
 
 
+RocImp3 <- varImp(glmnetFit,scale=F)
+RocImp3
+
+plot(RocImp3)
 
 
-# RocImp3 <- varImp(glmnetFit,scale=F)
-# RocImp3
-# 
-# plot(RocImp3)
-# 
-# 
-# results <- data.frame(row.names(RocImp3$importance),RocImp3$importance$Overall)
-# results$VariableName <- rownames(RocImp3)
-# colnames(results) <- c('VariableName','Class')
-# results <- results[order(results$Class),]
-# results <- results[(results$Class != 0),]
-# 
-# par(mar=c(5,15,4,2)) # increase y-axis margin. 
-# xx <- barplot(results$Class, width = 0.25, 
-#               main = paste("Variable Importance using GLM model"), horiz = T, 
-#               xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
-#               col = ifelse((results$Class > 0), 'blue', 'red')) 
-# axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
+results <- data.frame(row.names(RocImp3$importance),RocImp3$importance$Overall)
+results$VariableName <- rownames(RocImp3)
+colnames(results) <- c('VariableName','Class')
+results <- results[order(results$Class),]
+results <- results[(results$Class != 0),]
+
+par(mar=c(5,15,4,2)) # increase y-axis margin. 
+xx <- barplot(results$Class, width = 0.25, 
+              main = paste("Variable Importance using GLM model"), horiz = T, 
+              xlab = "< (-) importance >  < neutral >  < importance (+) >", axes = TRUE, 
+              col = ifelse((results$Class > 0), 'blue', 'red')) 
+axis(2, at=xx, labels=results$VariableName, tick=FALSE, las=2, line=-0.3, cex.axis=0.6)  
 
 
 

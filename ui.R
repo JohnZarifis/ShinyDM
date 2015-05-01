@@ -7,15 +7,17 @@ library("htmltools")
 library(rpivotTable)
 library(readxl)
 
-
-
 # load helpers.R file
 source("helpers.R")
 
 #Datamining281114 <- read.delim("Datamining281114.csv", header = TRUE, sep = ";", dec=".")
 #Dataset <- read.delim("bream2014.csv", header = TRUE, sep = ";", dec=",")
 #Dataset <- readWorksheetFromFile("TSIPOYRA-2014 BATCHES-ANON.xlsx",sheet =1)
-Dataset <- read_excel("bream2014.xlsx",sheet = 1 ,col_names = TRUE)
+#Dataset <- read_excel("bream2014.xlsx",sheet = 1 ,col_names = TRUE)
+
+pathname = paste(getwd(), "bream2014.xlsx", sep="/")
+Dataset <- read_excel(pathname, sheet = 1 ,col_names = TRUE, na='na')
+
 # Call function to create the dataset for analysis
 df <- create_dataset(Dataset)
 #View(df)
@@ -102,8 +104,7 @@ sidebarUni <- sidebarPanel(
                               max = max(as.double(df$Days)), 
                               value = c(min(as.double(df$Days)), max(as.double(df$Days))), 
                               step=1, round = TRUE, sep=".")
-                  
-                  ),
+                 ),
            column(6,
                   sliderInput("rangeAvWeight", "End.Av.Weight:", min = min(as.double(df$End.Av.Weight)), 
                               max = max(as.double(df$End.Av.Weight)), 
@@ -147,9 +148,7 @@ sidebarUni <- sidebarPanel(
                               value = c(min(as.double(df$FastingsPerc)), 
                                         max(as.double(df$FastingsPerc))), 
                               step=0.01, round=-2, sep=".")
-                  
-                  
-                  )
+                 )
   ), # end fluid row
   
   hr(),
@@ -197,6 +196,7 @@ shinyUI(
                                                                                   min = 5, max = 100, 
                                                                                   value = 20, step=1))), 
                                                    fluidRow(plotOutput("histPlotAvWeight")),
+                                                   fluidRow(plotOutput("histPlotAvWeightDeviation")),
                                                    fluidRow( plotOutput("histPlotPeriod.FCR")),
                                                    fluidRow( plotOutput("histPlotEcon.FCR")),
                                                    fluidRow( plotOutput("histPlotPeriod.SFR")),
@@ -207,6 +207,7 @@ shinyUI(
                                         ), # end tabPanel Histograms 
                                         tabPanel("Density Plots",
                                                    fluidRow(plotOutput("densPlotAvWeight")),
+                                                   fluidRow(plotOutput("densPlotAvWeightDeviation")),
                                                    fluidRow(plotOutput("densPlotPeriod.FCR")),
                                                    fluidRow(plotOutput("densPlotEcon.FCR")),
                                                    fluidRow(plotOutput("densPlotPeriod.SFR")),
@@ -217,6 +218,7 @@ shinyUI(
                                                ), # end tabPanel Density Plots
                                         tabPanel("Boxplots",
                                                    fluidRow(plotOutput("boxPlotAvWeight")),
+                                                   fluidRow(plotOutput("boxPlotAvWeightDeviation")),  
                                                    fluidRow(plotOutput("boxPlotPeriod.FCR")),
                                                    fluidRow(plotOutput("boxPlotEcon.FCR")),
                                                    fluidRow(plotOutput("boxPlotPeriod.SFR")),
@@ -228,6 +230,9 @@ shinyUI(
                                         tabPanel("Summary Statistics", 
                                                     h4("End Average Weight:"),
                                                     tableOutput("summary_stats_EndAvWeight"),
+                                                    hr(),
+                                                    h4("Average Weight Deviation:"),
+                                                    tableOutput("summary_stats_AvWeightDeviation"),
                                                     hr(),
                                                     h4("Period FCR:"),
                                                     tableOutput("summary_stats_PeriodFCR"),
