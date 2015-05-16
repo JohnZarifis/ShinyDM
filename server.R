@@ -1,4 +1,4 @@
-### Version Sea8 
+### Version Bream
 # This is the server logic for a Shiny web application.
 # You can find out more about building applications with Shiny here:
 # 
@@ -1963,21 +1963,20 @@ runSVM <- reactive({
   
   list.vars <- list(input$Targ.ML.Var, input$preds.ML.Vars)
   Class <- input$Targ.ML.Var
+  inpts.vars <- input$preds.ML.Vars 
   
   # "data": dataset that based on the user choices in the first page
   data <- passData()  
   dset.train <- data[ , names(data) %in% unlist(list.vars) ]
   
-  fmla <- as.formula( paste(input$Targ.ML.Var, paste(input$preds.ML.Vars, collapse="+"), sep=" ~ ") )      
+  fmla <- as.formula( paste(Class, paste(inpts.vars, collapse="+"), sep=" ~ ") )      
   
   # cross-validation
   if ( input$testingOptions == 1 ){
     
-    dummy.ds <- dummyVars(fmla,data=dset.train, fullRank=F)
-    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train),"Class"= dset.train$Class) #input$Targ.ML.Var)
+    dummy.ds <- dummyVars("~.", data=dset.train[inpts.vars], sep=".", fullRank=F)
+    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train), dset.train[Class])
    
-    # dummy.dset.train$Class <- ifelse(dummy.dset.train$Class=='GOOD',1,0)
-    
     fitControl <- trainControl(## 10-fold CV
       method = "repeatedcv",
       number = input$folds,
@@ -1994,12 +1993,10 @@ runSVM <- reactive({
     perc <- input$percentage/100
     set.seed(998)
     Class <- input$Targ.ML.Var
-    
-    dummy.ds <- dummyVars(fmla,data=dset.train, fullRank=F)
-    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train),"Class"= dset.train$Class) #input$Targ.ML.Var)
-    
-    # dummy.dset.train$Class <- ifelse(dummy.dset.train$Class=='GOOD',1,0)
-    
+
+    dummy.ds <- dummyVars("~.", data=dset.train[inpts.vars], sep=".", fullRank=F)
+    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train), dset.train[Class])
+      
     inTraining <- createDataPartition(dummy.dset.train$Class, p = perc, list = FALSE)
     training <- dummy.dset.train[ inTraining,]
     testing  <- dummy.dset.train[-inTraining,]
@@ -2021,6 +2018,7 @@ runGLM <- reactive({
   
   list.vars <- list(input$Targ.ML.Var, input$preds.ML.Vars)
   Class <- input$Targ.ML.Var
+  inpts.vars <- input$preds.ML.Vars 
   
   # "data": dataset that based on the user choices in the first page
   data <- passData()  
@@ -2030,12 +2028,10 @@ runGLM <- reactive({
  
   # cross-validation
   if ( input$testingOptions == 1 ){
-    dummy.ds <- dummyVars(fmla,data=dset.train, fullRank=F)
-    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train),"Class"= dset.train$Class) #input$Targ.ML.Var)
-  
-    dummy.dset.train$Class <- ifelse(dummy.dset.train$Class=='GOOD',1,0)
+    dummy.ds <- dummyVars("~.", data=dset.train[inpts.vars], sep=".", fullRank=F)
+    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train), dset.train[Class])
     
-    fitControl <- trainControl(## 10-fold CV
+   fitControl <- trainControl(## 10-fold CV
       method = "repeatedcv",
       number = 10,
       ## repeated ten times
@@ -2050,11 +2046,9 @@ runGLM <- reactive({
     set.seed(998)
     Class <- input$Targ.ML.Var
     
-    dummy.ds <- dummyVars(fmla,data=dset.train, fullRank=F)
-    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train),"Class"= dset.train$Class) #input$Targ.ML.Var)
+    dummy.ds <- dummyVars("~.", data=dset.train[inpts.vars], sep=".", fullRank=F)
+    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train), dset.train[Class])
     
-    dummy.dset.train$Class <- ifelse(dummy.dset.train$Class=='GOOD',1,0)
-
     inTraining <- createDataPartition(dummy.dset.train$Class, p = perc, list = FALSE)
     training <- dummy.dset.train[ inTraining,]
     testing  <- dummy.dset.train[-inTraining,]
@@ -2113,7 +2107,7 @@ output$validate.model <- renderPrint({
         if (input$radioML == 1){
         
           dummy.ds <- dummyVars(fmla, data=dset, fullRank=F)
-          dummy.dset <- data.frame(predict(dummy.ds, newdata = dset),"Class"= dset$Class) #input$Targ.ML.Var)
+          dummy.dset <- data.frame(predict(dummy.ds, newdata = dset),"Class"= dset[targ]) #input$Targ.ML.Var)
           
           predictorsNames <- names(dummy.dset)[names(dummy.dset) != targ]  
           
@@ -2133,7 +2127,7 @@ output$validate.model <- renderPrint({
           # if GLM
          
           dummy.ds <- dummyVars(fmla, data=dset, fullRank=F)
-          dummy.dset <- data.frame(predict(dummy.ds, newdata = dset),"Class"= dset$Class) #input$Targ.ML.Var)
+          dummy.dset <- data.frame(predict(dummy.ds, newdata = dset),"Class"= dset[targ]) #input$Targ.ML.Var)
           
           predictorsNames <- names(dummy.dset)[names(dummy.dset) != targ]  
           
@@ -2228,7 +2222,10 @@ predict.with.ML.Model <- reactive({
     ML.model <- runGLM()
   }
   
-  # create an instance from the input values 
+  # load the dataset
+  data <- passData()
+  
+  # create an instance from the input values (user-defined values)
   list.predictors <- input$preds.ML.Vars
   num.preds <- length(list.predictors)
   targ <- input$Targ.ML.Var
@@ -2242,15 +2239,21 @@ predict.with.ML.Model <- reactive({
   )# end lapply
   names(newdata) <- list.predictors
   
-  dummy.newdata <- dummyVars(fmla, data=newdata, fullRank=F)
-  dummy.newdata <- data.frame(predict(dummy.newdata, newdata = newdata))
-  predict.Names <- names(dummy.newdata)
- 
-  pred_ML_model <- predict(ML.model, dummy.newdata)
+  # Dummy dataset & variables
+  tm.data <- rbind(data[ list.predictors ], newdata)
+  names(tm.data) <- list.predictors
+  
+  dummy.instance.data <- dummyVars("~.", data=tm.data, fullRank=F)
+  dummy.newdata <- data.frame( predict( dummy.instance.data, newdata = tm.data), 'Class'=NA)
+  
+  dummy.inpts <- as.matrix(data.frame(dummy.newdata[ nrow(dummy.newdata), ]))
+  
+  pred_ML_model <- predict(ML.model, dummy.inpts, type="raw", na.action = na.omit)
+  
   names(pred_ML_model) <- as.character(input$Targ.ML.Var)
   
   return(pred_ML_model)
-  
+    
 })
 
 output$dyn_input <- renderUI({

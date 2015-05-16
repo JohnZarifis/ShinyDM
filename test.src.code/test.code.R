@@ -90,43 +90,44 @@ fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") )
 
 #------------------------------------------------------
 
-# ds.tr2 <- data[ , names(data) %in% unlist(list(preds,targ))]
-# 
-# targ <- "Class"
-# preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
-# 
-# fmla <- as.formula(paste(" ",paste(preds, collapse="+"), sep=" ~ ") )
-# dummy.ds <- dummyVars(fmla.cl,data=ds.tr2, fullRank=F)
-# dummy.ds.tr2 <- data.frame(predict(dummy.ds, newdata = ds.tr2),"Class"=ds.tr2$Class)
-# dummy.ds.tr2$Class <- ifelse(dummy.ds.tr2$Class=='GOOD',1,0)
-# 
-# 
-# fitControl <- trainControl(## 10-fold CV
-#   method = "repeatedcv",
-#   number = 10,
-#   ## repeated ten times
-#   repeats = 10
-#   )
-# 
-# glmnetFit <- train(Class~., data=dummy.ds.tr2, method = "glmnet", trControl = fitControl)
+ds.tr2 <- data[ , names(data) %in% unlist(list(preds,targ))]
 
-# perc <- 80/100
-# set.seed(998)
-# inTraining <- createDataPartition(dummy.ds.tr2$Class, p = perc, list = FALSE)
-# training <- dummy.ds.tr2[ inTraining,]
-# testing  <- dummy.ds.tr2[-inTraining,]
-# 
-# glmnetFit <- train(Class~., data=training, method = "glmnet") 
-# predictorsNames <- names(training)
-# 
-# testPred <- predict(glmnetFit, testing[ , predictorsNames] )
-# auc <- roc(testing[,targ], testPred)
-# print(auc$auc)
-# 
-# RocImp2 <- varImp(glmnetFit,scale=F)
-# RocImp2
-# 
-# plot(RocImp2)
+targ <- "Class"
+preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
+
+fmla <- as.formula(paste(" ",paste(preds, collapse="+"), sep=" ~ ") )
+dummy.ds <- dummyVars(fmla.cl,data=ds.tr2, fullRank=F)
+dummy.ds.tr2 <- data.frame(predict(dummy.ds, newdata = ds.tr2),"Class"=ds.tr2$Class)
+dummy.ds.tr2$Class <- ifelse(dummy.ds.tr2$Class=='GOOD',1,0)
+
+
+fitControl <- trainControl(## 10-fold CV
+  method = "repeatedcv",
+  number = 10,
+  ## repeated ten times
+  repeats = 10
+  )
+
+glmnetFit <- train(Class~., data=dummy.ds.tr2, method = "glmnet", trControl = fitControl)
+
+perc <- 80/100
+set.seed(998)
+inTraining <- createDataPartition(dummy.ds.tr2$Class, p = perc, list = FALSE)
+training <- dummy.ds.tr2[ inTraining,]
+testing  <- dummy.ds.tr2[-inTraining,]
+
+glmnetFit <- train(Class~., data=training, method = "glmnet") 
+predictorsNames <- names(training)
+
+testPred <- predict(glmnetFit, testing[ , predictorsNames] )
+auc <- roc(testing[,targ], testPred)
+print(auc$auc)
+
+RocImp2 <- varImp(glmnetFit,scale=F)
+RocImp2
+
+plot(RocImp2)
+
 
 #=======================================
 # predict one arbitrary value
