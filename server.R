@@ -1803,12 +1803,14 @@ output$prediction.value.Regression <- renderPrint({
       
       newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
       newdata <- lapply(1:num.preds, function(i) {
-        input_name <- paste0("input", i, sep="")
-        input[[ input_name ]]
-      } # end function
+          input_name <- paste0("input", i, sep="")
+          input[[ input_name ]]
+        } # end function
       )# end lapply
       names(newdata) <- list.predictors
-      
+ 
+  View(newdata)
+ 
       pred_val <- predict(fit, newdata)
       names(pred_val) <- as.character(input$responseVar)
       
@@ -2138,7 +2140,11 @@ output$validate.model <- renderPrint({
           
           gml.mod <- runGLM()
           testPred <- predict(gml.mod, dummy.ds.test[ , predictorsNames] )
-          auc <- roc(dummy.ds.test[,targ], testPred)
+          
+          # transform to 1 and 0
+          response <- ifelse(dummy.ds.test[,targ]=='GOOD',1,0)
+          predictors <- ifelse(testPred=='GOOD',1,0)
+          auc <- roc(response, predictors)
           
           results.model<-auc$auc
           
@@ -2238,7 +2244,7 @@ predict.with.ML.Model <- reactive({
   } # end function
   )# end lapply
   names(newdata) <- list.predictors
-  
+
   # Dummy dataset & variables
   tm.data <- rbind(data[ list.predictors ], newdata)
   names(tm.data) <- list.predictors
@@ -2321,7 +2327,7 @@ output$preds.Variables <- renderUI({
   data <- passData() 
   Vars <- names(data)
   indep.vars <- Vars[ Vars != input$TargVar] 
-  selectInput(inputId='preds.Vars', label=h3('Predictors:'), choices=indep.vars, multiple=TRUE)
+  selectInput(inputId='preds.Vars.CL', label=h3('Predictors:'), choices=indep.vars, multiple=TRUE)
 })  # end renderUI preds.Variables
 
 
@@ -2331,38 +2337,35 @@ output$fmla.dec.Trees <- renderText({
   else{ 
     isolate({   
         fmla = paste( as.character(input$TargVar), 
-                      paste(as.character(input$preds.Vars), collapse=" + "), sep=" ~ " )
+                      paste(as.character(input$preds.Vars.CL), collapse=" + "), sep=" ~ " )
     })  # end isolate
   } # end if...else
 })
 
 runClassRegTrees <- reactive({
   
-  list.vars <- list(input$TargVar, input$preds.Vars)
+  list.vars <- list(input$TargVar, input$preds.Vars.CL)
   
   # "data": dataset that based on the user choices in the first page
   data <- passData()  
   dset.train <- data[ , names(data) %in% unlist(list.vars) ]
   
-  fmla <- as.formula( paste(input$TargVar, paste(input$preds.Vars, collapse="+"), sep=" ~ ") )      
+  fmla <- as.formula( paste(input$TargVar, paste(input$preds.Vars.CL, collapse="+"), sep=" ~ ") )      
   
   if (input$radioDesTree == 1){
     dec.Tree <- rpart(formula=fmla, data=dset.train, method="class", model=T, parms = list(split = "gini"), 
                       control = rpart.control(minsplit = 50, minbucket = round(50/3), cp = 1e-3, xval = 20))
-    
     # prune the tree
     opt <- which.min(dec.Tree$cptable[,"xerror"])
     cp <- dec.Tree$cptable[opt, "CP"]
     dec.Tree <- prune( dec.Tree, cp = cp)
-    
   } else if (input$radioDesTree == 2){   
     dec.Tree <- rpart(formula=fmla, data=dset.train, method="anova", model=T, parms = list(split = "gini"), 
                       control = rpart.control(minsplit = 50, minbucket = round(50/3), cp = 1e-3, xval = 20))
     # prune the tree
     opt <- which.min(dec.Tree$cptable[,"xerror"])
     cp <- dec.Tree$cptable[opt, "CP"]
-    dec.Tree <- prune( dec.Tree, cp = cp)
-    
+    dec.Tree <- prune( dec.Tree, cp = cp )
   }  
   return(dec.Tree)
 })
@@ -2453,13 +2456,50 @@ output$print_Tree.rules <- renderPrint({
 #---------------------------------------------------------------------------------------------------
 # Tab: Predict with the Classification Tree
 #
+
+# predict value regarding the predictors' values
+output$prediction.value.DT <- renderPrint({ 
+  
+  if (input$goDTPredict == 0){
+    return() }
+  else{ 
+    isolate({
+      
+      # load the model 
+      class.reg.Tree <- runClassRegTrees()
+      
+      # create an instance from the input values 
+      list.predictors <- input$preds.Vars.CL
+      num.preds <- length(list.predictors)
+      
+      newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
+      newdata <- lapply(1:num.preds, function(i) {
+        input_name <- paste0("input", i, sep="")
+        input[[ input_name ]]
+      } # end function
+      )# end lapply
+      names(newdata) <- list.predictors
+   
+      View(newdata)
+      
+      pred_val <- predict(class.reg.Tree, newdata, type="class", na.action = na.omit)
+      names(pred_val) <- as.character(input$TargVar)
+      
+      DT.response <- data.frame(pred_val) #, stringsAsFactors = FALSE)
+      print( DT.response )
+      
+     }) # end isolate
+  } # end if...else
+  
+}) 
+
 output$dyn_input.DT <- renderUI({
   
   data <- passData()
-  list.predictors <- input$preds.Vars
+  list.predictors <- input$preds.Vars.CL
   num.preds <- length(list.predictors)
   
-  inputs <- lapply(1:num.preds, function(i) {
+  inputs.DT <- lapply(1:num.preds, function(i) {
     input_name <- paste0("input", i, sep="")
     fluidRow(column(width=6, 
                     if ( is.factor( data[, list.predictors[[i]]] ) )
@@ -2475,47 +2515,9 @@ output$dyn_input.DT <- renderUI({
   } # end function
   ) # end lapply
   
-  do.call(tagList, inputs)
+  do.call(tagList, inputs.DT)
+
 }) 
-
-# predict value regarding the predictors' values
-output$prediction.value.DT <- renderPrint({ 
-  
-  if (input$goDTPredict == 0){
-    return() }
-  else{ 
-    isolate({
-      
-      # load the model 
-      class.reg.Tree <- runClassRegTrees()
-      
-      # create an instance from the input values 
-      list.predictors <- input$preds.Vars
-      num.preds <- length(list.predictors)
-      
-      newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
-      newdata <- lapply(1:num.preds, function(i) {
-        input_name <- paste0("input", i, sep="")
-        input[[ input_name ]]
-      } # end function
-      )# end lapply
-      names(newdata) <- list.predictors
-      
-      print(newdata)
-      print( class(newdata) )
-      
-      pred_val <- predict(class.reg.Tree, newdata)
-      names(pred_val) <- as.character(input$TargVar)
-      
-      DT.response <- data.frame(pred_val) #, stringsAsFactors = FALSE)
-      print( DT.response )
-      
-     }) # end isolate
-  } # end if...else
-  
-}) 
-
-
 
 
 

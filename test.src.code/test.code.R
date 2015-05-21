@@ -8,10 +8,30 @@ library("glmnet")
 Dataset <- read.delim("TSIPOYRA-2014 BATCHES-ANON-2.csv", header = TRUE, sep = ";", dec=".")
 data <- create_dataset(Dataset)
 
-targ <- "Class"
-#preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight", "Origin.Month")
-preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
-fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") ) 
+# targ <- "Class"
+# #preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight", "Origin.Month")
+# preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
+# fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") ) 
+# 
+# list.vars <- list(targ, preds)
+# ds.train <- data[, names(data) %in% unlist(list.vars) ]
+
+# dec.Tree <- rpart(formula=fmla.cl, data=ds.train, method="class", model=T, parms = list(split = "gini"), 
+#                   control = rpart.control(minsplit = 50, minbucket = round(50/3), cp = 1e-3, xval = 20))
+# 
+# plot(as.party(dec.Tree))
+# 
+# newdata <- ds.train[1,preds]
+# newdata$End.Av.Weight <- 200
+# newdata$Econ.FCR.Period <- 2.5
+# newdata$Days <- 100
+# 
+# pred_val <- predict(dec.Tree, newdata, na.action = na.omit)
+# ###############################################################
+
+
+
+
 
 # perc = 80/100
 # nr <- nrow(data)
@@ -90,13 +110,13 @@ fmla.cl<- as.formula(paste(targ, paste(preds, collapse="+"), sep=" ~ ") )
 
 #------------------------------------------------------
 
-ds.tr2 <- data[ , names(data) %in% unlist(list(preds,targ))]
-
 targ <- "Class"
 preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")
+ds.tr2 <- data[ , names(data) %in% unlist(list(preds,targ))]
+
 
 fmla <- as.formula(paste(" ",paste(preds, collapse="+"), sep=" ~ ") )
-dummy.ds <- dummyVars(fmla.cl,data=ds.tr2, fullRank=F)
+dummy.ds <- dummyVars(fmla,data=ds.tr2, fullRank=F)
 dummy.ds.tr2 <- data.frame(predict(dummy.ds, newdata = ds.tr2),"Class"=ds.tr2$Class)
 dummy.ds.tr2$Class <- ifelse(dummy.ds.tr2$Class=='GOOD',1,0)
 
@@ -119,8 +139,9 @@ testing  <- dummy.ds.tr2[-inTraining,]
 glmnetFit <- train(Class~., data=training, method = "glmnet") 
 predictorsNames <- names(training)
 
+
 testPred <- predict(glmnetFit, testing[ , predictorsNames] )
-auc <- roc(testing[,targ], testPred)
+auc <- roc(testing[,targ], as.matrix(testPred))
 print(auc$auc)
 
 RocImp2 <- varImp(glmnetFit,scale=F)
