@@ -8,6 +8,31 @@ library("glmnet")
 Dataset <- read.delim("TSIPOYRA-2014 BATCHES-ANON-2.csv", header = TRUE, sep = ";", dec=".")
 data <- create_dataset(Dataset)
 
+
+#--------------------------- Regression Test
+
+# regressors <- list("End.Av.Weight", "Start.Av.Weight", "Days", "Econ.FCR.Period", "SFR.Period", "SGR.Period",
+#                    "Avg.Temperature", "Age")
+# 
+# response <- list("End.Av.Weight")
+# predictors <- regressors[ regressors != unlist(response) ]
+#  
+# ds <- data[ , names(data) %in% unlist(regressors) ]
+# 
+# fmla = as.formula(paste(response," ~ ",paste(predictors, collapse="+")))
+# 
+# model <- glm(formula=fmla, family=gaussian(link='identity'), 
+#               data=ds, control=glm.control(maxit=1000,trace=FALSE), model=TRUE)
+# 
+# 
+# library("car")
+# library("relaimpo")
+# metrics <- calc.relimp(model, type = "car")
+
+
+#--------------------------- End Regression Test
+
+
 # targ <- "Class"
 # #preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight", "Origin.Month")
 # preds <- c("Site", "Region", "Hatchery", "Days", "Econ.FCR.Period", "Actual.Feed", "End.Av.Weight")

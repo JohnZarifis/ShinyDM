@@ -1672,7 +1672,9 @@ output$table_Infl <- renderDataTable({
   else{ 
     isolate({
       p<-influencePlot(runRegression(), id.n=10)
-  return(p) 
+      results <- as.data.frame( cbind('Observation' = rownames(p), p) )
+      
+  return(results) 
   }) # end isolate
   } # end if...else
 })
@@ -1704,6 +1706,7 @@ run_Relative.Importance <- reactive({
       if (is.null(input$explanatory.Variables) || length(input$explanatory.Variables) <2) return()
       fit <- runRegression()
       metrics <- calc.relimp(fit, type = "car")
+      
       return(metrics) 
     }) # end isolate
   } # end if...else
@@ -1768,7 +1771,7 @@ output$dyn_input.Regression <- renderUI({
   num.preds <- length(list.predictors)
   
   inputs <- lapply(1:num.preds, function(i) {
-    input_name <- paste0("input", i, sep="")
+    input_name <- paste0("inputLR", i, sep="")
     fluidRow(column(width=6, 
                     if ( is.factor( data[, list.predictors[[i]]] ) )
                     {
@@ -1800,16 +1803,18 @@ output$prediction.value.Regression <- renderPrint({
       # create an instance from the input values 
       list.predictors <- input$explanatory.Variables
       num.preds <- length(list.predictors)
-      
+  
       newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
       newdata <- lapply(1:num.preds, function(i) {
-          input_name <- paste0("input", i, sep="")
+          input_name <- paste0("inputLR", i, sep="")
           input[[ input_name ]]
         } # end function
       )# end lapply
       names(newdata) <- list.predictors
- 
-  View(newdata)
+
+
+View(newdata)
+
  
       pred_val <- predict(fit, newdata)
       names(pred_val) <- as.character(input$responseVar)
@@ -2269,8 +2274,8 @@ output$dyn_input <- renderUI({
     num.preds <- length(list.predictors)
     
     inputs <- lapply(1:num.preds, function(i) {
-    input_name <- paste0("input", i, sep="")
-    fluidRow(column(width=6, 
+        input_name <- paste0("input", i, sep="")
+        fluidRow(column(width=6, 
                 if ( is.factor( data[, list.predictors[[i]]] ) )
                 {
                   list.values <- unique( data[, list.predictors[[i]]] )
@@ -2474,14 +2479,12 @@ output$prediction.value.DT <- renderPrint({
       
       newdata <- as.data.frame(matrix(0, nrow = 1, ncol=num.preds))
       newdata <- lapply(1:num.preds, function(i) {
-        input_name <- paste0("input", i, sep="")
+        input_name <- paste0("inputDT", i, sep="")
         input[[ input_name ]]
       } # end function
       )# end lapply
       names(newdata) <- list.predictors
-   
-      View(newdata)
-      
+     
       pred_val <- predict(class.reg.Tree, newdata, type="class", na.action = na.omit)
       names(pred_val) <- as.character(input$TargVar)
       
@@ -2500,7 +2503,7 @@ output$dyn_input.DT <- renderUI({
   num.preds <- length(list.predictors)
   
   inputs.DT <- lapply(1:num.preds, function(i) {
-    input_name <- paste0("input", i, sep="")
+    input_name <- paste0("inputDT", i, sep="")
     fluidRow(column(width=6, 
                     if ( is.factor( data[, list.predictors[[i]]] ) )
                     {
@@ -2518,18 +2521,6 @@ output$dyn_input.DT <- renderUI({
   do.call(tagList, inputs.DT)
 
 }) 
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
