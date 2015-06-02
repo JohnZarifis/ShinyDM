@@ -1,73 +1,131 @@
-### Version 28.02.2015
+### Version 30.05.2015
 #
+# load packages
+#
+library("shiny")
+library("shinythemes")
+library("lubridate")
+library("htmltools")
+#library(rpivotTable)
+library("DT")
+library("RColorBrewer")
+library("readxl")
+
+library("graphics")
+library("ggplot2")
+library("lattice")
+
+library("mgcv")
+library("plotrix")
+library("psych")
+library("plyr")
+library("dplyr")
+library("GGally")
+library("e1071")
+library("caret")
+library("pROC")
+library("glmnet")
+library("rpart")
+library("party")
+library("partykit")
+library("Hmisc")
+library("effects")
+library("car")
+library("relaimpo")
+library("ROCR")
+library("fpc")
+library("randomForest")
+library("maptree")
+library("nlme")
+
+
+#-----------------------------------------
+# load dataset
+pathname = paste(getwd(), "aquaData.xlsx", sep="/")
+Dataset <- read_excel(pathname, sheet = 1 ,col_names = TRUE, na='na')
+
 # ------------------------
 # Create the dataset
 # ------------------------
 create_dataset <- function(dataset){
   
   data <- data.frame(
-                     'Region' = dataset$Region,
-                     'Site' = dataset$Site,
-                     'Unit' = dataset$Unit,
-                     'Batch' = dataset$Batch, 
-                     "Hatchery" = dataset$Hatchery,
-                     "Origin.Year" = as.character(dataset$"Origin Year"),
-                     "Origin.Month" = dataset$'Origin Month',
-                     'Current.Grading' = dataset$'Current Grading',
-                     'From' = dmy(dataset$From),
-                     "To" = dmy(dataset$To),
-                     #"From" = ymd(as.Date(dataset$From, origin="1899-12-30")) ,
-                     #"To" = ymd(as.Date(dataset$To, origin="1899-12-30")),
-                     #"From" = as.Date(dataset$From, origin="1899-12-30") ,
-                     #"To" = as.Date(dataset$To, origin="1899-12-30"),
-                     "Month.Sampling" = month(as.Date(dataset$To, origin="1899-12-30"),label = TRUE),
-                     "Start.Av.Weight" = dataset$'Start Av. Wt.',
-                     "End.Av.Weight" = dataset$'End Av.Wt.',
-                     "Model.End.Av.Weight.Act.Feed" = dataset$'Model End Av. Wt. Act. Feed', 
-                     "Av.Weight.Deviation" = dataset$'Av. Wt. Deviation (%)', 
-                     "Av.Weight.Before.Sampling" = dataset$'Av. Wt. Before Sampl.', 
-                     "Model.End.Av.Weight.Suggested.Feed" = dataset$'Model End Av. Wt. Sugg. Feed', 
-                     "Actual.Feed" = dataset$'Actual Feed', 
-                     "Feed.Category" = dataset$'Feed Category', 
-                     "Supplier" = dataset$Supplier, 
-                     "Period.Feed.Qty" = dataset$'Period Feed Qty',
-                     "Suggested.Feed.Qty" = dataset$'Suggested Feed Qty',
-                     "Opening.Fish.No" = dataset$'Opening Fish No', 
-                     "Opening.Biomass" = dataset$'Opening Biomass',
-                     "Closing.Fish.No" = dataset$'Closing Fish No', 
-                     "Closing.Biomass" = dataset$'Closing Biomass',      
-                     "Harvest.Biomass" = dataset$'Harvest Biomass', 
-                     "Biomass.Produced" = dataset$'Biomass Produced',     
-                     "Biomass.Produced.Before.Sampling" = dataset$'Biomass Produced Before Sampl.', 
-                     "Econ.FCR.Period" = dataset$'Econ. FCR Period',
-                     "FCR.Before.Sampling" = dataset$'Econ FCR Period Before Sampl.', 
-                     "Mortality.No" = dataset$'Mortality No', 
-                     "Model.Mortality.No" = dataset$'Model Mortality No', 
-                     "Mortality.Deviation" = dataset$'Mortality Deviation (%)',
-                     "SFR.Period" = dataset$'SFR Period (%)', 
-                     "SFR.Period.Before.Sampling" = dataset$'SFR Period (%) Before Sampl.',     
-                     "SGR.Period" = dataset$'SGR Period (%)', 
-                     "Max.Food.Qty" = dataset$'Max Feed Qty',
-                     "Food.Price" = dataset$'Food Price', 
-                     "LTD.Econ.FCR" = dataset$'LTD Econ. FCR', 
-                     "LTD.Mortality" = dataset$'LTD Mortality %',  
-                     "LTD.Mortality.No" = dataset$'LTD Mortality No', 
-                     "Avg.Oxygene" = dataset$'Avg. Oxygene', 
-                     "Avg.Temperature" = dataset$'Avg. Temp.', 
-                     "Feeding.Policy" = dataset$'Feeding Policy', 
-                     "Period.Day.Degrees" = dataset$'Period Day Degrees',
-                     "Start.Av.Weight.Category" =  dataset$'Start Av. Weight Category',
-                     "End.Av.Weight.Category" = dataset$'End Av. Weight Category',                     
-                     "Age" = dataset$AGE,                     
-                     "Days" = interval( dmy(dataset$From), dmy(dataset$To) )%/%days(1),
-                     "Class" = dataset$CLASS,
-                     "Period.Mortality" = dataset$'Period Mortality %',
-                     "LTD.Day.Degrees" = dataset$'LTD Day Degrees',
-                     "Fastings.No" = dataset$'Fastings No',
-                     "FastingsPerc"=dataset$'Fastings %'
+                      'Orientation' = substr(dataset$Unit,1,1) 
+                     ,'System' = substr(dataset$Unit,2,2)
+                     ,'Cage' = substr(dataset$Unit,nchar(as.character(dataset$Unit))-1,nchar(as.character(dataset$Unit))-1)
+                     ,'Section' = substr(dataset$Unit,nchar(as.character(dataset$Unit)),nchar(as.character(dataset$Unit)))
+                     ,'Region' = dataset$Region
+                     ,'Site' = dataset$Site
+                     ,'Unit' = dataset$Unit
+                     ,'Batch' = dataset$Batch 
+                     ,"Hatchery" = dataset$Hatchery
+                     ,"Origin.Year" = as.character(dataset$"Origin Year")
+                     ,"Origin.Month" = dataset$'Origin Month'
+                     ,'Current.Grading' = dataset$'Current Grading'
+                     #,'From' = dmy(dataset$From)
+                     #,"To" = dmy(dataset$To)
+                     #,"From" = as.Date(dataset$From, origin="1899-12-30") 
+                     #,"To" = as.Date(dataset$To, origin="1899-12-30")
+                     ,"From" = ymd(as.Date(dataset$From, origin="1899-12-30")) 
+                     ,"To" = ymd(as.Date(dataset$To, origin="1899-12-30"))                    
+                     ,"Month.Sampling" = month(as.Date(dataset$To, origin="1899-12-30"),label = TRUE)
+                     ,"Start.Av.Weight" = dataset$'Start Av. Wt.'
+                     ,"End.Av.Weight" = dataset$'End Av.Wt.'
+                     ,"Model.End.Av.Weight.Act.Feed" = dataset$'Model End Av. Wt. Act. Feed' 
+                     ,"Av.Weight.Deviation" = dataset$'Av. Wt. Deviation (%)' 
+                     ,"Av.Weight.Before.Sampling" = dataset$'Av. Wt. Before Sampl.' 
+                     ,"Model.End.Av.Weight.Suggested.Feed" = dataset$'Model End Av. Wt. Sugg. Feed'
+                     ,"Actual.Feed" = dataset$'Actual Feed' 
+                     ,"Feed.Category" = dataset$'Feed Category' 
+                     ,"Supplier" = dataset$Supplier 
+                     ,"Period.Feed.Qty" = dataset$'Period Feed Qty'
+                     ,"Suggested.Feed.Qty" = dataset$'Suggested Feed Qty'
+                     ,"Opening.Fish.No" = dataset$'Opening Fish No' 
+                     ,"Opening.Biomass" = round(dataset$'Opening Biomass', digits=2)
+                     ,"Closing.Fish.No" = dataset$'Closing Fish No' 
+                     ,"Closing.Biomass" = round(dataset$'Closing Biomass', digits=2)     
+                     ,"Harvest.Biomass" = dataset$'Harvest Biomass' 
+                     ,"Biomass.Produced" = dataset$'Biomass Produced'     
+                     ,"Biomass.Produced.Before.Sampling" = dataset$'Biomass Produced Before Sampl.' 
+                     ,"Econ.FCR.Period" = dataset$'Econ. FCR Period'
+                     ,"FCR.Before.Sampling" = dataset$'Econ FCR Period Before Sampl.' 
+                     ,"Mortality.No" = dataset$'Mortality No' 
+                     ,"Model.Mortality.No" = dataset$'Model Mortality No' 
+                     ,"Mortality.Deviation" = dataset$'Mortality Deviation (%)'
+                     ,"SFR.Period" = dataset$'SFR Period (%)' 
+                     ,"SFR.Period.Before.Sampling" = dataset$'SFR Period (%) Before Sampl.'     
+                     ,"SGR.Period" = dataset$'SGR Period (%)' 
+                     ,"Max.Food.Qty" = dataset$'Max Feed Qty'
+                     ,"Food.Price" = dataset$'Food Price'
+                     ,"LTD.Econ.FCR" = round(dataset$'LTD Econ. FCR' , digits=2)
+                     ,"LTD.Mortality" = round(dataset$'LTD Mortality %', digits=2)  
+                     ,"LTD.Mortality.No" = dataset$'LTD Mortality No' 
+                     ,"Avg.Oxygene" = dataset$'Avg. Oxygene' 
+                     ,"Avg.Temperature" = dataset$'Avg. Temp.' 
+                     ,"Feeding.Policy" = dataset$'Feeding Policy' 
+                     ,"Period.Day.Degrees" = dataset$'Period Day Degrees'
+                     ,"Start.Av.Weight.Category" =  dataset$'Start Av. Weight Category'
+                     ,"End.Av.Weight.Category" = dataset$'End Av. Weight Category'                     
+                     ,"Age" = dataset$AGE                     
+                     ,"Days" = interval(as.Date(dataset$From, origin="1899-12-30"), as.Date(dataset$To, origin="1899-12-30") )%/%days(1)
+                     ,"Start.Av.Weight.BioCat" = dataset$"Start Av Weight BioCat"
+                     ,"End.Av.Weight.BioCat" = dataset$"End Av Weight BioCat"
+                     ,"Ph"=round(dataset$Ph, digits=2)
+                     ,"CAUDAL.O3" = round(dataset$"CAUDAL O3 (Nm3/H)")
+                     ,"WATER.RENEWAL"= round(dataset$"WATER RENEWAL (l./min.)")
+                     ,"NH3" = round(dataset$"NH3 (ppm.)", digits=2)
+                     ,"NO2" = round(dataset$"NO2 (ppm.)", digits=2)
+                     #"Class" = dataset$CLASS
+                     #"Period.Mortality" = dataset$'Period Mortality %'
+                     #"LTD.Day.Degrees" = dataset$'LTD Day Degrees',
+                     #"Fastings.No" = dataset$'Fastings No',
+                    # "FastingsPerc"=dataset$'Fastings %'
                     )
                     
-  
+  data$Class = ifelse( data$Av.Weight.Deviation > 0,"GOOD","BAD" )
+  data$Class = as.factor(data$Class)
+  #data$Ph = as.numeric(data$Ph)
+
   #   For debugging  
   #  View(data)
   #   str(data)

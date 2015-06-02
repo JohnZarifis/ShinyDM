@@ -1,47 +1,33 @@
 ### Version Bream
 
-library("shiny")
-library("lubridate")
-library("mgcv")
-library("htmltools")
-library(rpivotTable)
-library(readxl)
-
 # load helpers.R file
 source("helpers.R")
 
-#Datamining281114 <- read.delim("Datamining281114.csv", header = TRUE, sep = ";", dec=".")
-#Dataset <- read.delim("bream2014.csv", header = TRUE, sep = ";", dec=",")
-#Dataset <- readWorksheetFromFile("TSIPOYRA-2014 BATCHES-ANON.xlsx",sheet =1)
-#Dataset <- read_excel("bream2014.xlsx",sheet = 1 ,col_names = TRUE)
-
-pathname = paste(getwd(), "bream2014.xlsx", sep="/")
-Dataset <- read_excel(pathname, sheet = 1 ,col_names = TRUE, na='na')
-
 # Call function to create the dataset for analysis
 df <- create_dataset(Dataset)
-#View(df)
 
-#-----------------------------------------------------------------------------------------------------
 sidebarUni <- sidebarPanel(
   #fixed responsive img #added class img
-  img(src="Aquamanager-logo.png" ,class = "img-responsive"),
+  img(src="Aquamanager-logo.png", class = "img-responsive"),
   
   h2("Dimensions"),
   fluidRow(column(6,
-                  selectInput(inputId='groupRegion', label='Region', choices=c("All", unique(as.character(df$Region))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupSite', label='Site', choices=c("All", unique(as.character(df$Site))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupBatch', label='Batch', choices=c("All", unique(as.character(df$Batch))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupOrientation', label='Orientation', choices=c("All", unique(as.character(df$Orientation))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupSystem', label='System', choices=c("All", unique(as.character(df$System))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupCage', label='Cage', choices=c("All", unique(as.character(df$Cage))), selected="All", multiple=TRUE),
                   selectInput(inputId='groupUnit', label='Unit', choices=c("All", unique(as.character(df$Unit))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupOriginMonth', label='Stocking Month', choices=c("All", unique(as.character(df$Origin.Month))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupOriginYear', label='Stocking Year', choices=c("All", unique(as.character(df$Origin.Year))), selected="All", multiple=TRUE)),
+                  selectInput(inputId='groupBatch', label='Batch', choices=c("All", unique(as.character(df$Batch))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupSection', label='Section', choices=c("All", unique(as.character(df$Section))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupHatchery', label='Hatchery', choices=c("All", unique(as.character(df$Hatchery))), selected="All", multiple=TRUE)),
            column(6,
-                  selectInput(inputId='groupHatchery', label='Hatchery', choices=c("All", unique(as.character(df$Hatchery))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupFood', label='Feed Type', choices=c("All", unique(as.character(df$Actual.Feed))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupOriginMonth', label='Origin.Month', choices=c("All", unique(as.character(df$Origin.Month))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupOriginYear', label='Origin.Year', choices=c("All", unique(as.character(df$Origin.Year))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupFood', label='Actual.Feed', choices=c("All", unique(as.character(df$Actual.Feed))), selected="All", multiple=TRUE),
                   selectInput(inputId='groupFood.Category', label='Feed.Category', choices=c("All", unique(as.character(df$Feed.Category))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupSupplier', label='Feed Supplier', choices=c("All", unique(as.character(df$Supplier))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupCurrent.Grading', label='Current.Grading', choices=c("All", unique(as.character(df$Current.Grading))), selected="All", multiple=TRUE))),
-                 
+                  selectInput(inputId='groupSupplier', label='Supplier', choices=c("All", unique(as.character(df$Supplier))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupStartAvWeightBioCat', label='Start.Av.Weight.BioCat', choices=c("All", unique(as.character(df$Start.Av.Weight.BioCat))), selected="All", multiple=TRUE),
+                  selectInput(inputId='groupEndAvWeightBioCat', label='End.Av.Weight.BioCat', choices=c("All", unique(as.character(df$End.Av.Weight.BioCat))), selected="All", multiple=TRUE))),
+  
   dateRangeInput('dateRangeFrom',
                  label = paste(' From: '),
                  start = min( ymd(df$From)-days(0) ), 
@@ -69,7 +55,6 @@ sidebarUni <- sidebarPanel(
                               max = max(as.double(df$Start.Av.Weight)), 
                               value = c(min(as.double(df$Start.Av.Weight)), max(as.double(df$Start.Av.Weight))),
                               step=1.0, round=TRUE, sep="."),
-                  
                   sliderInput("rangeAvWeightDev", "Av.Weight.Deviation:", 
                               min = min(as.double(df$Av.Weight.Deviation)), 
                               max = max(as.double(df$Av.Weight.Deviation)), 
@@ -84,32 +69,18 @@ sidebarUni <- sidebarPanel(
                               max = max(as.double(df$LTD.Econ.FCR)), 
                               value = c(min(as.double(df$LTD.Econ.FCR)), max(as.double(df$LTD.Econ.FCR))), 
                               step=0.5, round=-2, sep="."),
-                  sliderInput("rangeAvg.Temp", "Avg.Temperature:", min = min(as.double(df$Avg.Temperature)), 
-                              max = max(as.double(df$Avg.Temperature)), 
-                              value = c(min(as.double(df$Avg.Temperature)), max(as.double(df$Avg.Temperature))), 
-                              step=0.5, round=-2, sep="."),
-                  sliderInput("rangeAge", "LTD Production Time:", min = min(as.double(df$Age)), 
-                              max = max(as.double(df$Age)), 
-                              value = c(min(as.double(df$Age)), max(as.double(df$Age))), 
-                              step=10, round = TRUE, sep="."),
-                  sliderInput("rangePeriod.Mortality", "Period Mortality % :", min = min(as.double(df$Period.Mortality)), 
-                              max = max(as.double(df$Period.Mortality)), 
-                              value = c(min(as.double(df$Period.Mortality)), max(as.double(df$Period.Mortality))), 
-                              step=0.01, round =-2, sep="."),
-                  sliderInput("rangeLTD.Day.Degrees", "LTD Day Degrees :", min = min(as.double(df$LTD.Day.Degrees)), 
-                              max = max(as.double(df$LTD.Day.Degrees)), 
-                              value = c(min(as.double(df$LTD.Day.Degrees)), max(as.double(df$LTD.Day.Degrees))), 
-                              step=10, round = TRUE, sep="."),
-                  sliderInput("rangeDays", "Days Between Samplings :", min = min(as.double(df$Days)), 
-                              max = max(as.double(df$Days)), 
-                              value = c(min(as.double(df$Days)), max(as.double(df$Days))), 
-                              step=1, round = TRUE, sep=".")
-                 ),
+                  sliderInput("rangePeriod.Feed.Qty", "Period.Feed.Qty:", 
+                              min = min(as.double(df$Period.Feed.Qty), na.rm=TRUE), 
+                              max = max(as.double(df$Period.Feed.Qty), na.rm=TRUE), 
+                              value = c(min(as.double(df$Period.Feed.Qty)), 
+                                        max(as.double(df$Period.Feed.Qty))), 
+                              step=10, round=TRUE, sep=".")
+                  ),
            column(6,
                   sliderInput("rangeAvWeight", "End.Av.Weight:", min = min(as.double(df$End.Av.Weight)), 
                               max = max(as.double(df$End.Av.Weight)), 
                               value = c(min(as.double(df$End.Av.Weight)), max(as.double(df$End.Av.Weight))),
-                              step=1.0, round=TRUE, sep="."), 
+                              step=1.0, round=TRUE, sep="."),
                   sliderInput("rangePeriod.SFR", "Period.SFR:", min = min(as.double(df$SFR.Period)), 
                               max = max(as.double(df$SFR.Period)), 
                               value = c(min(as.double(df$SFR.Period)), max(as.double(df$SFR.Period))), step=0.1, 
@@ -118,7 +89,7 @@ sidebarUni <- sidebarPanel(
                               max = max(as.double(df$SGR.Period)), 
                               value = c(min(as.double(df$SGR.Period)), max(as.double(df$SGR.Period))), step=0.1, 
                               round=-2, sep="."),
-                  sliderInput("rangeLTD.Mortality", "LTD.Mortality %:", 
+                  sliderInput("rangeLTD.Mortality", "LTD.Mortality:", 
                               min = min(as.double(df$LTD.Mortality)),
                               max = max(as.double(df$LTD.Mortality)), 
                               value = c(min(as.double(df$LTD.Mortality)), 
@@ -129,39 +100,53 @@ sidebarUni <- sidebarPanel(
                               max = max(as.double(df$Period.Day.Degrees), na.rm=TRUE), 
                               value = c(min(as.double(df$Period.Day.Degrees)), 
                                         max(as.double(df$Period.Day.Degrees))), 
-                              step=10, round=TRUE, sep="."),
-                  sliderInput("rangePeriod.Feed.Qty", "Period.Feed.Qty:", 
-                              min = min(as.double(df$Period.Feed.Qty), na.rm=TRUE), 
-                              max = max(as.double(df$Period.Feed.Qty), na.rm=TRUE), 
-                              value = c(min(as.double(df$Period.Feed.Qty)), 
-                                        max(as.double(df$Period.Feed.Qty))), 
-                              step=10, round=TRUE, sep="."),
-                  sliderInput("rangeFastings.No", " Number of Fastings:", 
-                              min = min(as.double(df$Fastings.No), na.rm=TRUE), 
-                              max = max(as.double(df$Fastings.No), na.rm=TRUE), 
-                              value = c(min(as.double(df$Fastings.No)), 
-                                        max(as.double(df$Fastings.No))), 
-                              step=1, round=TRUE, sep="."),
-                  sliderInput("rangeFastingsPerc", " Perc of Fastings:", 
-                              min = min(as.double(df$FastingsPerc), na.rm=TRUE), 
-                              max = max(as.double(df$FastingsPerc), na.rm=TRUE), 
-                              value = c(min(as.double(df$FastingsPerc)), 
-                                        max(as.double(df$FastingsPerc))), 
-                              step=0.01, round=-2, sep=".")
-                 )
+                              step=10, round=TRUE, sep=".")
+           ) # end column
   ), # end fluid row
   
   hr(),
+  h2('Environmental Measures'),
+  fluidRow(column(6,
+                    sliderInput("rangePh", "Ph:", min = min(as.double(df$Ph)), 
+                                max = max(as.double(df$Ph)), 
+                                value = c(min(as.double(df$Ph)), max(as.double(df$Ph))), 
+                                step=0.1, round=-2, sep="."),
+                    sliderInput("rangeCAUDAL.O3", "CAUDAL O3 (Nm3/H):", min = min(as.double(df$CAUDAL.O3)), 
+                                max = max(as.double(df$CAUDAL.O3)), 
+                                value = c(min(as.double(df$CAUDAL.O3)), max(as.double(df$CAUDAL.O3))), 
+                                step=10, round=0, sep="."),
+                    sliderInput("rangeWATER.RENEWAL", "WATER RENEWAL:", min = min(as.double(df$WATER.RENEWAL)), 
+                                max = max(as.double(df$WATER.RENEWAL)), 
+                                value = c(min(as.double(df$WATER.RENEWAL)), max(as.double(df$WATER.RENEWAL))), 
+                                step=1, round=0, sep=".")
+                 ),
+        column(6, 
+                  sliderInput("rangeNO2", "NO2:", min = min(as.double(df$NO2)), 
+                           max = max(as.double(df$NO2)), 
+                           value = c(min(as.double(df$NO2)), max(as.double(df$NO2))), 
+                           step=0.01, round=-2, sep="."),
+                  sliderInput("rangeNH3", "NH3:", min = min(as.double(df$NH3)), 
+                           max = max(as.double(df$NH3)), 
+                           value = c(min(as.double(df$NH3)), max(as.double(df$NH3))), 
+                           step=0.5, round=-2, sep="."),
+                  sliderInput("rangeAvg.Temp", "Avg.Temperature:", min = min(as.double(df$Avg.Temperature)), 
+                           max = max(as.double(df$Avg.Temperature)), 
+                           value = c(min(as.double(df$Avg.Temperature)), max(as.double(df$Avg.Temperature))), 
+                           step=0.5, round=-2, sep=".")
+        ) # end column
+  ), # end fluid row
+  
+  
+  hr(),
   radioButtons("radioDimUni", label = h3("Separate The Dataset By:"), 
-               choices = list("None", "Region", "Site", "Unit", "Batch", "Hatchery",
-                              "Origin.Month", "Origin.Year", "Current.Grading", 
-                              "Feed Type"="Actual.Feed","Feed.Category","Feed Supplier"="Supplier"), selected = "None"),
+               choices = list("None", "Orientation", "System", "Section", "Batch", "Hatchery",
+                              "Origin.Month", "Origin.Year", "Start.Av.Weight.BioCat", 
+                              "End.Av.Weight.BioCat", "Actual.Feed"), selected = "None"),
   
   hr(),
   actionButton(inputId = 'goUniPlot',  label = 'Refresh Univariate plots')
   
 ) # end sidebarUni function
-
 #-------------------------------------------------------------------------------
 # sidebarMulti <- sidebarPanel(
 #   
@@ -194,7 +179,7 @@ shinyUI(
                                         tabPanel("Histograms",
                                                    fluidRow(column(3, sliderInput("numbins", "Number of bins:", 
                                                                                   min = 5, max = 100, 
-                                                                                  value = 20, step=1))), 
+                                                                                  value = 50, step=1))), 
                                                    fluidRow(plotOutput("histPlotAvWeight")),
                                                    fluidRow(plotOutput("histPlotAvWeightDeviation")),
                                                    fluidRow( plotOutput("histPlotPeriod.FCR")),
@@ -203,7 +188,12 @@ shinyUI(
                                                    fluidRow( plotOutput("histPlotPeriod.SGR")),
                                                    fluidRow( plotOutput("histPlotMortality")),
                                                    fluidRow( plotOutput("histPlotPeriod.Day.Degrees")),
-                                                   fluidRow( plotOutput("histPlotAvg.Temperature"))
+                                                   fluidRow( plotOutput("histPlotAvg.Temperature")),
+                                                   fluidRow( plotOutput("histPlotPh")),
+                                                   fluidRow( plotOutput("histPlotCAUDAL.O3")),
+                                                   fluidRow( plotOutput("histPlotWATER.RENEWAL")),
+                                                   fluidRow( plotOutput("histPlotNH3")),
+                                                   fluidRow( plotOutput("histPlotNO2"))
                                         ), # end tabPanel Histograms 
                                         tabPanel("Density Plots",
                                                    fluidRow(plotOutput("densPlotAvWeight")),
@@ -214,8 +204,13 @@ shinyUI(
                                                    fluidRow(plotOutput("densPlotPeriod.SGR")),
                                                    fluidRow(plotOutput("densPlotMortality")),
                                                    fluidRow(plotOutput("densPlotPeriod.Day.Degrees")),
-                                                   fluidRow(plotOutput("densPlotAvg.Temperature"))
-                                               ), # end tabPanel Density Plots
+                                                   fluidRow(plotOutput("densPlotAvg.Temperature")),
+                                                   fluidRow( plotOutput("densPlotPh")),
+                                                   fluidRow( plotOutput("densPlotCAUDAL.O3")),
+                                                   fluidRow( plotOutput("densPlotWATER.RENEWAL")),
+                                                   fluidRow( plotOutput("densPlotNH3")),
+                                                   fluidRow( plotOutput("densPlotNO2"))
+                                        ), # end tabPanel Density Plots
                                         tabPanel("Boxplots",
                                                    fluidRow(plotOutput("boxPlotAvWeight")),
                                                    fluidRow(plotOutput("boxPlotAvWeightDeviation")),  
@@ -225,7 +220,12 @@ shinyUI(
                                                    fluidRow(plotOutput("boxPlotPeriod.SGR")),
                                                    fluidRow(plotOutput("boxPlotMortality")),
                                                    fluidRow(plotOutput("boxPlotPeriod.Day.Degrees")),
-                                                   fluidRow(plotOutput("boxPlotAvg.Temperature"))
+                                                   fluidRow(plotOutput("boxPlotAvg.Temperature")),
+                                                   fluidRow( plotOutput("boxPlotPh")),
+                                                   fluidRow( plotOutput("boxPlotCAUDAL.O3")),
+                                                   fluidRow( plotOutput("boxPlotWATER.RENEWAL")),
+                                                   fluidRow( plotOutput("boxPlotNH3")),
+                                                   fluidRow( plotOutput("boxPlotNO2"))
                                         ), # end tabPanel BoxPlots
                                         tabPanel("Summary Statistics", 
                                                     h4("End Average Weight:"),
@@ -253,12 +253,26 @@ shinyUI(
                                                     tableOutput("summary_stats_Period.Day.Degrees"),
                                                     hr(),
                                                     h4("Avg. Temperature:"),
-                                                    tableOutput("summary_stats_Avg.Temp")
+                                                    tableOutput("summary_stats_Avg.Temp"),
+                                                    hr(),
+                                                    h4("Ph:"),
+                                                    tableOutput("summary_stats_Ph"),
+                                                    hr(),
+                                                    h4("CAUDAL O3 (Nm3/H):"),
+                                                    tableOutput("summary_stats_CAUDAL.O3"),
+                                                    hr(),
+                                                    h4("WATER RENEWAL (l./min.):"),
+                                                    tableOutput("summary_stats_WATER.RENEWAL"),
+                                                    hr(),
+                                                    h4("NH3 (ppm.):"),
+                                                    tableOutput("summary_stats_NH3"),
+                                                    hr(),
+                                                    h4("NO2 (ppm.):"),
+                                                    tableOutput("summary_stats_NO2")
+                                                 
                                         ), # end tabPanel Summary Statistics
                                         tabPanel("Data", 
-                                                    textOutput("Dataset for processing..."),
-                                                    hr(),
-                                                    dataTableOutput("dataset") 
+                                                    DT::dataTableOutput("dataset") 
                                         )
 #                                         ,# end tabPanel Data
 #                                         tabPanel("Pivot", 
@@ -367,6 +381,11 @@ shinyUI(
                                          wellPanel(
                                            fluidRow(column(9, plotOutput("scatterPlot.EconFCR.AvgTemp")),
                                                     column(3, verbatimTextOutput("cor.stats.EconFCR.AvgTemp")) 
+                                           )
+                                         ),
+                                         wellPanel(
+                                           fluidRow(column(9, plotOutput("scatterPlot.EconFCR.Ph")),
+                                                    column(3, verbatimTextOutput("cor.stats.EconFCR.Ph")) 
                                            )
                                          )
                                        ) # end tabPanel "Scatter Plots"
@@ -628,11 +647,13 @@ tabPanel(" Machine Learning Models ", id="MenuPage_6",
            sidebarPanel(
              img(src="Aquamanager-logo.png",class = "img-responsive"),
              hr(),
+             radioButtons("radioML.task", label = h3("Choose Task:"), choices = list("Classification"=1,
+                                                                                 "Regression"=2), selected=1),
              uiOutput("targs.ML.Variables"),
              hr(),
              uiOutput("preds.ML.Variables"),
              hr(),
-             radioButtons("radioML", label = h3("Choose model:"), choices = list("Support Vector Machines"=1,
+             radioButtons("radioML.model", label = h3("Choose model:"), choices = list("Support Vector Machines"=1,
                                                         "GLMnet"=2), selected=1),
              hr(),
              radioButtons(inputId="testingOptions",label = h3("Testing Options:"), 
@@ -650,7 +671,7 @@ tabPanel(" Machine Learning Models ", id="MenuPage_6",
                       h4('Summary:'),
                       fluidRow(column(12, verbatimTextOutput("summary.model"))),
                       hr(),
-                      h4('Evaluate the model:'),
+                      h4('Evaluate the model on the whole Training Set:'),
                       fluidRow(column(12, verbatimTextOutput("validate.model"))),
                       
                       #------ relative importance
@@ -713,7 +734,7 @@ tabPanel(" Classification ", id="MenuPage_7",
                        hr(),
                        fluidRow(column(12, verbatimTextOutput("RegClass.Rel.Impo"))),              
                        hr(),
-                       fluidRow(column(12, dataTableOutput("info_tree_acc") )),
+                       fluidRow(column(12, verbatimTextOutput("info_tree_acc") )),
                        hr(),
                        h4(' Rules of the Tree:'),
                        fluidRow(column(12, verbatimTextOutput("print_Tree.rules") ))

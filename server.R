@@ -5,58 +5,12 @@
 # http://www.rstudio.com/shiny/
 #
 
-library("shiny")
-library("shinythemes")
-library("graphics")
-library("ggplot2")
-library("lattice")
-library("plotrix")
-library("psych")
-library("RColorBrewer")
-library("lubridate")
-library("plyr")
-library("dplyr")
-library("GGally")
-library("e1071")
-library("caret")
-library("pROC")
-library("glmnet")
-library("rpart")
-library("party")
-library("partykit")
-library("Hmisc")
-library("effects")
-library("car")
-library("relaimpo")
-library("ROCR")
-library("fpc")
-library("randomForest")
-library("maptree")
-library("nlme")
-library("mgcv")
-library("htmltools")
-library(rpivotTable)
-library(readxl)
-
-
 # load helpers.R file
 source("helpers.R")
 
-# load dataset 
-#Datamining281114 <- read.delim("Datamining281114.csv", header = TRUE, sep = ";", dec=".")
-
-#Dataset <- read.delim("DMFeb.csv", header = TRUE, sep = ";", dec=".")
-#Dataset <- readWorksheetFromFile("TSIPOYRA-2014 BATCHES-ANON.xlsx",sheet =1)
-#Dataset <- read.delim("bream2014.csv", header = TRUE, sep = ";", dec=",")
-#Dataset <- read_excel("bream2014.xlsx",sheet = 1 ,col_names = TRUE)
-
-pathname = paste(getwd(), "bream2014.xlsx", sep="/")
-Dataset <- read_excel(pathname, sheet = 1 ,col_names = TRUE, na='na')
-
 # Call function to create the dataset for analysis
 data <- create_dataset(Dataset)
-#
-
+#View(data)
 #----------------------------------------------------------------------------------
 # the histogram plot function
 #  
@@ -253,18 +207,24 @@ shinyServer(function(input, output, session){
   #     Subset of Dataset 
   #---------------------------------------------------------------------------------------------------
   passData <- reactive({
-       
-    if (input$groupRegion != "All"){ 
-      data <- subset(data, Region %in% c(input$groupOrientation)) 
+    
+    if (input$groupOrientation != "All"){ 
+      data <- subset(data, Orientation %in% c(input$groupOrientation)) 
     }
-    if (input$groupSite != "All"){ 
-      data <- subset(data, Site %in% c(input$groupSystem))
+    if (input$groupSystem != "All"){ 
+      data <- subset(data, System %in% c(input$groupSystem))
+    }
+    if (input$groupCage != "All"){ 
+      data <- subset(data, Cage %in% c(input$groupCage))
+    }
+    if (input$groupSection != "All"){ 
+      data <- subset(data, Section %in% c(input$groupSection))
     }
     if (input$groupBatch != "All"){ 
       data <- subset(data, Batch %in% c(input$groupBatch))
     }
     if (input$groupUnit != "All"){ 
-      data <- subset(data, Unit %in% c(input$groupSection))
+      data <- subset(data, Unit %in% c(input$groupUnit))
     }
     if (input$groupHatchery != "All"){ 
       data <- subset(data, Hatchery %in% c(input$groupHatchery))
@@ -284,48 +244,59 @@ shinyServer(function(input, output, session){
     if (input$groupSupplier != "All"){ 
       data <- subset(data, Supplier %in% c(input$groupSupplier))
     }
-    if (input$groupCurrent.Grading != "All"){ 
-      data <- subset(data, Current.Grading %in% c(input$groupCurrent.Grading))
-    }
+    #     if (input$groupCurrent.Grading != "All"){ 
+    #       data <- subset(data, Current.Grading %in% c(input$groupCurrent.Grading))
+    #     }
     
-    
-    data <- data[ data$End.Av.Weight >= as.numeric(input$rangeAvWeight[1]) & data$End.Av.Weight <= as.numeric(input$rangeAvWeight[2])
-               & data$Start.Av.Weight >= as.numeric(input$rangeStAvWeight[1]) & data$Start.Av.Weight <= as.numeric(input$rangeStAvWeight[2])
-               & data$Av.Weight.Deviation >= as.numeric(input$rangeAvWeightDev[1])
-               & data$Av.Weight.Deviation <= as.numeric(input$rangeAvWeightDev[2]) 
-               & data$Econ.FCR.Period >= as.numeric(input$rangePeriod.FCR[1]) & data$Econ.FCR.Period <= as.numeric(input$rangePeriod.FCR[2]) 
-               & data$LTD.Econ.FCR >= as.numeric(input$rangeLTD.Econ.FCR[1]) & data$LTD.Econ.FCR <= as.numeric(input$rangeLTD.Econ.FCR[2])  
-               & data$SGR.Period >= as.numeric(input$rangePeriod.SGR[1]) & data$SGR.Period <= as.numeric(input$rangePeriod.SGR[2]) 
-               & data$SFR.Period >= as.numeric(input$rangePeriod.SFR[1]) & data$SFR.Period <= as.numeric(input$rangePeriod.SFR[2]) 
-               & data$LTD.Mortality >= as.numeric(input$rangeLTD.Mortality[1]) & data$LTD.Mortality <= as.numeric(input$rangeLTD.Mortality[2])
-               & data$Period.Day.Degrees >= as.numeric(input$rangePeriod.Day.Degrees[1]) 
-               & data$Period.Day.Degrees <= as.numeric(input$rangePeriod.Day.Degrees[2])
-               & data$Avg.Temperature >= as.numeric(input$rangeAvg.Temp[1]) 
-               & data$Avg.Temperature <= as.numeric(input$rangeAvg.Temp[2])
-               #& (data$From >= input$dateRangeFrom[1] & data$From <= input$dateRangeFrom[2]) 
-               #& (data$To >= input$dateRangeTo[1] & data$To <= input$dateRangeTo[2])
-               & (data$From >= ymd(input$dateRangeFrom[1]) & data$From <= ymd(input$dateRangeFrom[2])) 
-               & (data$To >= ymd(input$dateRangeTo[1]) & data$To <= ymd(input$dateRangeTo[2]))
-               & data$Period.Feed.Qty >= as.numeric(input$rangePeriod.Feed.Qty[1]) 
-               & data$Period.Feed.Qty <= as.numeric(input$rangePeriod.Feed.Qty[2])
-               & data$FastingsPerc >= as.numeric(input$rangeFastingsPerc[1]) 
-               & data$FastingsPerc <= as.numeric(input$rangeFastingsPerc[2])
-               & data$Fastings.No >= as.numeric(input$rangeFastings.No[1]) 
-               & data$Fastings.No <= as.numeric(input$rangeFastings.No[2])
-               & data$LTD.Day.Degrees >= as.numeric(input$rangeLTD.Day.Degrees[1]) 
-               & data$LTD.Day.Degrees <= as.numeric(input$rangeLTD.Day.Degrees[2])
-               & data$Period.Mortality >= as.numeric(input$rangePeriod.Mortality[1]) 
-               & data$Period.Mortality <= as.numeric(input$rangePeriod.Mortality[2])
-               & data$Age >= as.numeric(input$rangeAge[1]) 
-               & data$Age <= as.numeric(input$rangeAge[2])
-              , ]
+     data <- data[ data$End.Av.Weight >= as.numeric(input$rangeAvWeight[1]) & data$End.Av.Weight <= as.numeric(input$rangeAvWeight[2])
+                   & data$Start.Av.Weight >= as.numeric(input$rangeStAvWeight[1]) & data$Start.Av.Weight <= as.numeric(input$rangeStAvWeight[2])
+                   & data$Av.Weight.Deviation >= as.numeric(input$rangeAvWeightDev[1])
+                   & data$Av.Weight.Deviation <= as.numeric(input$rangeAvWeightDev[2]) 
+                   & data$Econ.FCR.Period >= as.numeric(input$rangePeriod.FCR[1]) & data$Econ.FCR.Period <= as.numeric(input$rangePeriod.FCR[2]) 
+                   & data$LTD.Econ.FCR >= as.numeric(input$rangeLTD.Econ.FCR[1]) & data$LTD.Econ.FCR <= as.numeric(input$rangeLTD.Econ.FCR[2])  
+                   & data$SGR.Period >= as.numeric(input$rangePeriod.SGR[1]) & data$SGR.Period <= as.numeric(input$rangePeriod.SGR[2]) 
+                   & data$SFR.Period >= as.numeric(input$rangePeriod.SFR[1]) & data$SFR.Period <= as.numeric(input$rangePeriod.SFR[2]) 
+                   & data$LTD.Mortality >= as.numeric(input$rangeLTD.Mortality[1]) & data$LTD.Mortality <= as.numeric(input$rangeLTD.Mortality[2])
+                   & data$Period.Day.Degrees >= as.numeric(input$rangePeriod.Day.Degrees[1]) 
+                   & data$Period.Day.Degrees <= as.numeric(input$rangePeriod.Day.Degrees[2])
+                   & data$Avg.Temperature >= as.numeric(input$rangeAvg.Temp[1]) 
+                   & data$Avg.Temperature <= as.numeric(input$rangeAvg.Temp[2])
+                   & data$Ph >= as.numeric(input$rangePh[1]) 
+                   & data$Ph <= as.numeric(input$rangePh[2])
+                   & data$CAUDAL.O3 >= as.numeric(input$rangeCAUDAL.O3[1]) 
+                   & data$CAUDAL.O3 <= as.numeric(input$rangeCAUDAL.O3[2])
+                   & data$WATER.RENEWAL >= as.numeric(input$rangeWATER.RENEWAL[1]) 
+                   & data$WATER.RENEWAL <= as.numeric(input$rangeWATER.RENEWAL[2])
+                   & data$NO2 >= as.numeric(input$rangeNO2[1]) 
+                   & data$NO2 <= as.numeric(input$rangeNO2[2])
+                   & data$NH3 >= as.numeric(input$rangeNH3[1]) 
+                   & data$NH3 <= as.numeric(input$rangeNH3[2])
+                   & (data$From >= ymd(input$dateRangeFrom[1]) & data$From <= ymd(input$dateRangeFrom[2])) 
+                   & (data$To >= ymd(input$dateRangeTo[1]) & data$To <= ymd(input$dateRangeTo[2]))
+                   & data$Period.Feed.Qty >= as.numeric(input$rangePeriod.Feed.Qty[1]) 
+                   & data$Period.Feed.Qty <= as.numeric(input$rangePeriod.Feed.Qty[2])
+                , ]
+     
+                   #& (data$From >= input$dateRangeFrom[1] & data$From <= input$dateRangeFrom[2]) 
+                   #& (data$To >= input$dateRangeTo[1] & data$To <= input$dateRangeTo[2])          
+#                   & data$FastingsPerc >= as.numeric(input$rangeFastingsPerc[1]) 
+#                   & data$FastingsPerc <= as.numeric(input$rangeFastingsPerc[2])
+#                   & data$Fastings.No >= as.numeric(input$rangeFastings.No[1]) 
+#                   & data$Fastings.No <= as.numeric(input$rangeFastings.No[2])
+#                   & data$LTD.Day.Degrees >= as.numeric(input$rangeLTD.Day.Degrees[1]) 
+#                   & data$LTD.Day.Degrees <= as.numeric(input$rangeLTD.Day.Degrees[2])
+                   #& data$Period.Mortality >= as.numeric(input$rangePeriod.Mortality[1]) 
+                   #& data$Period.Mortality <= as.numeric(input$rangePeriod.Mortality[2])
+#                   & data$Age >= as.numeric(input$rangeAge[1]) 
+#                   & data$Age <= as.numeric(input$rangeAge[2])
+                   
     
     class(data$ProductionTimeDays)
     
-#   For debugging  
-# View(data)
-#   str(data)
-#   print(nrow(data))
+    #   For debugging  
+    #   View(data)
+    #  str(data)
+    #   print(nrow(data))
     return(data)
   })  
   
@@ -453,6 +424,77 @@ output$histPlotAvg.Temperature <- renderPlot({
   }
 })
 
+#...................................................... H10
+output$histPlotPh <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- histPlot(graphData, x="Ph", nbins = input$numbins, group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
+#...................................................... H11
+output$histPlotCAUDAL.O3 <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- histPlot(graphData, x="CAUDAL.O3", nbins = input$numbins, group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
+#...................................................... H12
+output$histPlotWATER.RENEWAL <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- histPlot(graphData, x="WATER.RENEWAL", nbins = input$numbins, group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
+#...................................................... H13
+output$histPlotNH3 <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- histPlot(graphData, x="NH3", nbins = input$numbins, group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
+#...................................................... H14
+output$histPlotNO2 <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- histPlot(graphData, x="NO2", nbins = input$numbins, group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
+
 #---------------------------------------------------------------------------------------------------
 #     Density Plots
 #---------------------------------------------------------------------------------------------------
@@ -570,6 +612,71 @@ output$densPlotAvg.Temperature <- renderPlot({
     isolate({    
       graphData <- passData()   
       theGraph <- densityPlot(graphData, x="Avg.Temperature", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+#...................................................... D10
+output$densPlotPh <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()   
+      theGraph <- densityPlot(graphData, x="Ph", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+#...................................................... D11
+output$densPlotCAUDAL.O3 <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()   
+      theGraph <- densityPlot(graphData, x="CAUDAL.O3", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+#...................................................... D12
+output$densPlotWATER.RENEWAL <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()   
+      theGraph <- densityPlot(graphData, x="WATER.RENEWAL", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+#...................................................... D13
+output$densPlotNH3 <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()   
+      theGraph <- densityPlot(graphData, x="NH3", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+#...................................................... D14
+output$densPlotNO2 <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()   
+      theGraph <- densityPlot(graphData, x="NO2", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -697,6 +804,76 @@ output$boxPlotAvg.Temperature <- renderPlot({
   }
 })
 
+#...................................................... B10
+output$boxPlotPh <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- boxPlots( graphData, x="Ph", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
+#...................................................... B11
+output$boxPlotCAUDAL.O3 <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- boxPlots( graphData, x="CAUDAL.O3", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
+#...................................................... B12
+output$boxPlotWATER.RENEWAL <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- boxPlots( graphData, x="WATER.RENEWAL", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
+#...................................................... B13
+output$boxPlotNH3 <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- boxPlots( graphData, x="NH3", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
+#...................................................... B14
+output$boxPlotNO2 <- renderPlot({ 
+  # Re-run when button is clicked
+  if (input$goUniPlot == 0){
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      theGraph <- boxPlots( graphData, x="NO2", group_var=input$radioDimUni )
+      print(theGraph)
+    })
+  }
+})
+
 #---------------------------------------------------------------------------------------------------
 #     Summary Univariate Statistics
 #---------------------------------------------------------------------------------------------------
@@ -809,15 +986,83 @@ output$summary_stats_Avg.Temp <- renderTable({
   }
 }) 
 
+output$summary_stats_Ph <- renderTable({
+  if (input$goUniPlot == 0) { 
+    return() }
+  else{ 
+    isolate({  
+      data <- passData()
+      data_stats <- sum_stats(data, measurevar="Ph", groupvars=input$radioDimUni,
+                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
+    })
+    return(data_stats)
+  }
+}) 
+
+output$summary_stats_CAUDAL.O3 <- renderTable({
+  if (input$goUniPlot == 0) { 
+    return() }
+  else{ 
+    isolate({  
+      data <- passData()
+      data_stats <- sum_stats(data, measurevar="CAUDAL.O3", groupvars=input$radioDimUni,
+                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
+    })
+    return(data_stats)
+  }
+}) 
+
+output$summary_stats_WATER.RENEWAL <- renderTable({
+  if (input$goUniPlot == 0) { 
+    return() }
+  else{ 
+    isolate({  
+      data <- passData()
+      data_stats <- sum_stats(data, measurevar="WATER.RENEWAL", groupvars=input$radioDimUni,
+                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
+    })
+    return(data_stats)
+  }
+}) 
+
+output$summary_stats_NH3 <- renderTable({
+  if (input$goUniPlot == 0) { 
+    return() }
+  else{ 
+    isolate({  
+      data <- passData()
+      data_stats <- sum_stats(data, measurevar="NH3", groupvars=input$radioDimUni,
+                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
+    })
+    return(data_stats)
+  }
+}) 
+
+output$summary_stats_NO2 <- renderTable({
+  if (input$goUniPlot == 0) { 
+    return() }
+  else{ 
+    isolate({  
+      data <- passData()
+      data_stats <- sum_stats(data, measurevar="NO2", groupvars=input$radioDimUni,
+                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
+    })
+    return(data_stats)
+  }
+}) 
 
 
 #---------------------------------------------------------------------------------------------------
 #     Dislpay dataset (Data)
 #---------------------------------------------------------------------------------------------------
 # Dislpay dataset
-output$dataset <- renderDataTable({
+output$dataset <- DT::renderDataTable({
   data <- passData() 
+  DT::datatable(data, class='compact', rowname = TRUE, caption="Dataset for processing...",
+                filter = 'top', options=list(autoWidth=TRUE) ) 
 })
+
+
 
 #---------------------------------------------------------------------------------------------------
 #     Dislpay Pivot (Data)
@@ -843,7 +1088,8 @@ output$scatterMatrixPlot <- renderPlot({
       graphData <- passData()
       
       dim_vars = c("End.Av.Weight", "Econ.FCR.Period", "SFR.Period", "SGR.Period", "LTD.Econ.FCR", 
-                   "LTD.Mortality", "Avg.Temperature", "Period.Day.Degrees")
+                   "LTD.Mortality", "Avg.Temperature", "Period.Day.Degrees", 
+                   "Ph", "CAUDAL.O3", "WATER.RENEWAL", "NH3", "NO2")
       group_by_var = input$radioDimMulti
       theGraph <- scatterMatrixPlot(graphData, dim_vars, group_by_var)
       print(theGraph)
@@ -1287,6 +1533,40 @@ output$cor.stats.EconFCR.AvgTemp <- renderPrint({
   }
 })
 
+
+#.......................................................... S16
+output$scatterPlot.EconFCR.Ph <- renderPlot({ 
+  #Re-run when button is clicked
+  if (input$goMultiPlot == 0){ 
+    return() }
+  else{ 
+    isolate({    
+      graphData <- passData()
+      p <- scatterPlot(graphData, x="Ph", y="LTD.Econ.FCR", colour=input$radioDimMulti,
+                       size = "Closing.Biomass", regr.method="loess") 
+      print(p)
+    })
+  }
+})
+output$cor.stats.EconFCR.Ph <- renderPrint({
+  if (input$goMultiPlot == 0){ 
+    return() }
+  else{ 
+    isolate({    
+      data <- passData()
+      if ( input$radioDimMulti != "None"){   
+        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Ph, y=LTD.Econ.FCR))
+      }else{
+        d <- data.frame("Pearson Correlation" = cor(x=data$Ph, y=data$LTD.Econ.FCR))
+      }
+      return( d ) 
+    })  
+  }
+})
+
+
+
+
 #---------------------------------------------------------------------------------------------------
 #     Multidimensional Dashboard
 #---------------------------------------------------------------------------------------------------
@@ -1395,7 +1675,8 @@ output$explanatoryVar <- renderUI({
   if (is.null(input$responseVar)) { return() }
   regressors <- list("End.Av.Weight", "Start.Av.Weight", "Days", "Period.Feed.Qty",
                      "Suggested.Feed.Qty", "Econ.FCR.Period", "SFR.Period", "SGR.Period",
-                     "LTD.Mortality", "Avg.Temperature", "Age")
+                     "LTD.Mortality", "Avg.Temperature", "Age",  "Ph", "CAUDAL.O3", "WATER.RENEWAL",
+                     "NH3", "NO2" )
   regressors <- regressors[ regressors != input$responseVar ]   
   checkboxGroupInput(inputId='explanatory.Variables', label=h3('Explanatory Variable(s):'), 
                      choices=regressors, selected=regressors[1])
@@ -1812,10 +2093,6 @@ output$prediction.value.Regression <- renderPrint({
       )# end lapply
       names(newdata) <- list.predictors
 
-
-View(newdata)
-
- 
       pred_val <- predict(fit, newdata)
       names(pred_val) <- as.character(input$responseVar)
       
@@ -1929,8 +2206,13 @@ output$plot.TukeyHSD <- renderPlot({
 #     Study only classification problems then the targets variable are categorical
 #----------------------------------------------------------------------------------------------------
 output$targs.ML.Variables <- renderUI({ 
-    var <- list("Class")
-    radioButtons(inputId='Targ.ML.Var', label=h3('Target Variable:'), choices=var, selected=var[[1]])
+    if ( input$radioML.task == 1 ){
+      var <- list("Class")
+      radioButtons(inputId='Targ.ML.Var', label=h3('Target Variable:'), choices=var, selected=var[[1]])
+    }else{
+      var <- list("End.Av.Weight", "Econ.FCR.Period")
+      radioButtons(inputId='Targ.ML.Var', label=h3('Target Variable:'), choices=var, selected=var[[1]])
+    }
 })  # end renderUI targs.Variables
 
 output$preds.ML.Variables <- renderUI({
@@ -1969,50 +2251,67 @@ output$fmla.model <- renderText({
 runSVM <- reactive({
   
   list.vars <- list(input$Targ.ML.Var, input$preds.ML.Vars)
-  Class <- input$Targ.ML.Var
+  response <- input$Targ.ML.Var
   inpts.vars <- input$preds.ML.Vars 
   
   # "data": dataset that based on the user choices in the first page
   data <- passData()  
   dset.train <- data[ , names(data) %in% unlist(list.vars) ]
   
-  fmla <- as.formula( paste(Class, paste(inpts.vars, collapse="+"), sep=" ~ ") )      
+  fmla <- as.formula( paste(response, paste(inpts.vars, collapse="+"), sep=" ~ ") )      
+  
+  dummy.ds <- dummyVars("~.", data=dset.train[inpts.vars], sep=".", fullRank=F)
+  dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train), dset.train[response])
+  dummy.preds <- names( dummy.dset.train )[names(dummy.dset.train) != response]
+  dummy.fmla <- as.formula(paste(response," ~ ",paste(dummy.preds, collapse="+")))
   
   # cross-validation
   if ( input$testingOptions == 1 ){
+   
+    # if task is for Classification (1)
+    if (input$radioML.task == 1){
+        fitControl <- trainControl(## 10-fold CV
+          method = "repeatedcv",
+          number = input$folds,
+          ## repeated ten times
+          repeats = 10, 
+          classProbs = TRUE,
+          returnData = TRUE)
+        svmFit <- train(dummy.fmla, data=dummy.dset.train, method = "svmRadial", trControl = fitControl, metric="ROC")
     
-    dummy.ds <- dummyVars("~.", data=dset.train[inpts.vars], sep=".", fullRank=F)
-    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train), dset.train[Class])
-   
-    fitControl <- trainControl(## 10-fold CV
-      method = "repeatedcv",
-      number = input$folds,
-      ## repeated ten times
-      repeats = 10, 
-      classProbs = TRUE,
-      returnData = TRUE)
-   
-    svmFit <- train(Class~., data=dummy.dset.train, method = "svmRadial", trControl = fitControl, metric="ROC")
-   
+    }else{
+      # if task is for Regression (2)
+      fitControl <- trainControl(## 10-fold CV
+        method = "repeatedcv",
+        number = input$folds, 
+        ## repeated ten times
+        repeats = 1, 
+        returnData = TRUE)
+      svmFit <- train(dummy.fmla, data=dummy.dset.train, method = "svmRadial", trControl = fitControl, metric="RMSE")
+      
+    } # end if..else for ML task
+    
   }
   else{
     # random split
     perc <- input$percentage/100
     set.seed(998)
-    Class <- input$Targ.ML.Var
-
-    dummy.ds <- dummyVars("~.", data=dset.train[inpts.vars], sep=".", fullRank=F)
-    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train), dset.train[Class])
-      
-    inTraining <- createDataPartition(dummy.dset.train$Class, p = perc, list = FALSE)
+   
+    inTraining <- createDataPartition(dummy.dset.train[,response], p = perc, list = FALSE)
     training <- dummy.dset.train[ inTraining,]
     testing  <- dummy.dset.train[-inTraining,]
-    
-    fitControl <- trainControl(classProbs = TRUE, returnData = TRUE)
+   
+    # if task is for Classification (1)
+    if (input$radioML.task == 1){
+        fitControl <- trainControl(classProbs = TRUE, returnData = TRUE)
+        svmFit <- train(dummy.fmla, data=training, method = "svmRadial", trControl = fitControl, metric="ROC")
+    }else{
+    # if task is for Regression (2)
+        fitControl <- trainControl(returnData = TRUE)
+        svmFit <- train(dummy.fmla, data=training, method = "svmRadial", trControl = fitControl, metric="RMSE")
+    }  # end if..else for ML task 
 
-    svmFit <- train(Class~., data=training, method = "svmRadial", trControl = fitControl, metric="ROC")
-    
-  } 
+  } # end if..else for testing options
   
   svm.model <- svmFit
   
@@ -2024,43 +2323,40 @@ runSVM <- reactive({
 runGLM <- reactive({
   
   list.vars <- list(input$Targ.ML.Var, input$preds.ML.Vars)
-  Class <- input$Targ.ML.Var
+  response <- input$Targ.ML.Var
   inpts.vars <- input$preds.ML.Vars 
   
   # "data": dataset that based on the user choices in the first page
   data <- passData()  
   dset.train <- data[ , names(data) %in% unlist(list.vars) ]
+  dummy.ds <- dummyVars("~.", data=dset.train[inpts.vars], sep=".", fullRank=F)
+  dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train), dset.train[response])
   
-  fmla <- as.formula( paste(input$Targ.ML.Var, paste(input$preds.ML.Vars, collapse="+"), sep=" ~ ") )      
- 
+  dummy.preds <- names( dummy.dset.train )[names(dummy.dset.train) != response]
+  dummy.fmla <- as.formula(paste(response," ~ ",paste(dummy.preds, collapse="+")))
+  
   # cross-validation
   if ( input$testingOptions == 1 ){
-    dummy.ds <- dummyVars("~.", data=dset.train[inpts.vars], sep=".", fullRank=F)
-    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train), dset.train[Class])
-    
+
    fitControl <- trainControl(## 10-fold CV
       method = "repeatedcv",
-      number = 10,
+      number = input$folds,
       ## repeated ten times
       repeats = 10)
     
-    glmnetFit <- train(Class~., data=dummy.dset.train, method = "glmnet", trControl = fitControl)
+    glmnetFit <- train(dummy.fmla, data=dummy.dset.train, method = "glmnet", trControl = fitControl)
     
   }else{
     # random split
 
     perc <- input$percentage/100
     set.seed(998)
-    Class <- input$Targ.ML.Var
-    
-    dummy.ds <- dummyVars("~.", data=dset.train[inpts.vars], sep=".", fullRank=F)
-    dummy.dset.train <- data.frame(predict(dummy.ds, newdata = dset.train), dset.train[Class])
-    
-    inTraining <- createDataPartition(dummy.dset.train$Class, p = perc, list = FALSE)
+   
+    inTraining <- createDataPartition(dummy.dset.train[,response], p = perc, list = FALSE)
     training <- dummy.dset.train[ inTraining,]
     testing  <- dummy.dset.train[-inTraining,]
     
-    glmnetFit <- train(Class~., data=training, method = "glmnet") 
+    glmnetFit <- train(dummy.fmla, data=training, method = "glmnet") 
     
    }
   
@@ -2077,7 +2373,7 @@ output$summary.model <- renderPrint({
     isolate({   
       if ( !is.null(input$Targ.ML.Var) ){
         # if SVM 
-        if (input$radioML == 1){
+        if (input$radioML.model == 1){
             svm.mod <- runSVM()
             res <- svm.mod$results[rownames(svm.mod$bestTune),]
         }else{
@@ -2111,7 +2407,7 @@ output$validate.model <- renderPrint({
         targ <- input$Targ.ML.Var
         
         # if SVM 
-        if (input$radioML == 1){
+        if (input$radioML.model == 1){
         
           dummy.ds <- dummyVars(fmla, data=dset, fullRank=F)
           dummy.dset <- data.frame(predict(dummy.ds, newdata = dset),"Class"= dset[targ]) #input$Targ.ML.Var)
@@ -2126,10 +2422,16 @@ output$validate.model <- renderPrint({
           # call svm model
           svm.mod <- runSVM()
           testPred <- predict(svm.mod, dummy.ds.test )
-          confmat <- confusionMatrix(testPred, dummy.ds.test[ ,targ])
           
-          results.model<-confmat
-          
+          # if task is for Classification (1)
+          if (input$radioML.task == 1){
+                confmat <- confusionMatrix(testPred, dummy.ds.test[ ,targ])
+                results.model<-confmat
+          }else{
+          # if task is for Regression (2)
+                RMSE <- sqrt( sum( (testPred - dummy.ds.test[ ,targ])^2 )/nr )
+                results.model <- list("RMSE"=RMSE)
+          } # end if...else task
         }else{
           # if GLM
          
@@ -2146,16 +2448,24 @@ output$validate.model <- renderPrint({
           gml.mod <- runGLM()
           testPred <- predict(gml.mod, dummy.ds.test[ , predictorsNames] )
           
-          # transform to 1 and 0
-          response <- ifelse(dummy.ds.test[,targ]=='GOOD',1,0)
-          predictors <- ifelse(testPred=='GOOD',1,0)
-          auc <- roc(response, predictors)
-          
-          results.model<-auc$auc
-          
-        }
-      
+          # if task is for Classification (1)
+          if (input$radioML.task == 1){
+            
+              # transform to 1 and 0
+              response <- ifelse(dummy.ds.test[,targ]=='GOOD',1,0)
+              predictors <- ifelse(testPred=='GOOD',1,0)
+              auc <- roc(response, predictors)
+              
+              results.model<-auc$auc
+          }else{
+          # if task is for Regression (2)
+              RMSE <- sqrt( sum( (testPred - dummy.ds.test[ ,targ])^2 )/nr )
+              results.model <- list("RMSE"=RMSE)
+          } # end if...else task
+        } # end if...else model
+        
         print( results.model )
+      
       }else{ 
         print(data.frame(Warning="Please select Model Parameters."))
       }
@@ -2171,7 +2481,7 @@ output$plot_ML.Rel.Impo <- renderPlot({
   else{ 
     isolate({ 
       # if SVM 
-      if (input$radioML == 1){
+      if (input$radioML.model == 1){
         
           svm.mod <- runSVM()
           RocImp <- varImp(svm.mod, scale = FALSE)
@@ -2207,9 +2517,9 @@ output$ML.Rel.Impo <- renderPrint({
   else{ 
     isolate({  
       # if SVM 
-      if (input$radioML == 1){
+      if (input$radioML.model == 1){
         svm.mod <- runSVM()
-        RocImp <- varImp(svm.mod, scale = FALSE)
+        RocImp <- varImp(svm.mod, scale = FALSE, top=)
         print(RocImp, digits=3, justify="left")
       }
       else{
@@ -2227,7 +2537,7 @@ output$ML.Rel.Impo <- renderPrint({
 #
 predict.with.ML.Model <- reactive({
   # load the model SVM or GLMnet 
-  if (input$radioML == 1){
+  if (input$radioML.model == 1){
     ML.model <- runSVM()
   }else{
     ML.model <- runGLM()
@@ -2410,7 +2720,7 @@ output$info_tree_abs_relacc <- renderPrint({
   }
 })
 
-output$info_tree_acc <- renderDataTable({  
+output$info_tree_acc <- renderPrint({  
   if (input$goDT == 0){
     return() }
   else{ 
@@ -2418,6 +2728,7 @@ output$info_tree_acc <- renderDataTable({
         class.reg.Tree <- runClassRegTrees()
         table <- class.reg.Tree$cptable   
         colnames(table)<-c("Complexity Parameter (CP)", "No Splits", "Relative Error", "Cross-Validated Error", "Cross-Validated Standard Deviation" )
+        
         print(table, digits=3, justify="left", width='minimum')
     })
   }
@@ -2430,6 +2741,7 @@ output$RegClass.Rel.Impo <- renderPrint({
     isolate({  
         class.reg.Tree <- runClassRegTrees()
         rel.imp <- 100*class.reg.Tree$variable.importance/sum(class.reg.Tree$variable.importance)
+        
         print(rel.imp, row.names=FALSE, digits=3, justify="left")
     })
   }
