@@ -7,14 +7,12 @@ library("shinythemes")
 library("lubridate")
 library("htmltools")
 #library(rpivotTable)
-library("DT")
-library("RColorBrewer")
-library("readxl")
-
+library("DT") #devtools::install_github("rstudio/DT")
+library("RColorBrewer") 
+library("readxl") 
 library("graphics")
 library("ggplot2")
 library("lattice")
-
 library("mgcv")
 library("plotrix")
 library("psych")
@@ -37,7 +35,8 @@ library("fpc")
 library("randomForest")
 library("maptree")
 library("nlme")
-
+library("ggthemr") # devtools::install_github('ggthemr', 'cttobin')
+library("shinyBS")
 
 #-----------------------------------------
 # load dataset
@@ -189,6 +188,42 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
 }
 
 ######-------end of function-----------####
+
+
+###--------- Set ggplot2 theme and enrich the pallete --------###
+
+ggthemr('flat dark')
+
+set_swatch(c(   "#ecf0f1" # original Light grayish cyan.
+                , "#3498db" # original Bright blue
+                , "#2ecc71" # original Strong cyan - lime green.
+                , "#f1c40f" # original Vivid yellow
+                , "#e74c3c" # original Bright red.
+                , "#9b59b6" # original Moderate violet.
+                , "#1abc9c" # original Strong cyan.
+                , "#f39c12" # original Vivid orange
+                , "#2a0189" # Dark violet
+                , "#221abc" # Strong blue
+                , "#555555" # sgi darkgray 
+                , "#3d3208" # Very dark yellow [Olive tone]
+                , "#8E388E" #sgi beet
+                , "#8470FF" #lightslateblue
+                , "#8B8989" #Dark grayish red
+                , "#1c8901" #Dark lime green
+                , "#D1EEEE" #lightcyan 2
+                , "#4b1abc" #Strong violet
+                , "#B0171F" #indian red
+                , "#8bbc1a" #Strong green
+                , "#7D9EC0" #sgi lightblue
+                , "#CAE1FF" #lightsteelblue 1
+                , "#7171C6" #sgi slateblue
+                , "#9c1abc" #Strong magenta
+                , "#d35400" #original Strong orange
+))
+
+# in case we need to reset the theme.
+# set_swatch(c("#ecf0f1", "#3498db", "#2ecc71", "#f1c40f" ,"#e74c3c", "#9b59b6", "#1abc9c", "#f39c12", "#d35400"))
+# ggthemr_reset()
 
 
 

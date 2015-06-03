@@ -1,0 +1,13 @@
+Changelog SEA-8
+----03/06/2015 ---------------------------------------------------------------------------------------------------------
+V.05.1
+minor changes on version release on Sea8
+1.  Documentation on packages ( note down which of them are not from CRAN )
+    DT - #devtools::install_github("rstudio/DT")
+    ggthemr - #devtools::install_github('ggthemr', 'cttobin')
+    
+2. calling Helpers.R only once
+
+3.  Added  ggthemr  ggplot2 tools.
+
+4.  Added ShinyBS Colapses ( on sidebar & histgrams)

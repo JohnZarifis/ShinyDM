@@ -5,8 +5,8 @@
 # http://www.rstudio.com/shiny/
 #
 
-# load helpers.R file
-source("helpers.R")
+# load helpers.R file 
+#source("helpers.R") # no need UI is loaded first.
 
 # Call function to create the dataset for analysis
 data <- create_dataset(Dataset)
