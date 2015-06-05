@@ -11,3 +11,7 @@ minor changes on version release on Sea8
 3.  Added  ggthemr  ggplot2 tools.
 
 4.  Added ShinyBS Colapses ( on sidebar & histgrams)
+----04/06/2015 ---------------------------------------------------------------------------------------------------------
+V.05.2
+minor changes on version release on Sea8
+1. Added ToolTips Only problem is that i had to change rangeCAUDAL.O3 to rangeCAUDALO3 (If an element ID has '.' in it bstooltip doesnt understant it.)

@@ -108,8 +108,8 @@ sidebarUni <- sidebarPanel(
   hr()
   ,bsCollapsePanel('Environmental Measures', style = "primary" 
   ,h2('Environmental Measures')
-  ,bsTooltip(c("rangeCAUDAL.O3","rangePh","rangeNO2") , "Remove -1 in order to remove empty values",
-            "right", options = list(container = "body"))
+  ,bsTooltip(c("rangePh","rangeNO2","rangeWATERRENEWAL","rangeNH3","rangeAvgTemp","rangeCAUDALO3") , "Remove -1 in order to remove empty values",
+             "right", options = list(container = "body"))
 
   
   ,fluidRow(column(6,
@@ -117,11 +117,11 @@ sidebarUni <- sidebarPanel(
                               max = max(as.double(df$Ph)), 
                               value = c(min(as.double(df$Ph)), max(as.double(df$Ph))), 
                               step=0.1, round=-2, sep="."),
-                  sliderInput("rangeCAUDAL.O3", "CAUDAL O3 (Nm3/H):", min = min(as.double(df$CAUDAL.O3)), 
+                  sliderInput("rangeCAUDALO3", "CAUDAL O3 (Nm3/H):", min = min(as.double(df$CAUDAL.O3)), 
                               max = max(as.double(df$CAUDAL.O3)), 
                               value = c(min(as.double(df$CAUDAL.O3)), max(as.double(df$CAUDAL.O3))), 
                               step=10, round=0, sep="."),
-                  sliderInput("rangeWATER.RENEWAL", "WATER RENEWAL:", min = min(as.double(df$WATER.RENEWAL)), 
+                  sliderInput("rangeWATERRENEWAL", "WATER RENEWAL:", min = min(as.double(df$WATER.RENEWAL)), 
                               max = max(as.double(df$WATER.RENEWAL)), 
                               value = c(min(as.double(df$WATER.RENEWAL)), max(as.double(df$WATER.RENEWAL))), 
                               step=1, round=0, sep=".")
@@ -135,7 +135,7 @@ sidebarUni <- sidebarPanel(
                      max = max(as.double(df$NH3)), 
                      value = c(min(as.double(df$NH3)), max(as.double(df$NH3))), 
                      step=0.5, round=-2, sep="."),
-         sliderInput("rangeAvg.Temp", "Avg.Temperature:", min = min(as.double(df$Avg.Temperature)), 
+         sliderInput("rangeAvgTemp", "Avg.Temperature:", min = min(as.double(df$Avg.Temperature)), 
                      max = max(as.double(df$Avg.Temperature)), 
                      value = c(min(as.double(df$Avg.Temperature)), max(as.double(df$Avg.Temperature))), 
                      step=0.5, round=-2, sep=".")
