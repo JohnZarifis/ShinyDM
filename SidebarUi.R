@@ -110,8 +110,6 @@ sidebarUni <- sidebarPanel(
   ,h2('Environmental Measures')
   ,bsTooltip(c("rangeCAUDAL.O3","rangePh","rangeNO2") , "Remove -1 in order to remove empty values",
             "right", options = list(container = "body"))
-
-  
   ,fluidRow(column(6,
                   sliderInput("rangePh", "Ph:", min = min(as.double(df$Ph)), 
                               max = max(as.double(df$Ph)), 
