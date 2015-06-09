@@ -227,3 +227,191 @@ set_swatch(c(   "#ecf0f1" # original Light grayish cyan.
 
 
 
+#----------------------------------------------------------------------------------
+# the histogram plot function
+#  
+histPlot <- function( ds, x, nbins, group_var ){  
+  range_var = diff(range(as.numeric(ds[,x])))/nbins 
+  
+  if (group_var!="None")
+  {
+    cdf <- ddply( ds, group_var, function(df) mean(df[,x]) )
+    colnames(cdf)<-c("gv", "x.means")
+    
+    h <- ggplot(ds, aes_string(x=x, fill=group_var)) +
+      geom_histogram( aes( y=..density.. ), binwidth=range_var, alpha=.5, position="identity" ) +  
+      scale_x_continuous(limits=c(min(as.numeric(ds[,x])),max(as.numeric(ds[,x])))) +
+      geom_vline(data=cdf, aes_string(xintercept="x.means", colour="gv"), linetype="dashed", size=1)
+    
+  }else{
+    h <- ggplot(ds, aes_string(x=x)) + geom_histogram( aes( y=..density..,fill=..count.. ), binwidth=range_var ) +
+      scale_x_continuous(limits=c(min(as.numeric(ds[,x])),max(as.numeric(ds[,x])))) +
+      geom_vline(aes_string(xintercept=mean(ds[,x], na.rm=T)), color="red", linetype="dashed", size=1) 
+  }
+  
+}
+#----------------------------------------------------------------------------------
+# the density plot function
+# 
+densityPlot <- function( ds, x, group_var ){  
+  
+  if (group_var!="None")
+  {
+    cdf <- ddply( ds, group_var, function(df)mean(df[,x]) )
+    colnames(cdf)<-c("gv", "x.means")
+    
+    d <- ggplot(ds, aes_string(x=x, color=group_var)) + geom_density(size=1,alpha=0.8) + 
+      geom_vline(data=cdf, aes_string(xintercept="x.means", colour="gv"), linetype="dashed", size=0.5)
+  }else{
+    
+    d <- ggplot(ds, aes_string(x=x)) + geom_density(size=1,color="blue") +
+      geom_vline( aes_string(xintercept=mean(ds[,x], na.rm=T)), linetype="dashed", size=0.5 )
+  }
+}
+
+#----------------------------------------------------------------------------------
+# the Boxplot function
+# 
+boxPlots <- function( ds, x, group_var ){  
+  if (group_var!="None")
+  {
+    d <- ggplot(ds, aes_string(x=group_var, y=x, fill=group_var)) + 
+      geom_boxplot(notch=TRUE, width=0.5, outlier.size=1.5) +
+      stat_summary(fun.y=mean, geom="point", shape=5, size=4)
+  }else{
+    d <- ggplot(ds, aes_string(x=1, y=x)) + 
+      geom_boxplot(notch=TRUE, width=0.5, outlier.size=1.5) +
+      stat_summary(fun.y=mean, geom="point", shape=5, size=4)
+  }
+  
+  r <- max(ds[,x]) - min(ds[,x])
+  d <- d # + scale_y_continuous(breaks=seq(min(ds[,x]), max(ds[,x]), round(r/5)))  # todo not working in some cases
+  
+}
+
+#----------------------------------------------------------------------------------
+# the scatter plot function
+#
+scatterPlot <- function(ds, x, y, colour, size, regr.method)
+{
+  if (colour!="None")
+  {
+    p <- ggplot(ds, aes_string(x=x, y=y)) 
+    p <- p + aes_string(color=colour, size=size) + geom_point()
+    p <- p + geom_smooth(method = regr.method, size = 1)  
+    p <- p + scale_color_brewer(type="qual",palette='Set1') + scale_fill_brewer()
+  }else{
+    p <- ggplot(ds, aes_string(x=x, y=y)) 
+    p <- p + geom_point()
+    p <- p + geom_smooth(method = regr.method, size = 1)  
+    p <- p + scale_color_brewer(type="qual",palette='Set1') + scale_fill_brewer() 
+  }
+}
+
+#----------------------------------------------------------------------------------
+# the scatter matrix plot function
+# 
+scatterMatrixPlot <- function(ds, dim_vars, group_by_var)
+{
+  if ( group_by_var != "None"){
+    ds <- ds[,c(dim_vars,group_by_var)]
+    p <- ggpairs(ds, columns=1:length(dim_vars), 
+                 upper = list(continuous='cor'),
+                 lower = list(continuous = "smooth"), color = group_by_var,params=c(size=3),
+                 axisLabels='internal', title = "Matrix Scatter Plot")
+  }else{
+    ds <- ds[,dim_vars]
+    p <- ggpairs(ds, columns=1:length(dim_vars), 
+                 upper = list(continuous='cor'),
+                 lower = list(continuous = "smooth"),params=c(size=3),
+                 axisLabels='internal', title = "Matrix Scatter Plot")
+  }
+  
+}  
+##----------------------------------------------------------------------------------
+##                 Summary Mutlivariate Statistics function
+##
+## Gives count, mean, standard deviation, standard error of the mean, and confidence interval (default 95%).
+##   data: a data frame.
+##   measurevar: the name of a column that contains the variable to be summariezed
+##   groupvars: a vector containing names of columns that contain grouping variables
+##   na.rm: a boolean that indicates whether to ignore NA's
+##   conf.interval: the percent range of the confidence interval (default is 95%)
+sum_stats <- function(data, measurevar, groupvars, na.rm=FALSE, conf.interval=.95, .drop=TRUE)
+{
+  
+  if ( groupvars != "None" ){
+    
+    # New version of length which can handle NA's: if na.rm==T, don't count them
+    length2 <- function (x, na.rm=FALSE) {
+      if (na.rm) sum(!is.na(x))
+      else       length(x)
+    }
+    
+    # This does the summary. For each group's data frame, return a vector with
+    # N, min, max, mean, median, sd, CV, kurtosis, skewness, Q1, Q3, IR, se and ci
+    data_stats <- ddply(data, groupvars, .drop=.drop,
+                        .fun = function(xx, col) {
+                          c(N      = length2(xx[[col]], na.rm=na.rm),
+                            min    = min(xx[[col]], na.rm=na.rm),
+                            max    = max(xx[[col]], na.rm=na.rm),
+                            mean   = mean(xx[[col]], na.rm=na.rm),
+                            median = median(xx[[col]], na.rm=na.rm),
+                            sd     = sd(xx[[col]], na.rm=na.rm),
+                            CV     = ( sd(xx[[col]], na.rm=na.rm)/mean(xx[[col]], na.rm=na.rm) )*100,
+                            kurtosis = kurtosis(xx[[col]], na.rm=na.rm),
+                            skewness = skewness(xx[[col]], na.rm=na.rm),
+                            Q1       = quantile(xx[[col]], 1/4, na.rm=na.rm, names=FALSE),
+                            Q3       = quantile(xx[[col]], 3/4, na.rm=na.rm, names=FALSE),
+                            IR       = IQR(xx[[col]], na.rm=na.rm)
+                          )
+                        },
+                        measurevar
+    )
+    
+    data_stats$se <- data_stats$sd / sqrt(data_stats$N)  # Calculate standard error of the mean
+    
+    # Confidence interval multiplier for standard error
+    # Calculate t-statistic for confidence interval: 
+    # e.g., if conf.interval is .95, use .975 (above/below), and use df=N-1
+    ciMult <- qt(conf.interval/2 + .5, data_stats$N-1)
+    data_stats$ci <- data_stats$se * ciMult
+    
+  }else{
+    
+    # This does the summary for all records of the data set at the variable measurevar 
+    # N, min, max, mean, median, sd, CV, kurtosis, skewness, Q1, Q3, IR, se and ci
+    
+    ds <- data[,measurevar]
+    data_stats <- data.frame(N     = length(ds),
+                             min   = min(ds, na.rm=na.rm),
+                             max    = max(ds, na.rm=na.rm),
+                             mean   = mean(ds, na.rm=na.rm),
+                             median = median(ds, na.rm=na.rm),
+                             sd     = sd(ds, na.rm=na.rm),
+                             CV     = ( sd(ds, na.rm=na.rm)/mean(ds, na.rm=na.rm) )*100,
+                             kurtosis = kurtosis(ds, na.rm=na.rm),
+                             skewness = skewness(ds, na.rm=na.rm),
+                             Q1       = quantile(ds, 1/4, na.rm=na.rm, names=FALSE),
+                             Q3       = quantile(ds, 3/4, na.rm=na.rm, names=FALSE),
+                             IR       = IQR(ds, na.rm=na.rm)
+    )
+    
+    
+    data_stats$se <- data_stats$sd / sqrt(data_stats$N)  # Calculate standard error of the mean
+    
+    # Confidence interval multiplier for standard error
+    # Calculate t-statistic for confidence interval: 
+    # e.g., if conf.interval is .95, use .975 (above/below), and use df=N-1
+    ciMult <- qt(conf.interval/2 + .5, data_stats$N-1)
+    data_stats$ci <- data_stats$se * ciMult
+    
+    rownames(data_stats)<-"Total"
+    
+  }
+  
+  return(data_stats)
+  
+}
+##----------------------------------------------------------------------------------
+
