@@ -15,3 +15,10 @@ minor changes on version release on Sea8
 V.05.2
 minor changes on version release on Sea8
 1. Added ToolTips Only problem is that i had to change rangeCAUDAL.O3 to rangeCAUDALO3 (If an element ID has '.' in it bstooltip doesnt understant it.)
+
+
+---------------------------To Do list--------------------
+1. Data Table less intetactivity or move to olap tools.
+2. Κλεψύδρα... (για να φαίνεται ότι γίνονται υπολογισμοί.)
+3. Tooltips in evaluation of models.
+4. Glmnet ερμηνεία σημαντικότητας των αριθμητικών μεταβλητών.
