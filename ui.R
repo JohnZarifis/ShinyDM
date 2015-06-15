@@ -1,5 +1,4 @@
-### Version Bream
-
+### Version Sea-8 (Sol)
 
 source("SidebarUi.R")
 
@@ -256,7 +255,7 @@ shinyUI(
 
 #---------------------------------------------------------- Third MenuPage
             navbarMenu("Tools",
-                       tabPanel("Dashboard ", id="MenuPage_3", 
+                       tabPanel("Dashboard ", id="MenuPage_3d", 
                                 fluidPage( #theme = shinytheme("cerulean"),
                                   plotOutput('plotDashboard',height="600px"),
                                   hr(),
@@ -307,8 +306,12 @@ shinyUI(
                                   ) # end fluidRow
                                 ) # end fluidPage
                        ),  # end tabPanel Multidimensional Dashboard    
-                       tabPanel("PivotTable")),
-            
+                       
+                       tabPanel("PivotTable", id="MenuPage_3piv", 
+                                h3("Pivot Table:")
+                              # , rpivotTableOutput('pivTable') 
+                        ) # end tabPanel Pivot Table
+            ), # end navbarMenu Tools
             
 #---------------------------------------------------------- Third_Interactive MenuPage
 # tabPanel(" Multidimensional Interactive Dashboard ", id="MenuPage_3i", 
@@ -390,6 +393,11 @@ tabPanel(" Regression Models ", id="MenuPage_4",
                                fluidRow(column(12, verbatimTextOutput("fmla"))),
                                hr(),
                                fluidRow(
+                                 
+                                  bsTooltip("regression_R", "R-Squared: measures the proportion of variability
+                                            in response variable that can be explained using predictors.",
+                                           "right", options = list(container = "body")),
+                                 
                                    column(12, h4('Percentage of Variation explained by the regression line:'),
                                           verbatimTextOutput("regression_R")),
                                    column(12, h4('Residuals:'), 

@@ -4,10 +4,15 @@
 #
 library("shiny")
 library("shinythemes")
+library("shinydashboard")
+library("shinyFiles")
+library("shinyBS")
+
 library("lubridate")
 library("htmltools")
-#library(rpivotTable)
+
 library("DT") #devtools::install_github("rstudio/DT")
+library("rpivotTable")
 library("RColorBrewer") 
 library("readxl") 
 library("graphics")
@@ -36,7 +41,7 @@ library("randomForest")
 library("maptree")
 library("nlme")
 library("ggthemr") # devtools::install_github('ggthemr', 'cttobin')
-library("shinyBS")
+
 
 #-----------------------------------------
 # load dataset

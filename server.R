@@ -869,9 +869,16 @@ output$summary_stats_NO2 <- renderTable({
 #---------------------------------------------------------------------------------------------------
 # Dislpay dataset
 output$dataset <- DT::renderDataTable({
-  data <- passData() 
-  DT::datatable(data, class='compact', rowname = TRUE, caption="Dataset for processing...",
+  
+  if (input$goUniPlot == 0) { 
+    return() }
+  else{ 
+    isolate({  
+      data <- passData() 
+      DT::datatable(data, class='compact', rowname = TRUE, caption="Dataset for processing...",
                 filter = 'top', options=list(autoWidth=TRUE) ) 
+    })
+  } 
 })
 
 
@@ -1377,8 +1384,6 @@ output$cor.stats.EconFCR.Ph <- renderPrint({
 })
 
 
-
-
 #---------------------------------------------------------------------------------------------------
 #     Multidimensional Dashboard
 #---------------------------------------------------------------------------------------------------
@@ -1435,6 +1440,13 @@ output$plotDashboard <- renderPlot({
   print(p)
   
 })
+
+
+#-------------------- Pivot Table
+# output$pivTable <- rpivotTable::renderRpivotTable({
+#   dataPT <- passData()
+#   rpivotTable(data = dataPT)
+# })
 
 
 #---------------------------------------------------------------------------------------------------
