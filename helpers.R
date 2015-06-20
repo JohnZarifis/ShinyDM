@@ -3,8 +3,8 @@
 # load packages
 #
 library("shiny")
-library("shinythemes")
-library("shinydashboard")
+#library("shinythemes")
+#library("shinydashboard")
 library("shinyFiles")
 library("shinyBS")
 
