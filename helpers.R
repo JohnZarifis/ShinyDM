@@ -13,6 +13,7 @@ library("htmltools")
 
 library("DT") #devtools::install_github("rstudio/DT")
 library("rpivotTable")
+library("htmlwidgets")
 library("RColorBrewer") 
 library("readxl") 
 library("graphics")

@@ -2,7 +2,6 @@
 # This is the server logic for a Shiny web application.
 
 
-
 # load helpers.R file 
 #source("helpers.R")  # no need UI is loaded first.
 
@@ -882,19 +881,6 @@ output$dataset <- DT::renderDataTable({
 })
 
 
-
-#---------------------------------------------------------------------------------------------------
-#     Dislpay Pivot (Data)
-#---------------------------------------------------------------------------------------------------
-# Dislpay pivot
-
-
-# output$foo <- rpivotTable::renderRpivotTable({
-#   rpivotTable::rpivotTable(data <- passData())
-# })
-
-
-
 #---------------------------------------------------------------------------------------------------
 #     Scatter Matrix Plots & Scatter Plots
 #---------------------------------------------------------------------------------------------------
@@ -1441,12 +1427,15 @@ output$plotDashboard <- renderPlot({
   
 })
 
+#---------------------------------------------------------------------------------------------------
+#     Dislpay Pivot Table (Data)
+#---------------------------------------------------------------------------------------------------
+#
+output$pivTable <- rpivotTable::renderRpivotTable({
+  data = passData()
+#  rpivotTable::rpivotTable(data <- passData())
+})
 
-#-------------------- Pivot Table
-# output$pivTable <- rpivotTable::renderRpivotTable({
-#   dataPT <- passData()
-#   rpivotTable(data = dataPT)
-# })
 
 
 #---------------------------------------------------------------------------------------------------

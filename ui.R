@@ -133,13 +133,7 @@ shinyUI(
                                         tabPanel("Data", 
                                                     DT::dataTableOutput("dataset") 
                                         )
-#                                         ,# end tabPanel Data
-#                                         tabPanel("Pivot", 
-#                                                  rpivotTable::rpivotTableOutput('foo')
-#                                                  
-#                                                  #rpivotTableOutput('foo') 
-#                                         )
-                                       ) # end tabsetPanel
+                                     ) # end tabsetPanel
                                     )# end mainPanel
                                   ) # end sidebarLayout
                        )  # end fluidPage
@@ -307,9 +301,10 @@ shinyUI(
                                 ) # end fluidPage
                        ),  # end tabPanel Multidimensional Dashboard    
                        
+                       # pivot Table
                        tabPanel("PivotTable", id="MenuPage_3piv", 
-                                h3("Pivot Table:")
-                              # , rpivotTableOutput('pivTable') 
+                                #rpivotTable::
+                                rpivotTableOutput('pivTable', height = "800px") 
                         ) # end tabPanel Pivot Table
             ), # end navbarMenu Tools
             
@@ -393,14 +388,18 @@ tabPanel(" Regression Models ", id="MenuPage_4",
                                fluidRow(column(12, verbatimTextOutput("fmla"))),
                                hr(),
                                fluidRow(
-                                 
-                                  bsTooltip("regression_R", "R-Squared: measures the proportion of variability
-                                            in response variable that can be explained using predictors.",
-                                           "right", options = list(container = "body")),
-                                 
                                    column(12, h4('Percentage of Variation explained by the regression line:'),
-                                          verbatimTextOutput("regression_R")),
-                                   column(12, h4('Residuals:'), 
+                                          verbatimTextOutput("regression_R"),
+                                   
+                                          bsPopover(id="regression_R", title="Informations", 
+                                                    content="R-Squared: measures the proportion of variability
+                                                    in response variable that can be explained using predictors.",
+                                                    placement = "right", trigger = "hover", 
+                                                    options = list(container = "body"))
+                                   )                               
+                               ),
+                              
+                               fluidRow( column(12, h4('Residuals:'), 
                                           verbatimTextOutput("regression_Table_residuals"))),
                                hr(),
                                fluidRow(column(12, plotOutput("plot_lm_13"))),
