@@ -1,8 +1,8 @@
 # load helpers.R file
 source("helpers.R")
+
 # Call function to create the dataset for analysis
 df <- create_dataset(Dataset)
-
 
 sidebarUni <- sidebarPanel(
   #fixed responsive img #added class img

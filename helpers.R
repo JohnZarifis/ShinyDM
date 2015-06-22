@@ -3,8 +3,6 @@
 # load packages
 #
 library("shiny")
-library("shinythemes")
-library("shinydashboard")
 library("shinyFiles")
 library("shinyBS")
 
@@ -43,6 +41,8 @@ library("maptree")
 library("nlme")
 library("ggthemr") # devtools::install_github('ggthemr', 'cttobin')
 
+#library("jsonlite")
+#library("RJSONIO")
 
 #-----------------------------------------
 # load dataset

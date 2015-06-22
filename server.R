@@ -1431,11 +1431,10 @@ output$plotDashboard <- renderPlot({
 #     Dislpay Pivot Table (Data)
 #---------------------------------------------------------------------------------------------------
 #
-output$pivTable <- rpivotTable::renderRpivotTable({
-  data = passData()
-#  rpivotTable::rpivotTable(data <- passData())
-})
-
+# output$pivTable <- rpivotTable::renderRpivotTable({
+#   data = passData()
+#   rpivotTable::rpivotTable(data)
+# })
 
 
 #---------------------------------------------------------------------------------------------------
