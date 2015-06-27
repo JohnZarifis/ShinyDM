@@ -1430,11 +1430,23 @@ output$plotDashboard <- renderPlot({
 #---------------------------------------------------------------------------------------------------
 #     Dislpay Pivot Table (Data)
 #---------------------------------------------------------------------------------------------------
-#
-# output$pivTable <- rpivotTable::renderRpivotTable({
-#   data = passData()
-#   rpivotTable::rpivotTable(data)
-# })
+#                   
+ output$pivTable <- renderRpivotTable({
+   dataPiv = passData()
+   rpivotTable(dataPiv)
+ })
+
+#---------------------------------------------------------------------------------------------------
+#     Dislpay HeatMap (Data)
+#---------------------------------------------------------------------------------------------------
+# 
+output$HeatMap <- renderD3heatmap({
+  dataHeat = passData()
+  dataHeat <- dataHeat[c("Start.Av.Weight","End.Av.Weight")]
+  row.names(dataHeat) <- dataHeat$Unit
+  d3heatmap(dataHeat, scale = "column", colors = "Spectral")
+})
+
 
 
 #---------------------------------------------------------------------------------------------------

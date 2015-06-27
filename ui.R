@@ -299,13 +299,17 @@ shinyUI(
                                     fluidRow(column(12, hr()))
                                   ) # end fluidRow
                                 ) # end fluidPage
-                       ) #,  # end tabPanel Multidimensional Dashboard    
+                       )  # end tabPanel Multidimensional Dashboard    
                        
                        # pivot Table
-                       # tabPanel("PivotTable", id="MenuPage_3piv", 
+                        ,tabPanel("PivotTable", id="MenuPage_3piv", 
                                 # rpivotTable::rpivotTableOutput('pivTable', height = "800px") 
-                                # rpivotTableOutput('pivTable', height = "800px") 
-                       # ) # end tabPanel Pivot Table
+                                 rpivotTableOutput("pivTable", height = "800px") 
+                      
+                        ) # end tabPanel Pivot Table
+                       ,tabPanel("HeatMap"
+                                 ,d3heatmapOutput('HeatMap',height = "800px")
+                       )
             ), # end navbarMenu Tools
             
 #---------------------------------------------------------- Third_Interactive MenuPage

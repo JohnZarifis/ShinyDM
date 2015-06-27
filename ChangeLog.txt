@@ -20,10 +20,12 @@ minor changes on version release on Sea8
 ---------------------------To Do list--------------------
 1. Data Table less intetactivity or move to olap tools.
 --> Done: Add the isolate() function. Need to press the button so as to dispay the dataset.
---> Tab "OLAP" (problems with rPivotTable!!!!)
+--> Done:Tab "OLAP" (problems with rPivotTable!!!!)
 
 2. Κλεψύδρα... (για να φαίνεται ότι γίνονται υπολογισμοί.)
 
 3. Tooltips in evaluation of models.
 
 4. Glmnet ερμηνεία σημαντικότητας των αριθμητικών μεταβλητών.
+
+5. Διορθώσεις στα δέντρα.

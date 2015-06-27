@@ -5,12 +5,11 @@
 library("shiny")
 library("shinyFiles")
 library("shinyBS")
-
 library("lubridate")
 library("htmltools")
-
+library("d3heatmap")
 library("DT") #devtools::install_github("rstudio/DT")
-library("rpivotTable")
+library("rpivotTable") #devtools::install_github("smartinsightsfromdata/rpivotTable")
 library("htmlwidgets")
 library("RColorBrewer") 
 library("readxl") 
