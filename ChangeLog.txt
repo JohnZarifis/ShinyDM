@@ -14,7 +14,8 @@ minor changes on version release on Sea8
 ----04/06/2015 ----------------------------------------------------------------------------
 V.05.2
 minor changes on version release on Sea8
-1. Added ToolTips Only problem is that i had to change rangeCAUDAL.O3 to rangeCAUDALO3 (If an element ID has '.' in it bstooltip doesnt understant it.)
+1. Added ToolTips Only problem is that i had to change rangeCAUDAL.O3 to rangeCAUDALO3 
+(If an element ID has '.' in it bstooltip doesnt understant it.)
 ----01/07/2015-----------------------------------------------------------------------------
 v.06
 1. added d3heatmap
