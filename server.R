@@ -102,12 +102,12 @@ shinyServer(function(input, output, session){
 #                   & data$Age <= as.numeric(input$rangeAge[2])
                    
     
-    class(data$ProductionTimeDays)
     
-    #   For debugging  
-    #   View(data)
-    #  str(data)
-    #   print(nrow(data))
+    # For debugging 
+    # class(data$ProductionTimeDays)
+    # View(data)
+    # str(data)
+    # print(nrow(data))
     return(data)
   })  
   
@@ -1442,9 +1442,19 @@ output$plotDashboard <- renderPlot({
 # 
 output$HeatMap <- renderD3heatmap({
   dataHeat = passData()
-  dataHeat <- dataHeat[c("Start.Av.Weight","End.Av.Weight")]
   row.names(dataHeat) <- dataHeat$Unit
-  d3heatmap(dataHeat, scale = "column", colors = "Spectral")
+  dataHeat <- dataHeat[c("Start.Av.Weight","End.Av.Weight","Av.Weight.Deviation","Econ.FCR.Period")]
+  #View(dataHeat)
+  d3heatmap(dataHeat
+            , scale = "column"
+            #, colors = "Spectral"
+            ,colors = input$palette
+            ,dendrogram = if (input$cluster) "both" else "none"
+            #,labRow = passData()$Unit
+            ,xaxis_height = 100
+            ,cellnote = dataHeat
+            ,xaxis_font_size = "9pt"
+            )
 })
 
 

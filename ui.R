@@ -308,7 +308,15 @@ shinyUI(
                       
                         ) # end tabPanel Pivot Table
                        ,tabPanel("HeatMap"
-                                 ,d3heatmapOutput('HeatMap',height = "800px")
+                                 
+                                 ,d3heatmapOutput('HeatMap'
+                                                  ,height = "800px"
+                                                  
+                                                  )
+                                 ,selectInput("palette", "Palette", c("YlOrRd", "RdYlBu", "Greens", "Blues","Spectral"))
+                                 ,checkboxInput("cluster", "Apply clustering")
+                                 ,h1("------")
+                                 
                        )
             ), # end navbarMenu Tools
             
