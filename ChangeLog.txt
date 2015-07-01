@@ -1,5 +1,5 @@
 Changelog SEA-8
-----03/06/2015 ---------------------------------------------------------------------------------------------------------
+----03/06/2015 ---------------------------------------------------------------------------
 V.05.1
 minor changes on version release on Sea8
 1.  Documentation on packages ( note down which of them are not from CRAN )
@@ -11,11 +11,15 @@ minor changes on version release on Sea8
 3.  Added  ggthemr  ggplot2 tools.
 
 4.  Added ShinyBS Colapses ( on sidebar & histgrams)
-----04/06/2015 ---------------------------------------------------------------------------------------------------------
+----04/06/2015 ----------------------------------------------------------------------------
 V.05.2
 minor changes on version release on Sea8
 1. Added ToolTips Only problem is that i had to change rangeCAUDAL.O3 to rangeCAUDALO3 (If an element ID has '.' in it bstooltip doesnt understant it.)
-
+----01/07/2015-----------------------------------------------------------------------------
+v.06
+1. added d3heatmap
+v.06.1
+1. fixed tooltips
 
 ---------------------------To Do list--------------------
 1. Data Table less intetactivity or move to olap tools.
@@ -25,7 +29,10 @@ minor changes on version release on Sea8
 2. Κλεψύδρα... (για να φαίνεται ότι γίνονται υπολογισμοί.)
 
 3. Tooltips in evaluation of models.
+--> Done: Δεν δέχεται αποστρόφους και για νέα γραμμή θέλει paste0 
 
 4. Glmnet ερμηνεία σημαντικότητας των αριθμητικών μεταβλητών.
 
 5. Διορθώσεις στα δέντρα.
+
+6. Επιλογή μεταβλητών για το heatmap ( is.numeric ) [ δύναμικό checkbox ] 

@@ -400,31 +400,23 @@ tabPanel(" Regression Models ", id="MenuPage_4",
                                fluidRow(column(12, verbatimTextOutput("fmla"))),
                                hr(),
                                fluidRow(
-                                   column(12, h4('Percentage of Variation explained by the regression line:'),
+                                   column(12, h4('Percentage of Variation explained by the regression line:',id = 'test'),
                                          verbatimTextOutput("regression_R") ),
-                                   bsPopover(id="regression_R", title="Information about the model's goodness:", 
-                                             content="R-Squared: Metric for evaluating the goodness of fit of your model. 
-                                             Higher is better with 1 being the best. It measures the proportion of variability
-                                             in response variable that can be explained using predictors. 
-                                             Adjusted R-Squared: R-squared on data will be higher for models with more input
-                                             parameters, independently of whether the additional variables actually improve the
-                                             model or not. That’s why the adjusted R-squared is a more
-                                             realistic assessment of model's effectiveness, due to the fact that it adjusts R-Squared
-                                             for the number of explanatory variables in the equation.
-                                             Akaike’s Information Criterion - AIC: a log-likelihood value can be obtained, according to the formula 
-                                             -2*log-likelihood + k*npar, where npar represents the number of parameters in the fitted model, 
-                                             and k = 2 for the usual AIC. The AIC is usually used to decide which and how many input variables to use 
-                                             in the model. If you train many different models with different sets of variables on the same
-                                             training set, you can consider the model with the lowest AIC to be the best fit.",
-                                             placement = "top", trigger = "hover", options = list(container = "body")) 
+                                   bsPopover(id="regression_R", title=paste0("Information about the models goodness:"), 
+                                             content = paste0("R-Squared: Metric for evaluating the goodness of fit of your model. bla bla lba lbla lba lbla llabl lb aalkfjlkf fg fd") 
+                                             
+                                             ,placement = "bottom", trigger = "click"
+                                             , options = list(container = "body")
+                                             ) 
                                ),
                               
                                fluidRow( column(12, h4('Residuals:'), 
                                           verbatimTextOutput("regression_Table_residuals")),
                                           bsPopover(id="regression_Table_residuals", title="Information about Residuals:",
-                                                   content="The residuals are the difference between the actual values of the 
-                                                   variable you're predicting and predicted values from your regression model.",
-                                                   placement = "top", trigger = "hover", options = list(container = "body") )
+                                                   content=paste0("The residuals are the difference between the actual values"
+                                                                  , " of the variable you &#39re predicting and predicted values from your regression model."
+                                                                  , sep=""),
+                                                   placement = "top", trigger = "click", options = list(container = "body") )
                                ),
                                hr(),
                                fluidRow(column(12, plotOutput("plot_lm_13")),
@@ -466,15 +458,15 @@ tabPanel(" Regression Models ", id="MenuPage_4",
                                                   called Cook’s distance, or Cook’s D. Cook’s D values greater than 4/(n-k-1), where 
                                                   n is the sample size and k is the number of predictor variables indicate influential
                                                   observations.",
-                                                  placement = "right", trigger = "click", options = list(container = "body") )
+                                                  placement = "bottom", trigger = "click", options = list(container = "body") )
                                ),
                                hr(),
                                conditionalPanel( "input.radioModel != 3 ", 
                                       fluidRow(column(12,h4('Significance of the Regression Coefficients at LM or GLM model:'),
                                                   verbatimTextOutput("regression_Table_sign_coeff") ),
                                                bsPopover(id="regression_Table_sign_coeff", 
-                                                         title="Information about Significance of the Regression Coefficients:",
-                                                         content="Each model coefficient forms a row of the summary coefficients table. 
+                                                         title=paste0("Information about Significance of the Regression Coefficients:"),
+                                                         content=paste0("Each model coefficient forms a row of the summary coefficients table. 
                                                          The columns report the estimated coefficient (column Estimate)
                                                          for the intercept and each independent variable, the uncertainty of the 
                                                          estimate (column Std. Error), how large the coefficient is relative to the uncertainty 
@@ -485,8 +477,8 @@ tabPanel(" Regression Models ", id="MenuPage_4",
                                                          In common practice, a cutoff 0.05 is used to determine statistical significance. 
                                                          In general, it is better to have significant coefficients and models, because 
                                                          statistical significance indicates that our results are more likely to be genuine 
-                                                         and unlikely to have occurred by random chance.",
-                                                         placement = "right", trigger = "click", options = list(container = "body") )
+                                                         and unlikely to have occurred by random chance."),
+                                                         placement = "bottom", trigger = "click", options = list(container = "body") )
                                       )
                                ),
                                conditionalPanel( "input.radioModel == 3 ", 
@@ -502,14 +494,14 @@ tabPanel(" Regression Models ", id="MenuPage_4",
                                                  bsPopover(id="regression_CI", 
                                                            title="Information about Confidence Intervals:",
                                                            content="Confidence intervals for the regression coefficients.",
-                                                           placement = "right", trigger = "click", options = list(container = "body"))
+                                                           placement = "bottom", trigger = "click", options = list(container = "body"))
                                         ),
                                         hr(),
                                         fluidRow(column(12, h4('Analysis of Variance:'),
                                                  verbatimTextOutput("regression_Anova")),
                                                  bsPopover(id="regression_Anova", 
                                                            title="Information about ANOVA test:",
-                                                           content="A sequential ANalysis Of VAriance (ANOVA) table assesses the contribution
+                                                           content=paste0("A sequential ANalysis Of VAriance (ANOVA) table assesses the contribution
                                                            of each predictor variable to the model in turn, assuming inclusion of previously 
                                                            assessed variables. The F-statistic is used to measure whether the regression model 
                                                            predicts outcome better than the constant mode (the mean value of y). 
@@ -517,8 +509,8 @@ tabPanel(" Regression Models ", id="MenuPage_4",
                                                            if the variance of the residuals from the constant model and the variance of the 
                                                            residuals from the linear model are significantly different. The model
                                                            is significant if any of the coefficients are nonzero. It is insignificant if all 
-                                                           coefficients are zero. ",
-                                                           placement = "right", trigger = "click", options = list(container = "body"))
+                                                           coefficients are zero. "),
+                                                           placement = "bottom", trigger = "click", options = list(container = "body"))
                                         ),
                                         hr(),
                                         fluidRow(column(12, h4('Outliers Observations:'),
@@ -529,7 +521,7 @@ tabPanel(" Regression Models ", id="MenuPage_4",
                                                            They have either unusually large positive or negative residuals. Positive 
                                                            residuals indicate that the model is underestimating the response value, 
                                                            while negative residuals indicate an overestimation.",
-                                                           placement = "right", trigger = "click", options = list(container = "body"))
+                                                           placement = "bottom", trigger = "click", options = list(container = "body"))
                                                  ),
                                         hr(),
                                         h4(' Influential, Leverage and Outliers Observations:'),                                       
