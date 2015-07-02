@@ -1,0 +1,108 @@
+﻿bsPopover(id="regression_R", title="Information about the model's goodness:", 
+                                             content="R-Squared: Metric for evaluating the goodness of fit of your model. 
+                                             Higher is better with 1 being the best. It measures the proportion of variability
+                                             in response variable that can be explained using predictors. 
+                                             Adjusted R-Squared: R-squared on data will be higher for models with more input
+                                             parameters, independently of whether the additional variables actually improve the
+                                             model or not. That’s why the adjusted R-squared is a more
+                                             realistic assessment of model's effectiveness. 
+                                             Akaike’s Information Criterion - AIC: a log-likelihood value can be obtained, according to the formula 
+                                             -2*log-likelihood + k*npar, where npar represents the number of parameters in the fitted model, 
+                                             and k = 2 for the usual AIC. The AIC is usually used to decide which and how many input variables to use 
+                                             in the model. If you train many different models with different sets of variables on the same
+                                             training set, you can consider the model with the lowest AIC to be the best fit.",
+                                             placement = "right", trigger = "click", options = list(container = "body")) 
+                               ),
+                              
+                               fluidRow( column(12, h4('Residuals:'), 
+                                          verbatimTextOutput("regression_Table_residuals")),
+                                          bsPopover(id="regression_Table_residuals", title="Information about Residuals:",
+                                                   content="The residuals are the difference between the actual values of the 
+                                                   variable you're predicting and predicted values from your regression model.",
+                                                   placement = "right", trigger = "click", options = list(container = "body") )
+                               ),
+                               hr(),
+                               fluidRow(column(12, plotOutput("plot_lm_13")),
+                                        bsPopover(id="plot_lm_13", title="Information about plots:",
+                                                  content=" Residual graphs with predictions (Fitted values) on the x-axis 
+                                                  gives a sense of when the model may be under- or overpredicting, 
+                                                  based on the model’s output. 
+                                                  The first graph (left) shows residuals on the y axis against fitted 
+                                                  values on the x axis. If the dependent variable is linearly related to the 
+                                                  independent variables, there should be no systematic relationship between the 
+                                                  residuals and the predicted (that is, fitted) values. Ideally, the points will 
+                                                  all lie very close to that line. Instead, if input variables don’t explain the output 
+                                                  too closely a wider cloud of points is received, which suggests that a quadratic 
+                                                  term ought to be added to the regression model. 
+                                                  The second graph (right) is a repeat of the first, but on a different scale; it shows
+                                                  the square root of the standardized residuals (where all the values are positive) 
+                                                  against the fitted values. If there was a problem, such as the variance increasing 
+                                                  with the mean, then the points would be distributed inside a triangular shape, 
+                                                  with the scatter of the residuals increasing as the fitted values increase. 
+                                                  If the constant variance assumption (Homoscedasticity) is met, the points in
+                                                  the Scale-Location graph (bottom left) should be a random band around a horizontal
+                                                  line.",
+                                                  placement = "right", trigger = "click", options = list(container = "body") )
+                               ),
+                               hr(),
+                               fluidRow(column(12, plotOutput("plot_lm_24")),
+                                        bsPopover(id="plot_lm_24", title="Information about plots:",
+                                                  content="If the dependent variable is normally distributed for a fixed set of
+                                                  predictor values, then the residual values should be normally distributed with a
+                                                  mean of 0. The Normal Q-Q plot (left graph) is a probability plot of the standardized
+                                                  residuals against the values that would be expected under normality. If
+                                                  the normality assumption is met, the points on this graph should fall on the
+                                                  straight 45-degree line. If the pattern were S-shaped or banana-shaped, we would need 
+                                                  to fit a different model to the data.
+                                                  A Cook’s Distance plot (right graph) presents the influential observations, which are
+                                                  observations that have a disproportionate impact on the determination of the model 
+                                                  parameters. Imagine finding that your model changes dramatically with the removal 
+                                                  of a single observation. Influential observations are identified using a statistic 
+                                                  called Cook’s distance, or Cook’s D. Cook’s D values greater than 4/(n-k-1), where 
+                                                  n is the sample size and k is the number of predictor variables indicate influential
+                                                  observations.",
+                                                  placement = "right", trigger = "click", options = list(container = "body") )
+                               ),
+                               hr(),
+                               conditionalPanel( "input.radioModel != 3 ", 
+                                      fluidRow(column(12,h4('Significance of the Regression Coefficients at LM or GLM model:'),
+                                                  verbatimTextOutput("regression_Table_sign_coeff") ),
+                                               bsPopover(id="regression_Table_sign_coeff", 
+                                                         title="Information about Significance of the Regression Coefficients:",
+                                                         content="Each model coefficient forms a row of the summary coefficients table. 
+                                                         The columns report the estimated coefficient (column Estimate), the uncertainty of the 
+                                                         estimate (column Std. Error), how large the coefficient is relative to the uncertainty 
+                                                         (column t value), and how likely (probability) such a ratio would be due to mere 
+                                                         chance (column p-value). The p-value gauges the likelihood that the coefficient is not
+                                                         significant, so smaller is better. Big is bad because it indicates a high likelihood of
+                                                         insignificance (the variable is worthless; it adds nothing to the model).
+In common practice, a cutoff 0.05 is used to determine statistical significance. In general, it is better to have significant coefficients and models, 
+because statistical significance indicates that our results are more likely to be genuine and unlikely to have occurred by random chance. ",
+
+
+
+
+fluidRow(column(12, plotOutput("plot_Infl",height="600px"))),
+                                        bsPopover(id="plot_Infl", 
+                                                  title="Information about Leverage and Influencial Observations:",
+                                                  content="Leverage points are those observations, if any, made at extreme or outlying values of the 
+                                                  independent variables such that the lack of neighboring observations means that the fitted 
+                                                  regression model will pass close to that particular observation.
+                                                  Observations that have high leverage are outliers with regard to the other predictors.
+                                                  In other words, they have an unusual combination of predictor values. The response
+                                                  value isn’t involved in determining leverage. High leverage observations may or may not be 
+                                                  influential observations. That will depend on whether they’re also outliers.
+                                                  Influential observations are observations that have a disproportionate impact on the
+                                                  values of the model parameters. Imagine finding that your model changes dramatically
+                                                  with the removal of a single observation. It’s this concern that leads you to examine
+                                                  your data for influential points.
+                                                  Influence plot: States above +2 or below –2 on the Studentized-residual scale (vertical axis)
+                                                  are considered outliers. States above 2 or 3 times the average hat value (horizontal axis) have high
+                                                  leverage (unusual combinations of predictor values). Circle size is proportional
+                                                  to influence. Observations depicted by large circles may have disproportionate
+                                                  influence on the parameters estimates of the model.",
+                                                  placement = "bottom", trigger = "click", options = list(container = "body"))
+                                        ),
+
+
+
