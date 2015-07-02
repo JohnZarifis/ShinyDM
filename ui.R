@@ -15,7 +15,6 @@ source("SidebarUi.R")
 #  
 # ) # end sidebarMulti function
 
-
 #----------------------------------------------------
 # 
 shinyUI( 
@@ -331,7 +330,6 @@ shinyUI(
             ), # end navbarMenu Tools
             
   
-
 #---------------------------------------------------------- Forth MenuPage
 tabPanel(" Regression Models ", id="MenuPage_4", 
           fluidPage( #theme = shinytheme("cerulean"),
@@ -589,10 +587,32 @@ tabPanel(" Analysis Of Variance ", id="MenuPage_5",
                      fluidRow(column(12, verbatimTextOutput("fmla.aov"))),
                      hr(),
                      h4('Summary:'),
-                     fluidRow(column(12, verbatimTextOutput("summary.aov"))),
+                     fluidRow(column(12, verbatimTextOutput("summary.aov")),
+                            bsPopover(id="summary.aov", 
+                                      title="Analysis of Variance:",
+                                       content= paste0("<b>One-way ANOVA:</b> when the explanatory variable is categorical (factor) "
+                                                        ," with three or more levels. Here, we test the null hypothesis (H0) that "
+                                                        ," the means of all levels are equal. The alternative hypothesis is that "
+                                                        ," at least one of the means is significantly different from the others. "
+                                                        ," F ratio can be used to determine whether the statistically significant "
+                                                        ," differenced exist between the levels. The p-value indicates the likelihood "
+                                                        ," that the level is not significant, so smaller is better. If p-value is less "
+                                                        ," than the significance level a, then the null hypothesis is rejected in favor "
+                                                        ," of the alternative. "
+                                                        ,"<b>Two-way ANOVA:</b> when the explanatory variables are categorical (factors). "
+                                                        ," Crossing two factors produces a two-way ANOVA."
+                                                        ,"<b>Factorial ANOVA:</b> crossing two or more factors. For each factor, we have "
+                                                        ," F-tests for each factor and for each interaction between factors."),
+                                      placement = "bottom", trigger = "click", options = list(container = "body"))
+                     ),
                      hr(),
                      h4('Tukey’s honest significant differences:'),
-                     fluidRow(column(12, plotOutput("plot.TukeyHSD"))),
+                     fluidRow(column(12, plotOutput("plot.TukeyHSD")),
+                              bsPopover(id="plot.TukeyHSD", 
+                                        title="Tukey’s honest significant differences:",
+                                        content= paste0("Plot indicates paired significances. Those intervals that cross zero indicate  "
+                                                        ,"that the differences between the means of one level and another are not significant."))  
+                     ),
                      hr(),
                      fluidRow(column(12, verbatimTextOutput("sign.diffs.Tukey"))),
                      hr(),

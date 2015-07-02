@@ -130,9 +130,9 @@ create_dataset <- function(dataset){
   data$Class = as.factor(data$Class)
   #data$Ph = as.numeric(data$Ph)
 
-  #   For debugging  
+  #  For debugging  
   #  View(data)
-  #   str(data)
+  #  str(data)
   # print(nrow(data))
   
   return(data)
