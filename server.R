@@ -1443,7 +1443,7 @@ output$plotDashboard <- renderPlot({
 output$HeatMap <- renderD3heatmap({
   dataHeat = passData()
   row.names(dataHeat) <- dataHeat$Unit
-  dataHeat <- dataHeat[c("Start.Av.Weight","End.Av.Weight","Av.Weight.Deviation","Econ.FCR.Period")]
+  dataHeat <- dataHeat[c("Start.Av.Weight","End.Av.Weight","Av.Weight.Deviation","Econ.FCR.Period","LTD.Mortality")]
   #View(dataHeat)
   d3heatmap(dataHeat
             , scale = "column"
@@ -1464,15 +1464,17 @@ output$HeatMap <- renderD3heatmap({
 #---------------------------------------------------------------------------------------------------
 output$dimple <- renderdimple({
          dataDimple = passData()
-         seri = if(input$color=='None'){ NULL} else {input$color}
+         #seri = if(input$color=='None'){ NULL} else {input$color}
          dimple(dataDimple,
                 xMeasure= input$xVar
                 ,yMeasure=input$yVar
                 ,zMeasure=input$size
-                ,series=c("Unit",seri)
+                #,series = "Unit"
+                ,series=c("Unit",input$colori)
                 ,legend=TRUE
                 ,chartType="bubble"
-                , width = 590, height = 600
+                , width = 790, height = 600
+                , xOrderRule="To"
                )
        })
 

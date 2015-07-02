@@ -307,6 +307,14 @@ shinyUI(
                                  rpivotTableOutput("pivTable", height = "800px") 
                       
                         ) # end tabPanel Pivot Table
+                                               ,tabPanel("Interactive DashBoard"
+                                                         ,fluidRow(column(12,dimpleOutput("dimple",width = "100%", height = "600px")))
+                                                         ,fluidRow(column(12
+                                                                          ,selectInput('xVar', 'X', choices=names(df), selected="Start.Av.Weight") # ToDO is numeric
+                                                                         ,selectInput('yVar', 'Y', choices=names(df), selected="End.Av.Weight")
+                                                                          ,selectInput('colori', 'Color', choices=names(df),selected="Origin.Year")
+                                                                         ,selectInput('size', 'Size', choices=names(df), selected="Closing.Biomass")
+                                                                          )))
                        ,tabPanel("HeatMap"
                                  
                                  ,d3heatmapOutput('HeatMap'
@@ -318,14 +326,7 @@ shinyUI(
                                  ,h1("-")
                                  
                        )
-                       ,tabPanel("Interactive Dash"
-                                 ,fluidRow(column(12,dimpleOutput("dimple",width = "100%", height = "600px")))
-                                 ,fluidRow(column(12
-                                                  ,selectInput('xVar', 'X', choices=names(df), selected="To")
-                                                  ,selectInput('yVar', 'Y', choices=names(df), selected="End.Av.Weight")
-                                                  ,selectInput('color', 'Color', choices=c('None', names(df)))
-                                                  ,selectInput('size', 'Size', choices=names(df), selected="Closing.Biomass")
-                                                  )))
+
                                  
             ), # end navbarMenu Tools
             
