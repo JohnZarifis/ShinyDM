@@ -1462,6 +1462,24 @@ output$HeatMap <- renderD3heatmap({
 #---------------------------------------------------------------------------------------------------
 #     Multidimensional Interactive Dashboard
 #---------------------------------------------------------------------------------------------------
+output$dimple <- renderdimple({
+         dataDimple = passData()
+         seri = if(input$color=='None'){ NULL} else {input$color}
+         dimple(dataDimple,
+                xMeasure= input$xVar
+                ,yMeasure=input$yVar
+                ,zMeasure=input$size
+                ,series=c("Unit",seri)
+                ,legend=TRUE
+                ,chartType="bubble"
+                , width = 590, height = 600
+               )
+       })
+
+
+
+
+
 
 #  datasetMD <- reactive({
 #   data <- passData()

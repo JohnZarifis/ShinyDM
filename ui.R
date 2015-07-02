@@ -315,9 +315,18 @@ shinyUI(
                                                   )
                                  ,selectInput("palette", "Palette", c("YlOrRd", "RdYlBu", "Greens", "Blues","Spectral"))
                                  ,checkboxInput("cluster", "Apply clustering")
-                                 ,h1("------")
+                                 ,h1("-")
                                  
                        )
+                       ,tabPanel("Interactive Dash"
+                                 ,fluidRow(column(12,dimpleOutput("dimple",width = "100%", height = "600px")))
+                                 ,fluidRow(column(12
+                                                  ,selectInput('xVar', 'X', choices=names(df), selected="To")
+                                                  ,selectInput('yVar', 'Y', choices=names(df), selected="End.Av.Weight")
+                                                  ,selectInput('color', 'Color', choices=c('None', names(df)))
+                                                  ,selectInput('size', 'Size', choices=names(df), selected="Closing.Biomass")
+                                                  )))
+                                 
             ), # end navbarMenu Tools
             
   
