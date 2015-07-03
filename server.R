@@ -2329,7 +2329,7 @@ output$validate_model <- renderPrint({
 })    
 
 
-output$plot_ML.Rel.Impo <- renderPlot({ 
+output$plot_ML_Rel_Impo <- renderPlot({ 
   if (input$goAnalysis == 0){
     return() }
   else{ 

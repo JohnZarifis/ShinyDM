@@ -672,9 +672,18 @@ tabPanel(" Machine Learning Models ", id="MenuPage_6",
                       fluidRow(column(12, verbatimTextOutput("summary_model")),
                                bsPopover(id="summary_model", 
                                          title="About model:",
-                                         content= paste0("For <b>SVMs model</b>, <b>sigma</b> and <b>C</b> are the parameters of the model. "
-                                                         ," <b>Accuracy</b> and <b>Kappa</b> are two measures that evaluate the performance of the model."
-                                                         ," High accuracy means that the model is more reliable."),
+                                         content= paste0(" For <b>SVMs model</b>, <b>sigma</b> and <b>C</b> are the parameters of the model, while "
+                                                         ," for <b>GLMnet model</b> are <b>alpha</b> and <b>lambda</b>. "
+                                                         ," For <b>Classification</b> problems: "
+                                                         ," <b>Accuracy</b> is a measure of model goodness. High accuracy means that the model is more reliable. "
+                                                         ," The <b>Kappa</b> statistic is a measure of concordance for categorical data that measures agreement "
+                                                         ," relative to what would be expected by chance. Values of 1 indicate perfect agreement, while "
+                                                         ," a value of zero would indicate a lack of agreement. Negative Kappa values can also occur, "
+                                                         ," but are less common since it would indicate a negative association between the observed "
+                                                         ," and predicted data. Kappa is an excellent performance measure when the classes are highly unbalanced. "
+                                                         ," For <b>Regression</b> problems the goodness of the models is estimated using Root Mean Square Error "
+                                                         ," and R-squared, the correlation coefficient is computed between the observed and predicted values and squared. "
+                                                         ),
                                          placement = "bottom", trigger = "click", options = list(container = "body") )
                                ),
                       hr(),
@@ -682,15 +691,43 @@ tabPanel(" Machine Learning Models ", id="MenuPage_6",
                       fluidRow(column(12, verbatimTextOutput("validate_model")),
                                bsPopover(id="validate_model", 
                                          title="About model:",
-                                         content= paste0( ),
-                               
-                                         placement = "bottom", trigger = "click", options = list(container = "body") )
+                                         content= paste0(" For classification problems using <b>SVMs model</b> the evaluation of the model " 
+                                                         ," is presented using Confusion Matrix, which tabulates actual classifications "
+                                                         ," against predicted ones. Rows represent actual values and columns represent "
+                                                         ," predicted ones. The diagonal entries represent correct predictions. "
+                                                         ," <b>Sensitivity and specificity</b> are statistical measures of the performance "
+                                                         ," of a binary classification test. "
+                                                         ," Sensitivity (also called the True Positive Rate or Recall) measures "
+                                                         ," the proportion of positives which are correctly identified as such "
+                                                         ," and is complementary to the false negative rate. "
+                                                         ," Specificity (also called the True Negative Rate) measures the proportion of negatives "
+                                                         ," which are correctly identified as such and is complementary to the false positive rate. "
+                                                         ," For classification problems using <b>GLMnet model</b> the goodness of the model is "
+                                                         ," estimated through Area Under Curve (AUC) is equal to the probability that a classifier "
+                                                         ," will rank a randomly chosen positive instance higher than a randomly chosen negative one. "
+                                                         ," AUC value close to 1 would be considered very good. <b>AUC ranges between 0.5 and 1, where 0.5 "
+                                                         ," is random and 1 is perfect.</b> "
+                                                         ),
+                                        placement = "bottom", trigger = "click", options = list(container = "body") )
                                ),
-                      
+                    
                       #------ relative importance
                       hr(),
                       h4(' Relative Importance:'),      
-                      fluidRow(column(12, plotOutput("plot_ML.Rel.Impo",height="600px"))),
+                      fluidRow(column(12, plotOutput("plot_ML_Rel_Impo",height="600px")),
+                               bsPopover(id="plot_ML_Rel_Impo", 
+                                         title="Which variables are useful for predicting the outcome?",
+                                         content= paste0(" <b>Variable Importance:</b> Assess which of the predictors have the largest impact "
+                                                         ," on the model. In other words, identifying which variables are the most important "
+                                                         ," for predicting an outcome."
+                                                         ," For <b>SVMs model</b> each predictor will have a separate variable importance "
+                                                         ," for each class. "
+                                                         ," For <b>GLMnet model</b> the positive and negative variable importance is returned, "
+                                                         ," helping in this way the deeper understanding about model variables."
+                                         ),
+                                         placement = "bottom", trigger = "click", options = list(container = "body") )
+                      ),
+                                         
                       hr(),
                       fluidRow(column(12, verbatimTextOutput("ML.Rel.Impo")))
                       
