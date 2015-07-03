@@ -17,10 +17,14 @@ minor changes on version release on Sea8
 1. Added ToolTips Only problem is that i had to change rangeCAUDAL.O3 to rangeCAUDALO3 
 (If an element ID has '.' in it bstooltip doesnt understant it.)
 ----01/07/2015-----------------------------------------------------------------------------
-v.06
+v.0.6
 1. added d3heatmap
 v.06.1
 1. fixed tooltips
+
+----02/07/2015-----------------------------------------------------------------------------
+v 0.6.4
+1.Dimple interactive dashboard ( Need to fix axis on non numeric input + legend)
 
 ---------------------------To Do list--------------------
 1. Data Table less intetactivity or move to olap tools.
