@@ -523,8 +523,8 @@ tabPanel(" Regression Models ", id="MenuPage_4",
                                hr(),
                                h4(' Relative Importance:'),      
                                fluidRow(column(12, plotOutput("bar.Rel.Impo"))),
-                               fluidRow(column(12, verbatimTextOutput("Rel.Impo")),
-                                        bsPopover(id="Rel.Impo", 
+                               fluidRow(column(12, verbatimTextOutput("Rel_Impo")),
+                                        bsPopover(id="Rel_Impo", 
                                                   title="Which variables are most important in predicting the outcome?",
                                                   content= paste0("Rank-order the predictors in terms of relative importance. "
                                                   ,"Relative importance can be thought of as the contribution each predictor "
@@ -587,8 +587,8 @@ tabPanel(" Analysis Of Variance ", id="MenuPage_5",
                      fluidRow(column(12, verbatimTextOutput("fmla.aov"))),
                      hr(),
                      h4('Summary:'),
-                     fluidRow(column(12, verbatimTextOutput("summary.aov")),
-                            bsPopover(id="summary.aov", 
+                     fluidRow(column(12, verbatimTextOutput("summary_aov")),
+                            bsPopover(id="summary_aov", 
                                       title="Analysis of Variance:",
                                        content= paste0("<b>One-way ANOVA:</b> when the explanatory variable is categorical (factor) "
                                                         ," with three or more levels. Here, we test the null hypothesis (H0) that "
@@ -607,8 +607,8 @@ tabPanel(" Analysis Of Variance ", id="MenuPage_5",
                      ),
                      hr(),
                      h4('Tukey’s honest significant differences:'),
-                     fluidRow(column(12, plotOutput("plot.TukeyHSD")),
-                              bsPopover(id="plot.TukeyHSD", 
+                     fluidRow(column(12, plotOutput("plot_TukeyHSD")),
+                              bsPopover(id="plot_TukeyHSD", 
                                         title="Tukey’s honest significant differences:",
                                         content= paste0("Plot indicates paired significances. Those intervals that cross zero indicate  "
                                                         ,"that the differences between the means of one level and another are not significant."))  
@@ -647,13 +647,45 @@ tabPanel(" Machine Learning Models ", id="MenuPage_6",
            mainPanel(tabsetPanel( 
              tabPanel("Build the Model",
                       h4('Formula:'), 
-                      fluidRow(column(12, verbatimTextOutput("fmla.model"))),
+                      fluidRow(column(12, verbatimTextOutput("fmla_model")),
+                               bsPopover(id="fmla_model", 
+                                         title="About model:",
+                                         content= paste0("<b>Support Vector Machines (SVM):</b> supervised learninng models "
+                                                         ," used for classification and regression analysis. Given a set of training examples, " 
+                                            ," for belonging to one of two categories, an SVM training algorithm builds a model that "
+                                            ," assigns new examples into one category or the other, making it a non-probabilistic binary "
+                                            ," linear classifier. An SVM model is a representation of the examples as points in space, "
+                                            ," mapped so that the examples of the separate categories are divided by a clear gap that is as "
+                                            ," wide as possible. New examples are then mapped into that same space and predicted to belong to " 
+                                            ," a category based on which side of the gap they fall on. "
+                                            ," SVMs can efficiently perform a non-linear classification using kernels, implicitly mapping their "
+                                            ," inputs into high-dimensional feature spaces via a non-linear transformation. "
+                                            ," <b>Generalized Linear Models (GLMnet):</b> is a flexible generalization of ordinary linear regression "
+                                            ," that allows for response variables that have error distribution models other than a normal distribution. " 
+                                            ," The GLM generalizes linear regression by allowing the linear model to be related to the response variable "
+                                            ," via a link function and by allowing the magnitude of the variance of each measurement to be a function of "
+                                            ," its predicted value. "),
+                                         placement = "bottom", trigger = "click", options = list(container = "body") )
+                               ),
                       hr(),
                       h4('Summary:'),
-                      fluidRow(column(12, verbatimTextOutput("summary.model"))),
+                      fluidRow(column(12, verbatimTextOutput("summary_model")),
+                               bsPopover(id="summary_model", 
+                                         title="About model:",
+                                         content= paste0("For <b>SVMs model</b>, <b>sigma</b> and <b>C</b> are the parameters of the model. "
+                                                         ," <b>Accuracy</b> and <b>Kappa</b> are two measures that evaluate the performance of the model."
+                                                         ," High accuracy means that the model is more reliable."),
+                                         placement = "bottom", trigger = "click", options = list(container = "body") )
+                               ),
                       hr(),
                       h4('Evaluate the model on the whole Training Set:'),
-                      fluidRow(column(12, verbatimTextOutput("validate.model"))),
+                      fluidRow(column(12, verbatimTextOutput("validate_model")),
+                               bsPopover(id="validate_model", 
+                                         title="About model:",
+                                         content= paste0( ),
+                               
+                                         placement = "bottom", trigger = "click", options = list(container = "body") )
+                               ),
                       
                       #------ relative importance
                       hr(),

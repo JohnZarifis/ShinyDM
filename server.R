@@ -1848,7 +1848,7 @@ run_Relative.Importance <- reactive({
 })
 
 
-output$Rel.Impo <- renderPrint({
+output$Rel_Impo <- renderPrint({
   if (input$goRegression == 0){
     return() }
   else{ 
@@ -2000,7 +2000,7 @@ output$fmla.aov <- renderText({
 })
 
 
-output$summary.aov <- renderPrint({
+output$summary_aov <- renderPrint({
   if (input$goANOVA == 0){
     return() }
   else{ 
@@ -2041,7 +2041,7 @@ output$sign.diffs.Tukey <- renderPrint({
   }
 })
 
-output$plot.TukeyHSD <- renderPlot({
+output$plot_TukeyHSD <- renderPlot({
 
   if (input$goANOVA == 0){
     return() }
@@ -2220,7 +2220,7 @@ runGLM <- reactive({
 })
 
 #----------------------------------------------------
-output$summary.model <- renderPrint({
+output$summary_model <- renderPrint({
   if (input$goAnalysis == 0){
     return() }
   else{ 
@@ -2245,7 +2245,7 @@ output$summary.model <- renderPrint({
   } # end if...else
 })    
 
-output$validate.model <- renderPrint({
+output$validate_model <- renderPrint({
   if (input$goAnalysis == 0){
     return() }
   else{ 
