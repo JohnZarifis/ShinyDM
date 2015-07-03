@@ -312,7 +312,7 @@ shinyUI(
                                                                           ,selectInput('xVar', 'X', choices=names(df), selected="Start.Av.Weight") # ToDO is numeric
                                                                          ,selectInput('yVar', 'Y', choices=names(df), selected="End.Av.Weight")
                                                                           ,selectInput('colori', 'Color', choices=names(df),selected="Origin.Year")
-                                                                         ,selectInput('size', 'Size', choices=names(df), selected="Closing.Biomass")
+                                                                         ,selectInput('size', 'Size', choices=c('None', names(df)), selected="None")
                                                                           )))
                        ,tabPanel("HeatMap"
                                  
