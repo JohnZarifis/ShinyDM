@@ -1465,16 +1465,20 @@ output$HeatMap <- renderD3heatmap({
 output$dimple <- renderdimple({
          dataDimple = passData()
          #seri = if(input$color=='None'){ NULL} else {input$color}
+         sizee = if(input$size=='None'){} else {input$size}
          dimple(dataDimple,
                 xMeasure= input$xVar
+                ,xCategory=input$xVar
                 ,yMeasure=input$yVar
-                ,zMeasure=input$size
+                ,yCategory=input$yVar
+                ,zMeasure=sizee
                 #,series = "Unit"
                 ,series=c("Unit",input$colori)
                 ,legend=TRUE
                 ,chartType="bubble"
-                , width = 790, height = 600
-                , xOrderRule="To"
+                , width = 1124
+                , height = 600
+                
                )
        })
 
