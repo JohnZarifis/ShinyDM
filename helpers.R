@@ -28,6 +28,7 @@ library("pROC")
 library("glmnet")
 library("rpart")
 library("party")
+library("rpart.plot")
 library("partykit")
 library("Hmisc")
 library("effects")
@@ -45,6 +46,7 @@ library("dimple") #devtools::install_github("Bart6114/dimple")
 
 #-----------------------------------------
 # load dataset
+#
 pathname = paste(getwd(), "aquaData.xlsx", sep="/")
 Dataset <- read_excel(pathname, sheet = 1 ,col_names = TRUE, na='na')
 
