@@ -10,8 +10,22 @@ test <- dat[!trainrows,]
 
 #Build a decision tree
 require(rpart)
-model.rpart <- rpart(Species~., train)
+library("rpart.plot")
+library("partykit")
 
+model.rpart.1 <- rpart(formula=Species~., data=train, method="class", model=T, parms = list(split = "gini"), 
+      control = rpart.control(minsplit = round(nrow(train)*1), cp = 1e-3, xval = 20))
+
+plot(as.party(model.rpart.1))
+
+# prune the tree
+opt <- which.min(model.rpart.1$cptable[,"xerror"])
+cp <- model.rpart.1$cptable[opt, "CP"]
+dec.Tree <- prune( model.rpart.1, cp = cp)
+
+
+
+#------------------------ Random Forest
 model.rf <- randomForest(Species~., train, ntree=25, proximity=TRUE, importance=TRUE, nodesize=5)
 
 getTree(model.rf, k=1, labelVar=TRUE)

@@ -2527,18 +2527,22 @@ runClassRegTrees <- reactive({
   
   if (input$radioDesTree == 1){
     dec.Tree <- rpart(formula=fmla, data=dset.train, method="class", model=T, parms = list(split = "gini"), 
-                      control = rpart.control(minsplit = 50, minbucket = round(50/3), cp = 1e-3, xval = 20))
-    # prune the tree
-    opt <- which.min(dec.Tree$cptable[,"xerror"])
-    cp <- dec.Tree$cptable[opt, "CP"]
-    dec.Tree <- prune( dec.Tree, cp = cp)
+                      control = rpart.control(minsplit = round(nrow(dset.train)*0.1), cp = 1e-3, xval = 20))
+    # prune the tree if nsplit is greater than 2
+    if(  dec.Tree$cptable[,"nsplit"] > 2 ){
+      opt <- which.min(dec.Tree$cptable[,"xerror"])
+      cp <- dec.Tree$cptable[opt, "CP"]
+      dec.Tree <- prune( dec.Tree, cp = cp)
+    }  
   } else if (input$radioDesTree == 2){   
     dec.Tree <- rpart(formula=fmla, data=dset.train, method="anova", model=T, parms = list(split = "gini"), 
-                      control = rpart.control(minsplit = 50, minbucket = round(50/3), cp = 1e-3, xval = 20))
-    # prune the tree
-    opt <- which.min(dec.Tree$cptable[,"xerror"])
-    cp <- dec.Tree$cptable[opt, "CP"]
-    dec.Tree <- prune( dec.Tree, cp = cp )
+                      control = rpart.control(minsplit = round(nrow(dset.train)*0.1), cp = 1e-3, xval = 20))
+    # prune the tree if nsplit is greater than 2
+    if(  dec.Tree$cptable[,"nsplit"] > 2 ){
+      opt <- which.min(dec.Tree$cptable[,"xerror"])
+      cp <- dec.Tree$cptable[opt, "CP"]
+      dec.Tree <- prune( dec.Tree, cp = cp )
+    }
   }  
   return(dec.Tree)
 })
@@ -2612,7 +2616,7 @@ output$plot_RegClass.Rel.Impo <- renderPlot({
     isolate({  
         class.reg.Tree <- runClassRegTrees()
         rel.imp <- 100*class.reg.Tree$variable.importance/sum(class.reg.Tree$variable.importance)
-        barplot(rel.imp, xlab='% of Responce Variance', main=paste('Relative Importances for', input$responseVar, sep=' '), horiz=TRUE, 
+        barplot(rel.imp, xlab='% of Responce Variance', main=paste('Relative Importances for', input$TargVar, sep=' '), horiz=TRUE, 
                 las=1,cex.names=0.8, col='blue')
     })
   }
