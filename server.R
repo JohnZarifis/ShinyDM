@@ -2488,7 +2488,7 @@ output$prediction.value.ML <- renderPrint({
 # If the problem is for classification then the targets variable are categorical, else regression
 output$targs.Variables <- renderUI({ 
   if (input$radioDesTree == 1){
-    var <- list("Class", "Current.Grading")
+    var <- list("Class")
     radioButtons(inputId='TargVar', label=h3('Target Variable:'), choices=var, selected=var[[1]])
   } else if (input$radioDesTree == 2){
     var <- list("Econ.FCR.Period", "LTD.Econ.FCR", "SFR.Period", "SGR.Period")
@@ -2568,21 +2568,53 @@ output$info_tree_abs_relacc <- renderPrint({
   else{ 
     isolate({  
       class.reg.Tree <- runClassRegTrees()
-      n=nrow(class.reg.Tree$model)
-      Root.node.error = class.reg.Tree$frame$dev[1]/n
-      rel.err <- min(class.reg.Tree$cptable[,3])
-      resubstitution.error.rate = rel.err*Root.node.error*100
-      xrel.err <- min(class.reg.Tree$cptable[,4])
-      absolute.cross.validated.error = xrel.err*Root.node.error*100   
-      
-      res.mat <- matrix( c( rel.err*100, resubstitution.error.rate, xrel.err*100, absolute.cross.validated.error ), c(1,4) )
-      colnames(res.mat) <- c( " Rel.Error (%) ", " Resubstitution Error Rate ",  " Cross-Val. Error (%)", " Abs. Cross-Val. Error " )
-      print(res.mat[1,], row.names=FALSE, digits=3, justify="left")
+      if (input$radioDesTree == 1){
+        
+            n=nrow(class.reg.Tree$model)
+            Root.node.error = class.reg.Tree$frame$dev[1]/n
+            rel.err <- min(class.reg.Tree$cptable[,3])
+            resubstitution.error.rate = rel.err*Root.node.error*100
+            xrel.err <- min(class.reg.Tree$cptable[,4])
+            absolute.cross.validated.error = xrel.err*Root.node.error*100   
+            
+            res.mat <- matrix( c( rel.err*100, resubstitution.error.rate, absolute.cross.validated.error ), c(1,3) )
+            colnames(res.mat) <- c( " Rel.Error (%) ", " Resubstitution Error Rate ",  " Abs. Cross-Val. Error (%) " )
+            print(res.mat[1,], row.names=FALSE, digits=3, justify="left")
+        }else{
+            rel.err <- min(class.reg.Tree$cptable[,3])
+            res.mat <- matrix( c( rel.err*100 ), c(1,1) )
+            colnames(res.mat) <- c( " Rel.Error (%) " )
+            print(res.mat[1,], row.names=FALSE, digits=3, justify="left")
+        }
     })
   }
 })
 
-output$info_tree_acc <- renderPrint({  
+
+output$Conf.Mat.DT <- renderPrint({  
+  if (input$goDT == 0){
+    return() }
+  else{ 
+    if (input$radioDesTree == 1){
+        isolate({  
+          class.reg.Tree <- runClassRegTrees()
+          
+          inpt_patterns <- class.reg.Tree$model[, !(names(class.reg.Tree$model) %in% as.character(input$TargVar)) ]
+          pred_val_training <- predict(class.reg.Tree, inpt_patterns, type="class", na.action = na.omit)
+          names(pred_val_training) <- as.character(input$TargVar)
+                
+          targs_patterns <- class.reg.Tree$model[, names(class.reg.Tree$model) %in% as.character(input$TargVar) ]
+          cM <- confusionMatrix(pred_val_training, targs_patterns)
+          results.model <- cM
+          print(results.model)
+        })
+    }else{
+      print(' Confusion Matrix could not be calculated when the target variable is categorical.')
+    }
+  }
+})
+
+output$info_tree_split_acc <- renderPrint({  
   if (input$goDT == 0){
     return() }
   else{ 

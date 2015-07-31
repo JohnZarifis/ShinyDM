@@ -14,7 +14,7 @@ library("rpart.plot")
 library("partykit")
 
 model.rpart.1 <- rpart(formula=Species~., data=train, method="class", model=T, parms = list(split = "gini"), 
-      control = rpart.control(minsplit = round(nrow(train)*1), cp = 1e-3, xval = 20))
+      control = rpart.control(minsplit = round(nrow(train)*0.1), cp = 1e-3, xval = 20))
 
 plot(as.party(model.rpart.1))
 

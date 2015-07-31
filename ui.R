@@ -776,18 +776,33 @@ tabPanel(" Classification ", id="MenuPage_7",
                        hr(),
                        fluidRow(column(12, plotOutput("plot_dec.Tree") )),
                        
-                       h4(' Information on the predictive accuracy of the Tree:'),
-                       fluidRow(column(12, verbatimTextOutput("info_tree_abs_relacc") )),
+                       h4(' Information on the estimated error of the Tree:'),
+                       fluidRow(column(12, verbatimTextOutput("info_tree_abs_relacc") ),
+                                bsPopover(id="info_tree_abs_relacc", 
+                                          title="Accuracy of the model:",
+                                          content= paste0(" <b>Relative Error (%):</b> gives the relative error rate for predictions for the "
+                                                          , "training dataset that generated the tree."
+                                                          ," <b>Resubstitution Error Rate:</b> it can never increase as tree size increases, " 
+                                                          ," gives an optimistic assessment of relative error in a new sample. "
+                                                          ," <b>Absolute Cross-Validation Error Rate (%):</b> presents the more useful measure "
+                                                          ," of performance. It estimates the expected error rate for use of the prediction tree "
+                                                          ," with new data that are sampled in the same way as the training dataset used to derive "
+                                                          ," the model. " ),
+                                          placement = "bottom", trigger = "click", options = list(container = "body") )
+                       ),
+                       hr(),
+                       h4(' Confusion Matrix & accuracy of the Tree:'),
+                       fluidRow(column(12, verbatimTextOutput("Conf.Mat.DT"))),
                        hr(),
                        h4(' Relative Importance:'),      
                        fluidRow(column(12, plotOutput("plot_RegClass.Rel.Impo"))),
                        hr(),
                        fluidRow(column(12, verbatimTextOutput("RegClass.Rel.Impo"))),              
                        hr(),
-                       fluidRow(column(12, verbatimTextOutput("info_tree_acc") )),
+                       fluidRow(column(12, verbatimTextOutput("info_tree_split_acc"))),
                        hr(),
                        h4(' Rules of the Tree:'),
-                       fluidRow(column(12, verbatimTextOutput("print_Tree.rules") ))
+                       fluidRow(column(12, verbatimTextOutput("print_Tree.rules")))
                        
                       ), # end tabPanel "Build"
                 tabPanel("Predict with it",
