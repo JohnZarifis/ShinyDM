@@ -7,7 +7,9 @@
 
 # Call function to create the dataset for analysis
 data <- create_dataset(Dataset)
-#View(data) # for debugging reasons
+View(data) # for debugging reasons
+str(data)
+summary(data)
 
 
 #---------------------------------------------------------------------------------- shinyServer.......
@@ -74,14 +76,14 @@ shinyServer(function(input, output, session){
                    & data$Avg.Temperature <= as.numeric(input$rangeAvgTemp[2])
                    & data$Ph >= as.numeric(input$rangePh[1]) 
                    & data$Ph <= as.numeric(input$rangePh[2])
-                   & data$CAUDAL.O3 >= as.numeric(input$rangeCAUDALO3[1]) 
-                   & data$CAUDAL.O3 <= as.numeric(input$rangeCAUDALO3[2])
-                   & data$WATER.RENEWAL >= as.numeric(input$rangeWATERRENEWAL[1]) 
-                   & data$WATER.RENEWAL <= as.numeric(input$rangeWATERRENEWAL[2])
-                   & data$NO2 >= as.numeric(input$rangeNO2[1]) 
-                   & data$NO2 <= as.numeric(input$rangeNO2[2])
-                   & data$NH3 >= as.numeric(input$rangeNH3[1]) 
-                   & data$NH3 <= as.numeric(input$rangeNH3[2])
+#                    & data$CAUDAL.O3 >= as.numeric(input$rangeCAUDALO3[1]) 
+#                    & data$CAUDAL.O3 <= as.numeric(input$rangeCAUDALO3[2])
+#                    & data$WATER.RENEWAL >= as.numeric(input$rangeWATERRENEWAL[1]) 
+#                    & data$WATER.RENEWAL <= as.numeric(input$rangeWATERRENEWAL[2])
+#                    & data$NO2 >= as.numeric(input$rangeNO2[1]) 
+#                    & data$NO2 <= as.numeric(input$rangeNO2[2])
+#                    & data$NH3 >= as.numeric(input$rangeNH3[1]) 
+#                    & data$NH3 <= as.numeric(input$rangeNH3[2])
                    & (data$From >= ymd(input$dateRangeFrom[1]) & data$From <= ymd(input$dateRangeFrom[2])) 
                    & (data$To >= ymd(input$dateRangeTo[1]) & data$To <= ymd(input$dateRangeTo[2]))
                    & data$Period.Feed.Qty >= as.numeric(input$rangePeriod.Feed.Qty[1]) 
