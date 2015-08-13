@@ -1,0 +1,19 @@
+@echo off
+    title 'My Shiny APP'
+
+    setlocal ENABLEDELAYEDEXPANSION
+
+    for /l %%X in (1025,1,65535) do (   
+        netstat -o -n -a | findstr :%%X 
+        if !ERRORLEVEL! neq 0 ( 
+            set avail_port=%%X
+            goto eof
+        ) 
+    )
+
+    :eof
+    SET ROPTS=--no-save --no-environ --no-init-file --no-restore --no-Rconsole
+
+    start "" ".\GoogleChromePortable\App/Chrome-bin/chrome.exe" "http://localhost:!avail_port!/"
+
+    R-Portable\App\R-Portable\bin\Rscript.exe %ROPTS% -e "require(methods); shiny::runApp('./shiny', launch.browser = FALSE, port = !avail_port!)" 1> ShinyAppOut.log 2> ShinyAppMsg.log
