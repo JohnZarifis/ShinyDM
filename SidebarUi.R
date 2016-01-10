@@ -2,7 +2,7 @@
 source("helpers.R")
 
 # Call function to create the dataset for analysis
-df <- create_dataset(Dataset)
+df <- create.dataset(Dataset)
 #View(df)
 
 sidebarUni <- sidebarPanel(
@@ -13,12 +13,8 @@ sidebarUni <- sidebarPanel(
              bsCollapsePanel("Dimensions", style = "primary" ,
   #h2("Dimensions"),
   fluidRow(column(6,
-                  selectInput(inputId='groupOrientation', label='Orientation', choices=c("All", unique(as.character(df$Orientation))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupSystem', label='System', choices=c("All", unique(as.character(df$System))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupCage', label='Cage', choices=c("All", unique(as.character(df$Cage))), selected="All", multiple=TRUE),
                   selectInput(inputId='groupUnit', label='Unit', choices=c("All", unique(as.character(df$Unit))), selected="All", multiple=TRUE),
                   selectInput(inputId='groupBatch', label='Batch', choices=c("All", unique(as.character(df$Batch))), selected="All", multiple=TRUE),
-                  selectInput(inputId='groupSection', label='Section', choices=c("All", unique(as.character(df$Section))), selected="All", multiple=TRUE),
                   selectInput(inputId='groupHatchery', label='Hatchery', choices=c("All", unique(as.character(df$Hatchery))), selected="All", multiple=TRUE)),
            column(6,
                   selectInput(inputId='groupOriginMonth', label='Origin.Month', choices=c("All", unique(as.character(df$Origin.Month))), selected="All", multiple=TRUE),
@@ -101,48 +97,14 @@ sidebarUni <- sidebarPanel(
                      max = max(as.double(df$Period.Day.Degrees), na.rm=TRUE), 
                      value = c(min(as.double(df$Period.Day.Degrees)), 
                                max(as.double(df$Period.Day.Degrees))), 
-                     step=10, round=TRUE, sep=".")
-  ) # end column
-  ) # end fluid row
-  ), # end of colapsePanel
-  
-  hr()
-  ,bsCollapsePanel('Environmental Measures', style = "primary" 
-  ,h2('Environmental Measures')
-  ,bsTooltip(c("rangeCAUDAL.O3","rangePh","rangeNO2") , "Remove -1 in order to remove empty values",
-            "right", options = list(container = "body"))
-  ,bsTooltip(c("rangePh","rangeNO2","rangeWATERRENEWAL","rangeNH3","rangeAvgTemp","rangeCAUDALO3") , "Remove -1 in order to remove empty values",
-             "right", options = list(container = "body"))
-  ,fluidRow(column(6,
-                  sliderInput("rangePh", "Ph:", min = min(as.double(df$Ph)), 
-                              max = max(as.double(df$Ph)), 
-                              value = c(min(as.double(df$Ph)), max(as.double(df$Ph))), 
-                              step=0.1, round=-2, sep="."),
-                  sliderInput("rangeCAUDALO3", "CAUDAL O3 (Nm3/H):", min = min(as.double(df$CAUDAL.O3)), 
-                              max = max(as.double(df$CAUDAL.O3)), 
-                              value = c(min(as.double(df$CAUDAL.O3)), max(as.double(df$CAUDAL.O3))), 
-                              step=10, round=0, sep="."),
-                  sliderInput("rangeWATERRENEWAL", "WATER RENEWAL:", min = min(as.double(df$WATER.RENEWAL)), 
-                              max = max(as.double(df$WATER.RENEWAL)), 
-                              value = c(min(as.double(df$WATER.RENEWAL)), max(as.double(df$WATER.RENEWAL))), 
-                              step=1, round=0, sep=".")
-  ),
-  column(6, 
-         sliderInput("rangeNO2", "NO2:", min = min(as.double(df$NO2)), 
-                     max = max(as.double(df$NO2)), 
-                     value = c(min(as.double(df$NO2)), max(as.double(df$NO2))), 
-                     step=0.01, round=-2, sep="."),
-         sliderInput("rangeNH3", "NH3:", min = min(as.double(df$NH3)), 
-                     max = max(as.double(df$NH3)), 
-                     value = c(min(as.double(df$NH3)), max(as.double(df$NH3))), 
-                     step=0.5, round=-2, sep="."),
+                     step=10, round=TRUE, sep="."),
          sliderInput("rangeAvgTemp", "Avg.Temperature:", min = min(as.double(df$Avg.Temperature)), 
                      max = max(as.double(df$Avg.Temperature)), 
                      value = c(min(as.double(df$Avg.Temperature)), max(as.double(df$Avg.Temperature))), 
                      step=0.5, round=-2, sep=".")
   ) # end column
   ) # end fluid row
-  ), # end of ColapsePanel
+  ), # end of colapsePanel
   
   hr(),
   bsCollapsePanel("Separate By:", style = "primary" ,

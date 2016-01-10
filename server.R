@@ -6,7 +6,7 @@
 #source("helpers.R")  # no need UI is loaded first.
 
 # Call function to create the dataset for analysis
-data <- create_dataset(Dataset)
+data <- create.dataset(Dataset)
 #View(data) # for debugging reasons
 #str(data)
 #summary(data)
@@ -21,18 +21,6 @@ shinyServer(function(input, output, session){
   #---------------------------------------------------------------------------------------------------
   passData <- reactive({
     
-    if (input$groupOrientation != "All"){ 
-      data <- subset(data, Orientation %in% c(input$groupOrientation)) 
-    }
-    if (input$groupSystem != "All"){ 
-      data <- subset(data, System %in% c(input$groupSystem))
-    }
-    if (input$groupCage != "All"){ 
-      data <- subset(data, Cage %in% c(input$groupCage))
-    }
-    if (input$groupSection != "All"){ 
-      data <- subset(data, Section %in% c(input$groupSection))
-    }
     if (input$groupBatch != "All"){ 
       data <- subset(data, Batch %in% c(input$groupBatch))
     }
@@ -74,16 +62,6 @@ shinyServer(function(input, output, session){
                    & data$Period.Day.Degrees <= as.numeric(input$rangePeriod.Day.Degrees[2])
                    & data$Avg.Temperature >= as.numeric(input$rangeAvgTemp[1]) 
                    & data$Avg.Temperature <= as.numeric(input$rangeAvgTemp[2])
-                   & data$Ph >= as.numeric(input$rangePh[1]) 
-                   & data$Ph <= as.numeric(input$rangePh[2])
-#                    & data$CAUDAL.O3 >= as.numeric(input$rangeCAUDALO3[1]) 
-#                    & data$CAUDAL.O3 <= as.numeric(input$rangeCAUDALO3[2])
-#                    & data$WATER.RENEWAL >= as.numeric(input$rangeWATERRENEWAL[1]) 
-#                    & data$WATER.RENEWAL <= as.numeric(input$rangeWATERRENEWAL[2])
-#                    & data$NO2 >= as.numeric(input$rangeNO2[1]) 
-#                    & data$NO2 <= as.numeric(input$rangeNO2[2])
-#                    & data$NH3 >= as.numeric(input$rangeNH3[1]) 
-#                    & data$NH3 <= as.numeric(input$rangeNH3[2])
                    & (data$From >= ymd(input$dateRangeFrom[1]) & data$From <= ymd(input$dateRangeFrom[2])) 
                    & (data$To >= ymd(input$dateRangeTo[1]) & data$To <= ymd(input$dateRangeTo[2]))
                    & data$Period.Feed.Qty >= as.numeric(input$rangePeriod.Feed.Qty[1]) 
