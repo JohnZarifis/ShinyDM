@@ -125,7 +125,11 @@ create.dataset <- function(dataset){
                      "End.Av.Weight.Category" = dataset$"End Av. Weight Category",
                      "Product.Type"  = dataset$"PRODUCT TYPE",
                      "Grouping.Prod.BGT" = dataset$"GROUPING PROD. BGT"
+                     ,"Class" = ifelse( dataset$"Av. Wt. Deviation (%)" > 0,"GOOD","BAD" )
   )
+  
+  #data$Class = ifelse( data$Av.Weight.Deviation > 0,"GOOD","BAD" )
+  #data$Class = as.factor(data$Class)
   
   return(data)
   

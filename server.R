@@ -51,17 +51,17 @@ shinyServer(function(input, output, session){
     
      data <- data[ data$End.Av.Weight >= as.numeric(input$rangeAvWeight[1]) & data$End.Av.Weight <= as.numeric(input$rangeAvWeight[2])
                    & data$Start.Av.Weight >= as.numeric(input$rangeStAvWeight[1]) & data$Start.Av.Weight <= as.numeric(input$rangeStAvWeight[2])
-                   & data$Av.Weight.Deviation >= as.numeric(input$rangeAvWeightDev[1])
-                   & data$Av.Weight.Deviation <= as.numeric(input$rangeAvWeightDev[2]) 
+                   & data$Av.Wt.Deviation.Perc >= as.numeric(input$rangeAvWeightDev[1])
+                   & data$Av.Wt.Deviation.Perc <= as.numeric(input$rangeAvWeightDev[2]) 
                    & data$Econ.FCR.Period >= as.numeric(input$rangePeriod.FCR[1]) & data$Econ.FCR.Period <= as.numeric(input$rangePeriod.FCR[2]) 
                    & data$LTD.Econ.FCR >= as.numeric(input$rangeLTD.Econ.FCR[1]) & data$LTD.Econ.FCR <= as.numeric(input$rangeLTD.Econ.FCR[2])  
-                   & data$SGR.Period >= as.numeric(input$rangePeriod.SGR[1]) & data$SGR.Period <= as.numeric(input$rangePeriod.SGR[2]) 
-                   & data$SFR.Period >= as.numeric(input$rangePeriod.SFR[1]) & data$SFR.Period <= as.numeric(input$rangePeriod.SFR[2]) 
-                   & data$LTD.Mortality >= as.numeric(input$rangeLTD.Mortality[1]) & data$LTD.Mortality <= as.numeric(input$rangeLTD.Mortality[2])
+                   & data$SGR.Period.Perc >= as.numeric(input$rangePeriod.SGR[1]) & data$SGR.Period.Perc <= as.numeric(input$rangePeriod.SGR[2]) 
+                   & data$SFR.Period.Perc >= as.numeric(input$rangePeriod.SFR[1]) & data$SFR.Period.Perc <= as.numeric(input$rangePeriod.SFR[2]) 
+                   & data$LTD.Mortality.Perc >= as.numeric(input$rangeLTD.Mortality[1]) & data$LTD.Mortality.Perc <= as.numeric(input$rangeLTD.Mortality[2])
                    & data$Period.Day.Degrees >= as.numeric(input$rangePeriod.Day.Degrees[1]) 
                    & data$Period.Day.Degrees <= as.numeric(input$rangePeriod.Day.Degrees[2])
-                   & data$Avg.Temperature >= as.numeric(input$rangeAvgTemp[1]) 
-                   & data$Avg.Temperature <= as.numeric(input$rangeAvgTemp[2])
+                   & data$Avg.Temp >= as.numeric(input$rangeAvgTemp[1]) 
+                   & data$Avg.Temp <= as.numeric(input$rangeAvgTemp[2])
                    & (data$From >= ymd(input$dateRangeFrom[1]) & data$From <= ymd(input$dateRangeFrom[2])) 
                    & (data$To >= ymd(input$dateRangeTo[1]) & data$To <= ymd(input$dateRangeTo[2]))
                    & data$Period.Feed.Qty >= as.numeric(input$rangePeriod.Feed.Qty[1]) 
@@ -117,7 +117,7 @@ output$histPlotAvWeightDeviation <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- histPlot(graphData, x="Av.Weight.Deviation", nbins = input$numbins, group_var=input$radioDimUni )
+      theGraph <- histPlot(graphData, x="Av.Wt.Deviation.Perc", nbins = input$numbins, group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -157,7 +157,7 @@ output$histPlotPeriod.SFR <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- histPlot(graphData, x="SFR.Period", nbins = input$numbins, group_var=input$radioDimUni )
+      theGraph <- histPlot(graphData, x="SFR.Period.Perc", nbins = input$numbins, group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -170,7 +170,7 @@ output$histPlotPeriod.SGR <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- histPlot(graphData, x="SGR.Period", nbins = input$numbins, group_var=input$radioDimUni )
+      theGraph <- histPlot(graphData, x="SGR.Period.Perc", nbins = input$numbins, group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -183,7 +183,7 @@ output$histPlotMortality <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- histPlot(graphData, x="LTD.Mortality", nbins = input$numbins, group_var=input$radioDimUni )
+      theGraph <- histPlot(graphData, x="LTD.Mortality.Perc", nbins = input$numbins, group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -209,81 +209,13 @@ output$histPlotAvg.Temperature <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- histPlot(graphData, x="Avg.Temperature", nbins = input$numbins, group_var=input$radioDimUni )
+      theGraph <- histPlot(graphData, x="Avg.Temp", nbins = input$numbins, group_var=input$radioDimUni )
       print(theGraph)
     })
   }
 })
 
-#...................................................... H10
-output$histPlotPh <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      theGraph <- histPlot(graphData, x="Ph", nbins = input$numbins, group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
 
-#...................................................... H11
-output$histPlotCAUDAL.O3 <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      theGraph <- histPlot(graphData, x="CAUDAL.O3", nbins = input$numbins, group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
-
-#...................................................... H12
-output$histPlotWATER.RENEWAL <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      theGraph <- histPlot(graphData, x="WATER.RENEWAL", nbins = input$numbins, group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
-
-#...................................................... H13
-output$histPlotNH3 <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      theGraph <- histPlot(graphData, x="NH3", nbins = input$numbins, group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
-
-#...................................................... H14
-output$histPlotNO2 <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      theGraph <- histPlot(graphData, x="NO2", nbins = input$numbins, group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
 
 
 #---------------------------------------------------------------------------------------------------
@@ -311,7 +243,7 @@ output$densPlotAvWeightDeviation <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- densityPlot( graphData, x="Av.Weight.Deviation", group_var=input$radioDimUni )
+      theGraph <- densityPlot( graphData, x="Av.Wt.Deviation.Perc", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -350,7 +282,7 @@ output$densPlotPeriod.SFR <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()   
-      theGraph <- densityPlot(graphData, x="SFR.Period", group_var=input$radioDimUni )
+      theGraph <- densityPlot(graphData, x="SFR.Period.Perc", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -363,7 +295,7 @@ output$densPlotPeriod.SGR <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()   
-      theGraph <- densityPlot(graphData, x="SGR.Period", group_var=input$radioDimUni )
+      theGraph <- densityPlot(graphData, x="SGR.Period.Perc", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -376,7 +308,7 @@ output$densPlotMortality <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()   
-      theGraph <- densityPlot(graphData, x="LTD.Mortality", group_var=input$radioDimUni )
+      theGraph <- densityPlot(graphData, x="LTD.Mortality.Perc", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -402,76 +334,12 @@ output$densPlotAvg.Temperature <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()   
-      theGraph <- densityPlot(graphData, x="Avg.Temperature", group_var=input$radioDimUni )
+      theGraph <- densityPlot(graphData, x="Avg.Temp", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
 })
-#...................................................... D10
-output$densPlotPh <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()   
-      theGraph <- densityPlot(graphData, x="Ph", group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
-#...................................................... D11
-output$densPlotCAUDAL.O3 <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()   
-      theGraph <- densityPlot(graphData, x="CAUDAL.O3", group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
-#...................................................... D12
-output$densPlotWATER.RENEWAL <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()   
-      theGraph <- densityPlot(graphData, x="WATER.RENEWAL", group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
-#...................................................... D13
-output$densPlotNH3 <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()   
-      theGraph <- densityPlot(graphData, x="NH3", group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
-#...................................................... D14
-output$densPlotNO2 <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()   
-      theGraph <- densityPlot(graphData, x="NO2", group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
+
 
 #---------------------------------------------------------------------------------------------------
 #     BoxPlots
@@ -498,7 +366,7 @@ output$boxPlotAvWeightDeviation <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- boxPlots( graphData, x="Av.Weight.Deviation", group_var=input$radioDimUni )
+      theGraph <- boxPlots( graphData, x="Av.Wt.Deviation.Perc", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -537,7 +405,7 @@ output$boxPlotPeriod.SFR <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- boxPlots( graphData, x="SFR.Period", group_var=input$radioDimUni )
+      theGraph <- boxPlots( graphData, x="SFR.Period.Perc", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -550,7 +418,7 @@ output$boxPlotPeriod.SGR <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- boxPlots( graphData, x="SGR.Period", group_var=input$radioDimUni )
+      theGraph <- boxPlots( graphData, x="SGR.Period.Perc", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -563,7 +431,7 @@ output$boxPlotMortality <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- boxPlots( graphData, x="LTD.Mortality", group_var=input$radioDimUni )
+      theGraph <- boxPlots( graphData, x="LTD.Mortality.Perc", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
@@ -589,81 +457,13 @@ output$boxPlotAvg.Temperature <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      theGraph <- boxPlots( graphData, x="Avg.Temperature", group_var=input$radioDimUni )
+      theGraph <- boxPlots( graphData, x="Avg.Temp", group_var=input$radioDimUni )
       print(theGraph)
     })
   }
 })
 
-#...................................................... B10
-output$boxPlotPh <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      theGraph <- boxPlots( graphData, x="Ph", group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
 
-#...................................................... B11
-output$boxPlotCAUDAL.O3 <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      theGraph <- boxPlots( graphData, x="CAUDAL.O3", group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
-
-#...................................................... B12
-output$boxPlotWATER.RENEWAL <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      theGraph <- boxPlots( graphData, x="WATER.RENEWAL", group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
-
-#...................................................... B13
-output$boxPlotNH3 <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      theGraph <- boxPlots( graphData, x="NH3", group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
-
-#...................................................... B14
-output$boxPlotNO2 <- renderPlot({ 
-  # Re-run when button is clicked
-  if (input$goUniPlot == 0){
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      theGraph <- boxPlots( graphData, x="NO2", group_var=input$radioDimUni )
-      print(theGraph)
-    })
-  }
-})
 
 #---------------------------------------------------------------------------------------------------
 #     Summary Univariate Statistics
@@ -686,7 +486,7 @@ output$summary_stats_AvWeightDeviation <- renderTable({
   else{ 
     isolate({  
       data <- passData()
-      data_stats <- sum_stats(data, measurevar="Av.Weight.Deviation", groupvars=input$radioDimUni,
+      data_stats <- sum_stats(data, measurevar="Av.Wt.Deviation.Perc", groupvars=input$radioDimUni,
                               na.rm=FALSE, conf.interval=.95, .drop=TRUE)
     })
     return(data_stats)
@@ -722,7 +522,7 @@ output$summary_stats_PeriodSFR <- renderTable({
   else{ 
     isolate({  
       data <- passData()
-      data_stats <- sum_stats(data, measurevar="SFR.Period", groupvars=input$radioDimUni,
+      data_stats <- sum_stats(data, measurevar="SFR.Period.Perc", groupvars=input$radioDimUni,
                                  na.rm=FALSE, conf.interval=.95, .drop=TRUE)
     })
     return(data_stats)
@@ -734,7 +534,7 @@ output$summary_stats_PeriodSGR <- renderTable({
   else{ 
     isolate({  
       data <- passData()
-      data_stats <- sum_stats(data, measurevar="SGR.Period", groupvars=input$radioDimUni,
+      data_stats <- sum_stats(data, measurevar="SGR.Period.Perc", groupvars=input$radioDimUni,
                                  na.rm=FALSE, conf.interval=.95, .drop=TRUE)
     })
     return(data_stats)
@@ -746,7 +546,7 @@ output$summary_stats_Mortality <- renderTable({
   else{ 
     isolate({  
       data <- passData()
-      data_stats <- sum_stats(data, measurevar="LTD.Mortality", groupvars=input$radioDimUni,
+      data_stats <- sum_stats(data, measurevar="LTD.Mortality.Perc", groupvars=input$radioDimUni,
                                  na.rm=FALSE, conf.interval=.95, .drop=TRUE)
     })
     return(data_stats)
@@ -770,77 +570,13 @@ output$summary_stats_Avg.Temp <- renderTable({
   else{ 
     isolate({  
       data <- passData()
-      data_stats <- sum_stats(data, measurevar="Avg.Temperature", groupvars=input$radioDimUni,
+      data_stats <- sum_stats(data, measurevar="Avg.Temp", groupvars=input$radioDimUni,
                               na.rm=FALSE, conf.interval=.95, .drop=TRUE)
     })
     return(data_stats)
   }
 }) 
 
-output$summary_stats_Ph <- renderTable({
-  if (input$goUniPlot == 0) { 
-    return() }
-  else{ 
-    isolate({  
-      data <- passData()
-      data_stats <- sum_stats(data, measurevar="Ph", groupvars=input$radioDimUni,
-                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
-    })
-    return(data_stats)
-  }
-}) 
-
-output$summary_stats_CAUDAL.O3 <- renderTable({
-  if (input$goUniPlot == 0) { 
-    return() }
-  else{ 
-    isolate({  
-      data <- passData()
-      data_stats <- sum_stats(data, measurevar="CAUDAL.O3", groupvars=input$radioDimUni,
-                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
-    })
-    return(data_stats)
-  }
-}) 
-
-output$summary_stats_WATER.RENEWAL <- renderTable({
-  if (input$goUniPlot == 0) { 
-    return() }
-  else{ 
-    isolate({  
-      data <- passData()
-      data_stats <- sum_stats(data, measurevar="WATER.RENEWAL", groupvars=input$radioDimUni,
-                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
-    })
-    return(data_stats)
-  }
-}) 
-
-output$summary_stats_NH3 <- renderTable({
-  if (input$goUniPlot == 0) { 
-    return() }
-  else{ 
-    isolate({  
-      data <- passData()
-      data_stats <- sum_stats(data, measurevar="NH3", groupvars=input$radioDimUni,
-                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
-    })
-    return(data_stats)
-  }
-}) 
-
-output$summary_stats_NO2 <- renderTable({
-  if (input$goUniPlot == 0) { 
-    return() }
-  else{ 
-    isolate({  
-      data <- passData()
-      data_stats <- sum_stats(data, measurevar="NO2", groupvars=input$radioDimUni,
-                              na.rm=FALSE, conf.interval=.95, .drop=TRUE)
-    })
-    return(data_stats)
-  }
-}) 
 
 
 #---------------------------------------------------------------------------------------------------
@@ -872,9 +608,9 @@ output$scatterMatrixPlot <- renderPlot({
     isolate({    
       graphData <- passData()
       
-      dim_vars = c("End.Av.Weight", "Econ.FCR.Period", "SFR.Period", "SGR.Period", "LTD.Econ.FCR", 
-                   "LTD.Mortality", "Avg.Temperature", "Period.Day.Degrees", 
-                   "Ph", "CAUDAL.O3", "WATER.RENEWAL", "NH3", "NO2")
+      dim_vars = c("End.Av.Weight", "Econ.FCR.Period", "SFR.Period.Perc", "SGR.Period.Perc", "LTD.Econ.FCR", 
+                   "LTD.Mortality.Perc", "Avg.Temp", "Period.Day.Degrees" 
+                   )
       group_by_var = input$radioDimMulti
       theGraph <- scatterMatrixPlot(graphData, dim_vars, group_by_var)
       print(theGraph)
@@ -919,7 +655,7 @@ output$scatterPlot.EndAvWeight.PeriodSFR <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="End.Av.Weight", y="SFR.Period", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="End.Av.Weight", y="SFR.Period.Perc", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -948,7 +684,7 @@ if (input$goMultiPlot == 0){
 else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="End.Av.Weight", y="SGR.Period", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="End.Av.Weight", y="SGR.Period.Perc", colour=input$radioDimMulti,
                   size = "Closing.Biomass", regr.method="loess") 
       print(p)
       })
@@ -961,9 +697,9 @@ output$cor.stats.EndAvWeight.PeriodSGR <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){
-          d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=End.Av.Weight, y=SGR.Period))
+          d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=End.Av.Weight, y=SGR.Period.Perc))
       }else{
-        d <- data.frame("Pearson Correlation" = cor(x=data$End.Av.Weight, y=data$SGR.Period))
+        d <- data.frame("Pearson Correlation" = cor(x=data$End.Av.Weight, y=data$SGR.Period.Perc))
       }
       return( d ) 
     })  
@@ -977,7 +713,7 @@ output$scatterPlot.EndAvWeight.AvgTemp <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="Avg.Temperature", y="End.Av.Weight", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="Avg.Temp", y="End.Av.Weight", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -990,9 +726,9 @@ output$cor.stats.EndAvWeight.AvgTemp <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){   
-          d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Avg.Temperature, y=End.Av.Weight))
+          d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Avg.Temp, y=End.Av.Weight))
       }else{
-      d <- data.frame("Pearson Correlation" = cor(x=data$Avg.Temperature, y=data$End.Av.Weight))
+      d <- data.frame("Pearson Correlation" = cor(x=data$Avg.Temp, y=data$End.Av.Weight))
       }
       return( d ) 
     })  
@@ -1006,7 +742,7 @@ output$scatterPlot.PeriodEcon.FCR.PeriodSFR <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="Econ.FCR.Period", y="SFR.Period", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="Econ.FCR.Period", y="SFR.Period.Perc", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -1019,9 +755,9 @@ output$cor.stats.PeriodEcon.FCR.PeriodSFR <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){   
-          d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Econ.FCR.Period, y=SFR.Period))
+          d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Econ.FCR.Period, y=SFR.Period.Perc))
       }else{
-          d <- data.frame("Pearson Correlation" = cor(x=data$Econ.FCR.Period, y=data$SFR.Period))
+          d <- data.frame("Pearson Correlation" = cor(x=data$Econ.FCR.Period, y=data$SFR.Period.Perc))
       }
       return( d ) 
     })  
@@ -1035,7 +771,7 @@ output$scatterPlot.PeriodEcon.FCR.PeriodSGR <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="Econ.FCR.Period", y="SGR.Period", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="Econ.FCR.Period", y="SGR.Period.Perc", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -1048,9 +784,9 @@ output$cor.stats.PeriodEcon.FCR.PeriodSGR <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){   
-          d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Econ.FCR.Period, y=SGR.Period))
+          d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Econ.FCR.Period, y=SGR.Period.Perc))
       }else{
-        d <- data.frame("Pearson Correlation" = cor(x=data$Econ.FCR.Period, y=data$SGR.Period))
+        d <- data.frame("Pearson Correlation" = cor(x=data$Econ.FCR.Period, y=data$SGR.Period.Perc))
       }
       return( d )
     })  
@@ -1064,7 +800,7 @@ output$scatterPlot.PeriodFCR.AvgTemp <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="Avg.Temperature", y="Econ.FCR.Period", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="Avg.Temp", y="Econ.FCR.Period", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -1077,9 +813,9 @@ output$cor.stats.PeriodFCR.AvgTemp <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){   
-          d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Avg.Temperature, y=Econ.FCR.Period))
+          d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Avg.Temp, y=Econ.FCR.Period))
       }else{
-          d <- data.frame("Pearson Correlation" = cor(x=data$Avg.Temperature, y=data$Econ.FCR.Period))
+          d <- data.frame("Pearson Correlation" = cor(x=data$Avg.Temp, y=data$Econ.FCR.Period))
       }
       return( d ) 
     })  
@@ -1093,7 +829,7 @@ output$scatterPlot.PeriodSFR.PeriodSGR <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="SFR.Period", y="SGR.Period", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="SFR.Period.Perc", y="SGR.Period.Perc", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -1106,9 +842,9 @@ output$cor.stats.PeriodSFR.PeriodSGR <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){   
-        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=SFR.Period, y=SGR.Period))
+        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=SFR.Period.Perc, y=SGR.Period.Perc))
       }else{
-        d <- data.frame("Pearson Correlation" = cor(x=data$SFR.Period, y=data$SGR.Period))
+        d <- data.frame("Pearson Correlation" = cor(x=data$SFR.Period.Perc, y=data$SGR.Period.Perc))
       }
       return( d )      
     })  
@@ -1122,7 +858,7 @@ output$scatterPlot.PeriodSFR.AvgTemp <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="Avg.Temperature", y="SFR.Period", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="Avg.Temp", y="SFR.Period.Perc", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -1135,9 +871,9 @@ output$cor.stats.PeriodSFR.AvgTemp <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){   
-        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Avg.Temperature, y=SFR.Period))
+        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Avg.Temp, y=SFR.Period.Perc))
       }else{
-        d <- data.frame("Pearson Correlation" = cor(x=data$Avg.Temperature, y=data$SFR.Period))
+        d <- data.frame("Pearson Correlation" = cor(x=data$Avg.Temp, y=data$SFR.Period.Perc))
       }
       return( d )      
     })  
@@ -1151,7 +887,7 @@ output$scatterPlot.PeriodSGR.AvgTemp <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="Avg.Temperature", y="SGR.Period", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="Avg.Temp", y="SGR.Period.Perc", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -1164,9 +900,9 @@ output$cor.stats.PeriodSGR.AvgTemp <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){   
-        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Avg.Temperature, y=SGR.Period))
+        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Avg.Temp, y=SGR.Period.Perc))
       }else{
-        d <- data.frame("Pearson Correlation" = cor(x=data$Avg.Temperature, y=data$SGR.Period))
+        d <- data.frame("Pearson Correlation" = cor(x=data$Avg.Temp, y=data$SGR.Period.Perc))
       }
       return( d ) 
     })  
@@ -1238,7 +974,7 @@ output$scatterPlot.EconFCR.SFRPeriod <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="SFR.Period", y="LTD.Econ.FCR", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="SFR.Period.Perc", y="LTD.Econ.FCR", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -1251,9 +987,9 @@ output$cor.stats.EconFCR.SFRPeriod <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){   
-        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=SFR.Period, y=LTD.Econ.FCR))
+        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=SFR.Period.Perc, y=LTD.Econ.FCR))
       }else{
-        d <- data.frame("Pearson Correlation" = cor(x=data$SFR.Period, y=data$LTD.Econ.FCR))
+        d <- data.frame("Pearson Correlation" = cor(x=data$SFR.Period.Perc , y=data$LTD.Econ.FCR))
       }
       return( d ) 
     })  
@@ -1267,7 +1003,7 @@ output$scatterPlot.EconFCR.SGRPeriod <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="SGR.Period", y="LTD.Econ.FCR", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="SGR.Period.Perc", y="LTD.Econ.FCR", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -1280,9 +1016,9 @@ output$cor.stats.EconFCR.SGRPeriod <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){   
-        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=SGR.Period, y=LTD.Econ.FCR))
+        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=SGR.Period.Perc, y=LTD.Econ.FCR))
       }else{
-        d <- data.frame("Pearson Correlation" = cor(x=data$SGR.Period, y=data$LTD.Econ.FCR))
+        d <- data.frame("Pearson Correlation" = cor(x=data$SGR.Period.Perc, y=data$LTD.Econ.FCR))
       }
       return( d ) 
     })  
@@ -1296,7 +1032,7 @@ output$scatterPlot.EconFCR.AvgTemp <- renderPlot({
   else{ 
     isolate({    
       graphData <- passData()
-      p <- scatterPlot(graphData, x="Avg.Temperature", y="LTD.Econ.FCR", colour=input$radioDimMulti,
+      p <- scatterPlot(graphData, x="Avg.Temp", y="LTD.Econ.FCR", colour=input$radioDimMulti,
                        size = "Closing.Biomass", regr.method="loess") 
       print(p)
     })
@@ -1309,9 +1045,9 @@ output$cor.stats.EconFCR.AvgTemp <- renderPrint({
     isolate({    
       data <- passData()
       if ( input$radioDimMulti != "None"){   
-        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Avg.Temperature, y=LTD.Econ.FCR))
+        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Avg.Temp, y=LTD.Econ.FCR))
       }else{
-        d <- data.frame("Pearson Correlation" = cor(x=data$Avg.Temperature, y=data$LTD.Econ.FCR))
+        d <- data.frame("Pearson Correlation" = cor(x=data$Avg.Temp, y=data$LTD.Econ.FCR))
       }
       return( d ) 
     })  
@@ -1319,35 +1055,9 @@ output$cor.stats.EconFCR.AvgTemp <- renderPrint({
 })
 
 
-#.......................................................... S16
-output$scatterPlot.EconFCR.Ph <- renderPlot({ 
-  #Re-run when button is clicked
-  if (input$goMultiPlot == 0){ 
-    return() }
-  else{ 
-    isolate({    
-      graphData <- passData()
-      p <- scatterPlot(graphData, x="Ph", y="LTD.Econ.FCR", colour=input$radioDimMulti,
-                       size = "Closing.Biomass", regr.method="loess") 
-      print(p)
-    })
-  }
-})
-output$cor.stats.EconFCR.Ph <- renderPrint({
-  if (input$goMultiPlot == 0){ 
-    return() }
-  else{ 
-    isolate({    
-      data <- passData()
-      if ( input$radioDimMulti != "None"){   
-        d <- ddply(data, input$radioDimMulti, summarise, "Pearson Correlation" = cor(x=Ph, y=LTD.Econ.FCR))
-      }else{
-        d <- data.frame("Pearson Correlation" = cor(x=data$Ph, y=data$LTD.Econ.FCR))
-      }
-      return( d ) 
-    })  
-  }
-})
+
+
+
 
 
 #---------------------------------------------------------------------------------------------------
@@ -1423,7 +1133,7 @@ output$plotDashboard <- renderPlot({
 output$HeatMap <- renderD3heatmap({
   dataHeat = passData()
   row.names(dataHeat) <- dataHeat$Unit
-  dataHeat <- dataHeat[c("Start.Av.Weight","End.Av.Weight","Av.Weight.Deviation","Econ.FCR.Period","LTD.Mortality")]
+  dataHeat <- dataHeat[c("Start.Av.Weight","End.Av.Weight","Av.Wt.Deviation.Perc","Econ.FCR.Period","LTD.Mortality.Perc")]
   #View(dataHeat)
   d3heatmap(dataHeat
             , scale = "column"
@@ -1511,10 +1221,10 @@ output$dimple <- renderdimple({
 
 output$explanatoryVar <- renderUI({
   if (is.null(input$responseVar)) { return() }
-  regressors <- list("End.Av.Weight", "Start.Av.Weight", "Days", "Period.Feed.Qty",
-                     "Suggested.Feed.Qty", "Econ.FCR.Period", "SFR.Period", "SGR.Period",
-                     "LTD.Mortality", "Avg.Temperature", "Age",  "Ph", "CAUDAL.O3", "WATER.RENEWAL",
-                     "NH3", "NO2" )
+  regressors <- list("End.Av.Weight", "Start.Av.Weight", "Diff.Days", "Period.Feed.Qty",
+                     "Suggested.Feed.Qty", "Econ.FCR.Period", "SFR.Period.Perc", "SGR.Period.Perc",
+                     "LTD.Mortality.Perc", "Avg.Temp"
+                      )
   regressors <- regressors[ regressors != input$responseVar ]   
   checkboxGroupInput(inputId='explanatory.Variables', label=h3('Explanatory Variable(s):'), 
                      choices=regressors, selected=regressors[1])
@@ -2471,7 +2181,7 @@ output$targs.Variables <- renderUI({
     var <- list("Class")
     radioButtons(inputId='TargVar', label=h3('Target Variable:'), choices=var, selected=var[[1]])
   } else if (input$radioDesTree == 2){
-    var <- list("Econ.FCR.Period", "LTD.Econ.FCR", "SFR.Period", "SGR.Period")
+    var <- list("Econ.FCR.Period", "LTD.Econ.FCR", "SFR.Period.Perc", "SGR.Period")
     radioButtons(inputId='TargVar', label=h3('Target Variable:'), choices=var, selected=var[[1]])
   } 
 })  # end renderUI targs.Variables

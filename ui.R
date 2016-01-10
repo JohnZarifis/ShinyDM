@@ -46,12 +46,8 @@ shinyUI(
                                                    fluidRow( plotOutput("histPlotMortality"))),
                                                             bsCollapsePanel("Envirnomental", style = "primary" ,
                                                    fluidRow( plotOutput("histPlotPeriod.Day.Degrees")),
-                                                   fluidRow( plotOutput("histPlotAvg.Temperature")),
-                                                   fluidRow( plotOutput("histPlotPh")),
-                                                   fluidRow( plotOutput("histPlotCAUDAL.O3")),
-                                                   fluidRow( plotOutput("histPlotWATER.RENEWAL")),
-                                                   fluidRow( plotOutput("histPlotNH3")),
-                                                   fluidRow( plotOutput("histPlotNO2")))
+                                                   fluidRow( plotOutput("histPlotAvg.Temperature"))
+                                                   )
                                         )), # end tabPanel Histograms 
                                         tabPanel("Density Plots",
                                                    fluidRow(plotOutput("densPlotAvWeight")),
@@ -62,12 +58,8 @@ shinyUI(
                                                    fluidRow(plotOutput("densPlotPeriod.SGR")),
                                                    fluidRow(plotOutput("densPlotMortality")),
                                                    fluidRow(plotOutput("densPlotPeriod.Day.Degrees")),
-                                                   fluidRow(plotOutput("densPlotAvg.Temperature")),
-                                                   fluidRow( plotOutput("densPlotPh")),
-                                                   fluidRow( plotOutput("densPlotCAUDAL.O3")),
-                                                   fluidRow( plotOutput("densPlotWATER.RENEWAL")),
-                                                   fluidRow( plotOutput("densPlotNH3")),
-                                                   fluidRow( plotOutput("densPlotNO2"))
+                                                   fluidRow(plotOutput("densPlotAvg.Temperature"))
+                                                   
                                         ), # end tabPanel Density Plots
                                         tabPanel("Boxplots",
                                                    fluidRow(plotOutput("boxPlotAvWeight")),
@@ -78,12 +70,8 @@ shinyUI(
                                                    fluidRow(plotOutput("boxPlotPeriod.SGR")),
                                                    fluidRow(plotOutput("boxPlotMortality")),
                                                    fluidRow(plotOutput("boxPlotPeriod.Day.Degrees")),
-                                                   fluidRow(plotOutput("boxPlotAvg.Temperature")),
-                                                   fluidRow( plotOutput("boxPlotPh")),
-                                                   fluidRow( plotOutput("boxPlotCAUDAL.O3")),
-                                                   fluidRow( plotOutput("boxPlotWATER.RENEWAL")),
-                                                   fluidRow( plotOutput("boxPlotNH3")),
-                                                   fluidRow( plotOutput("boxPlotNO2"))
+                                                   fluidRow(plotOutput("boxPlotAvg.Temperature"))
+                                                   
                                         ), # end tabPanel BoxPlots
                                         tabPanel("Summary Statistics", 
                                                     h4("End Average Weight:"),
@@ -112,21 +100,7 @@ shinyUI(
                                                     hr(),
                                                     h4("Avg. Temperature:"),
                                                     tableOutput("summary_stats_Avg.Temp"),
-                                                    hr(),
-                                                    h4("Ph:"),
-                                                    tableOutput("summary_stats_Ph"),
-                                                    hr(),
-                                                    h4("CAUDAL O3 (Nm3/H):"),
-                                                    tableOutput("summary_stats_CAUDAL.O3"),
-                                                    hr(),
-                                                    h4("WATER RENEWAL (l./min.):"),
-                                                    tableOutput("summary_stats_WATER.RENEWAL"),
-                                                    hr(),
-                                                    h4("NH3 (ppm.):"),
-                                                    tableOutput("summary_stats_NH3"),
-                                                    hr(),
-                                                    h4("NO2 (ppm.):"),
-                                                    tableOutput("summary_stats_NO2")
+                                                    
                                                  
                                         ), # end tabPanel Summary Statistics
                                         tabPanel("Data", 
