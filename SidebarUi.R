@@ -3,7 +3,7 @@ source("helpers.R")
 
 # Call function to create the dataset for analysis
 df <- create_dataset(Dataset)
-View(df)
+#View(df)
 
 sidebarUni <- sidebarPanel(
   #fixed responsive img #added class img

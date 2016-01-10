@@ -7,9 +7,9 @@
 
 # Call function to create the dataset for analysis
 data <- create_dataset(Dataset)
-View(data) # for debugging reasons
-str(data)
-summary(data)
+#View(data) # for debugging reasons
+#str(data)
+#summary(data)
 
 
 #---------------------------------------------------------------------------------- shinyServer.......
