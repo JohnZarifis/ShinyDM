@@ -19,7 +19,7 @@ source("SidebarUi.R")
 # 
 shinyUI( 
   navbarPage( theme = "bootstrap.css",
-              "Aqua Miner", 
+              "aquaSmart", 
               
               #---------------------------------------------------------- First MenuPage
               tabPanel(" Univariate Statistics ", id="MenuPage_1", 
